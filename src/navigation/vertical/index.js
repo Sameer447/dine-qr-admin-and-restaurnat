@@ -6,10 +6,12 @@ const navigation = (role) => {
       badgeContent: "new",
       badgeColor: "error",
       children: [
-        !role && {
-          title: "Oders",
-          path: "/dashboards/orders/list",
-        },
+        !role
+          ? {
+              title: "Oders",
+              path: "/dashboards/orders/list",
+            }
+          : null,
         {
           title: "Analytics",
           path: "/dashboards/analytics",
@@ -22,7 +24,7 @@ const navigation = (role) => {
         //   title: 'eCommerce',
         //   path: '/dashboards/ecommerce'
         // }
-      ],
+      ].filter(Boolean),
     },
     // {
     //   sectionTitle: 'Apps & Pages'
