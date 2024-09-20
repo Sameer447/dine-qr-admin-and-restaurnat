@@ -28,6 +28,7 @@ import { styled } from "@mui/material/styles";
 
 // ** Icon Imports
 import { categoris } from "src/@fake-db/categories";
+import { GridRow } from "@mui/x-data-grid";
 
 const ButtonStyled = styled(Button)(({ theme }) => ({
   [theme.breakpoints.down()]: {
@@ -39,11 +40,20 @@ const ButtonStyled = styled(Button)(({ theme }) => ({
 const initialState = {
   category: categoris[0].value,
   subCategory: "",
-  specialityTags: "",
+  specialityTags: [],
   cuisine: "",
+  primaryIngredients: [],
   menuItemName: "",
   description: "",
   itemImage: "",
+  allergens: [],
+  preparationTime: "",
+  price: 0,
+  avialableSizes: [],
+  availability: true,
+  customiseable: false,
+  customiseableOptions: [],
+  calories: 0,
 };
 
 function reducer(state, action) {
@@ -52,8 +62,8 @@ function reducer(state, action) {
       return { ...state, category: action.payload };
     case "subCategory":
       return { ...state, subCategory: action.payload };
-    case "specialtyTags":
-      return { ...state, specialtyTags: action.payload };
+    case "specialityTags":
+      return { ...state, specialityTags: action.payload };
     case "cuisine":
       return { ...state, cuisine: action.payload };
     default:
@@ -72,7 +82,7 @@ const CustomInput = forwardRef(({ ...props }, ref) => {
   );
 });
 
-const FormValidationBasic = () => {
+const AddMenuItemForm = () => {
   // ** States
   const [state, dispatch] = useReducer(reducer, initialState);
   const [image, setImage] = useState(null);
@@ -151,7 +161,13 @@ const FormValidationBasic = () => {
                     label="Sub Category"
                     SelectProps={{
                       value: value,
-                      onChange: (e) => onChange(e),
+                      onChange: (e) => {
+                        onChange(e);
+                        dispatch({
+                          type: "subCategory",
+                          payload: e.target.value,
+                        });
+                      },
                     }}
                     id="validation-basic-select"
                     error={Boolean(errors.select)}
@@ -183,13 +199,19 @@ const FormValidationBasic = () => {
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
                     select
-                    multiple
                     fullWidth
                     defaultValue=""
                     label="Speciality Tags"
                     SelectProps={{
-                      value: value,
-                      onChange: (e) => onChange(e),
+                      multiple: true,
+                      value: state.specialityTags,
+                      onChange: (e) => {
+                        onChange(e);
+                        dispatch({
+                          type: "specialityTags",
+                          payload: e.target.value,
+                        });
+                      },
                     }}
                     id="validation-basic-select"
                     error={Boolean(errors.select)}
@@ -226,7 +248,13 @@ const FormValidationBasic = () => {
                     label="Cuisine"
                     SelectProps={{
                       value: value,
-                      onChange: (e) => onChange(e),
+                      onChange: (e) => {
+                        onChange(e);
+                        dispatch({
+                          type: "cuisine",
+                          payload: e.target.value,
+                        });
+                      },
                     }}
                     id="validation-basic-select"
                     error={Boolean(errors.select)}
@@ -288,6 +316,170 @@ const FormValidationBasic = () => {
                     {...(errors.firstName && {
                       helperText: "This field is required",
                     })}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="preparationTime"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <CustomTextField
+                    fullWidth
+                    value={value}
+                    label="Preparation Time"
+                    onChange={onChange}
+                    placeholder="20 minutes"
+                    error={Boolean(errors.firstName)}
+                    aria-describedby="validation-basic-first-name"
+                    {...(errors.firstName && {
+                      helperText: "This field is required",
+                    })}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="calories"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <CustomTextField
+                    fullWidth
+                    value={value}
+                    label="Calories"
+                    onChange={onChange}
+                    placeholder="100"
+                    error={Boolean(errors.firstName)}
+                    aria-describedby="validation-basic-first-name"
+                    {...(errors.firstName && {
+                      helperText: "This field is required",
+                    })}
+                  />
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="avialableSizes"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <CustomTextField
+                    select
+                    fullWidth
+                    defaultValue=""
+                    label="Avialable Sizes"
+                    SelectProps={{
+                      value: value,
+                      multiple: true,
+                      onChange: (e) => {
+                        onChange(e);
+                        dispatch({
+                          type: "avialableSizes",
+                          payload: e.target.value,
+                        });
+                      },
+                    }}
+                    id="validation-basic-select"
+                    error={Boolean(errors.select)}
+                    aria-describedby="validation-basic-select"
+                    {...(errors.select && {
+                      helperText: "This field is required",
+                    })}
+                  >
+                    <MenuItem value={"Small"}>Small</MenuItem>
+                    <MenuItem value={"Medium"}>Medium</MenuItem>
+                    <MenuItem value={"Large"}>Large</MenuItem>
+                  </CustomTextField>
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="allergens"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <CustomTextField
+                    select
+                    multiple
+                    fullWidth
+                    defaultValue=""
+                    label="Allergens"
+                    SelectProps={{
+                      value: state.allergens,
+                      multiple: true,
+                      onChange: (e) => {
+                        onChange(e);
+                        dispatch({
+                          type: "allergens",
+                          payload: e.target.value,
+                        });
+                      },
+                    }}
+                    id="validation-basic-select"
+                    error={Boolean(errors.select)}
+                    aria-describedby="validation-basic-select"
+                    {...(errors.select && {
+                      helperText: "This field is required",
+                    })}
+                  >
+                    <MenuItem value={"Dairy"}>Diary</MenuItem>
+                    <MenuItem value={"Gluten"}>Gluten</MenuItem>
+                    <MenuItem value={"Nuts"}>Nuts</MenuItem>
+                  </CustomTextField>
+                )}
+              />
+            </Grid>
+
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="availability"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <FormControl component="fieldset">
+                    <FormLabel component="legend">Availability</FormLabel>
+                    <RadioGroup
+                      aria-label="availability"
+                      name="availability"
+                      value={value}
+                      onChange={onChange}
+                      style={{ flexDirection: "row" }}
+                    >
+                      <FormControlLabel
+                        value="true"
+                        control={<Radio />}
+                        label="Available"
+                      />
+                      <FormControlLabel
+                        value="false"
+                        control={<Radio />}
+                        label="Not Available"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                )}
+              />
+            </Grid>
+            <Grid item xs={12} sm={6}>
+              <Controller
+                name="customiseable"
+                control={control}
+                rules={{ required: true }}
+                render={({ field: { value, onChange } }) => (
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={value}
+                        onChange={(e) => onChange(e.target.checked)}
+                      />
+                    }
+                    label="Customiseable"
                   />
                 )}
               />
@@ -376,4 +568,4 @@ const FormValidationBasic = () => {
   );
 };
 
-export default FormValidationBasic;
+export default AddMenuItemForm;

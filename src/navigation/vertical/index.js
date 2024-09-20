@@ -108,30 +108,18 @@ const navigation = (role) => {
           children: [
             {
               title: "List",
-              path: "/apps/user/list",
+              path: "/apps/menus/list",
             },
             {
               title: "View",
               children: [
                 {
-                  title: "Account",
-                  path: "/apps/user/view/account",
+                  title: "Add Menu",
+                  path: "/apps/menus/view/add-menu",
                 },
                 {
-                  title: "Security",
-                  path: "/apps/user/view/security",
-                },
-                {
-                  title: "Billing & Plans",
-                  path: "/apps/user/view/billing-plan",
-                },
-                {
-                  title: "Notifications",
-                  path: "/apps/user/view/notification",
-                },
-                {
-                  title: "Connection",
-                  path: "/apps/user/view/connection",
+                  title: "Add Menu Item",
+                  path: "/apps/menus/view/add-menu-item",
                 },
               ],
             },
