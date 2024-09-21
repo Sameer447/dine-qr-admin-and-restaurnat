@@ -25,15 +25,18 @@ import CustomTextField from "src/@core/components/mui/text-field";
 import toast from "react-hot-toast";
 import { useForm, Controller } from "react-hook-form";
 import { styled } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import Link from "next/link";
+// ** Custom Components Imports
+import PageHeader from "src/@core/components/page-header";
 
 // ** Icon Imports
 import { categoris } from "src/@fake-db/categories";
+import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
 
-const ButtonStyled = styled(Button)(({ theme }) => ({
-  [theme.breakpoints.down()]: {
-    width: "100%",
-    textAlign: "center",
-  },
+const LinkStyled = styled(Link)(({ theme }) => ({
+  textDecoration: "none",
+  color: theme.palette.primary.main,
 }));
 
 const initialState = {
@@ -85,211 +88,246 @@ const MenuForm = () => {
   } = useForm({ defaultValues: initialState });
   const onSubmit = () => toast.success("Form Submitted");
   return (
-    <Card>
-      <CardHeader title="Add Menu" />
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={5}>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="category"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Category"
-                    SelectProps={{
-                      value: value,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({ type: "category", payload: e.target.value });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    {categoris.map((category) => (
-                      <MenuItem key={category.value} value={category.value}>
-                        {category.name}
-                      </MenuItem>
-                    ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="subCategory"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Sub Category"
-                    SelectProps={{
-                      multiple: true,
-                      value: value,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({
-                          type: "subCategory",
-                          payload: e.target.value,
-                        });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    {state.category &&
-                      categoris
-                        .find((category) => category.value === state.category)
-                        .subCategories.map((subCategory) => (
-                          <MenuItem
-                            key={subCategory.value}
-                            value={subCategory.value}
-                          >
-                            {subCategory.name}
-                          </MenuItem>
-                        ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="specialityTags"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Speciality Tags"
-                    SelectProps={{
-                      multiple: true,
-                      value: state.specialityTags,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({
-                          type: "specialityTags",
-                          payload: e.target.value,
-                        });
-                      },
-                    }}
-                    id="select-multiple-default"
-                    error={Boolean(errors.select)}
-                    aria-describedby="select-multiple-default"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    {state.category &&
-                      categoris
-                        .find((category) => category.value === state.category)
-                        .specialityTags.map((subCategory) => (
-                          <MenuItem
-                            key={subCategory.value}
-                            value={subCategory.value}
-                          >
-                            {subCategory.name}
-                          </MenuItem>
-                        ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="cuisine"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Cuisine"
-                    SelectProps={{
-                      multiple: true,
-                      value: value,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({ type: "cuisine", payload: e.target.value });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    {state.category &&
-                      categoris
-                        .find((category) => category.value === state.category)
-                        .cuisineTypes.map((subCategory) => (
-                          <MenuItem
-                            key={subCategory.value}
-                            value={subCategory.value}
-                          >
-                            {subCategory.name}
-                          </MenuItem>
-                        ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Controller
-                name="description"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <CustomTextField
-                    rows={4}
-                    fullWidth
-                    multiline
-                    {...field}
-                    onChange={(e) => {
-                      field.onChange(e);
-                      dispatch({
-                        type: "description",
-                        payload: e.target.value,
-                      });
-                    }}
-                    label="Menu Item Description"
-                    error={Boolean(errors.textarea)}
-                    aria-describedby="validation-basic-textarea"
-                    {...(errors.textarea && {
-                      helperText: "This field is required",
-                    })}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained">
-                Submit
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </CardContent>
-    </Card>
+    <DatePickerWrapper>
+      <Grid container spacing={6} className="match-height">
+        <PageHeader
+          title={
+            <Typography variant="h4">
+              <LinkStyled href="link-to-restaurant" target="_blank">
+                Restaurant Name
+              </LinkStyled>
+            </Typography>
+          }
+          subtitle={
+            <Typography sx={{ color: "text.secondary" }}>
+              A catchy line that summarizes the restaurant's appeal.
+            </Typography>
+          }
+        />
+        <Grid item xs={12}>
+          <Card>
+            <CardHeader title="Add Menu" />
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Grid container spacing={5}>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="category"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Category"
+                          SelectProps={{
+                            value: value,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "category",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          {categoris.map((category) => (
+                            <MenuItem
+                              key={category.value}
+                              value={category.value}
+                            >
+                              {category.name}
+                            </MenuItem>
+                          ))}
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="subCategory"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Sub Category"
+                          SelectProps={{
+                            multiple: true,
+                            value: value,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "subCategory",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          {state.category &&
+                            categoris
+                              .find(
+                                (category) => category.value === state.category,
+                              )
+                              .subCategories.map((subCategory) => (
+                                <MenuItem
+                                  key={subCategory.value}
+                                  value={subCategory.value}
+                                >
+                                  {subCategory.name}
+                                </MenuItem>
+                              ))}
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="specialityTags"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Speciality Tags"
+                          SelectProps={{
+                            multiple: true,
+                            value: state.specialityTags,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "specialityTags",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="select-multiple-default"
+                          error={Boolean(errors.select)}
+                          aria-describedby="select-multiple-default"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          {state.category &&
+                            categoris
+                              .find(
+                                (category) => category.value === state.category,
+                              )
+                              .specialityTags.map((subCategory) => (
+                                <MenuItem
+                                  key={subCategory.value}
+                                  value={subCategory.value}
+                                >
+                                  {subCategory.name}
+                                </MenuItem>
+                              ))}
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="cuisine"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Cuisine"
+                          SelectProps={{
+                            multiple: true,
+                            value: value,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "cuisine",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          {state.category &&
+                            categoris
+                              .find(
+                                (category) => category.value === state.category,
+                              )
+                              .cuisineTypes.map((subCategory) => (
+                                <MenuItem
+                                  key={subCategory.value}
+                                  value={subCategory.value}
+                                >
+                                  {subCategory.name}
+                                </MenuItem>
+                              ))}
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Controller
+                      name="description"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <CustomTextField
+                          rows={4}
+                          fullWidth
+                          multiline
+                          {...field}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            dispatch({
+                              type: "description",
+                              payload: e.target.value,
+                            });
+                          }}
+                          label="Menu Item Description"
+                          error={Boolean(errors.textarea)}
+                          aria-describedby="validation-basic-textarea"
+                          {...(errors.textarea && {
+                            helperText: "This field is required",
+                          })}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button type="submit" variant="contained">
+                      Submit
+                    </Button>
+                  </Grid>
+                </Grid>
+              </form>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </DatePickerWrapper>
   );
 };
 

@@ -316,7 +316,7 @@ const UserList = ({ apiData }) => {
 
   return (
     <Grid container spacing={6.5}>
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         {apiData && (
           <Grid container spacing={6}>
             {apiData.statsHorizontalWithDetails.map((item, index) => {
@@ -328,7 +328,7 @@ const UserList = ({ apiData }) => {
             })}
           </Grid>
         )}
-      </Grid>
+      </Grid> */}
       <Grid item xs={12}>
         <Card>
           <CardHeader title="Search Filters" />
@@ -391,11 +391,11 @@ const UserList = ({ apiData }) => {
             </Grid>
           </CardContent>
           <Divider sx={{ m: "0 !important" }} />
-          <TableHeader
+          {/* <TableHeader
             value={value}
             handleFilter={handleFilter}
             toggle={toggleAddUserDrawer}
-          />
+          /> */}
           <DataGrid
             autoHeight
             rowHeight={62}

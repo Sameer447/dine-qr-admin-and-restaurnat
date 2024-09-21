@@ -25,16 +25,18 @@ import CustomTextField from "src/@core/components/mui/text-field";
 import toast from "react-hot-toast";
 import { useForm, Controller } from "react-hook-form";
 import { styled } from "@mui/material/styles";
+import Typography from "@mui/material/Typography";
+import Link from "next/link";
+// ** Custom Components Imports
+import PageHeader from "src/@core/components/page-header";
 
 // ** Icon Imports
 import { categoris } from "src/@fake-db/categories";
-import { GridRow } from "@mui/x-data-grid";
+import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
 
-const ButtonStyled = styled(Button)(({ theme }) => ({
-  [theme.breakpoints.down()]: {
-    width: "100%",
-    textAlign: "center",
-  },
+const LinkStyled = styled(Link)(({ theme }) => ({
+  textDecoration: "none",
+  color: theme.palette.primary.main,
 }));
 
 const initialState = {
@@ -109,462 +111,494 @@ const AddMenuItemForm = () => {
   };
 
   return (
-    <Card>
-      <CardHeader title="Add Menu" />
-      <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <Grid container spacing={5}>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="category"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Category"
-                    SelectProps={{
-                      value: value,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({ type: "category", payload: e.target.value });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    {categoris.map((category) => (
-                      <MenuItem key={category.value} value={category.value}>
-                        {category.name}
-                      </MenuItem>
-                    ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="subCategory"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Sub Category"
-                    SelectProps={{
-                      value: value,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({
-                          type: "subCategory",
-                          payload: e.target.value,
-                        });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    {state.category &&
-                      categoris
-                        .find((category) => category.value === state.category)
-                        .subCategories.map((subCategory) => (
-                          <MenuItem
-                            key={subCategory.value}
-                            value={subCategory.value}
-                          >
-                            {subCategory.name}
-                          </MenuItem>
-                        ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="specialityTags"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Speciality Tags"
-                    SelectProps={{
-                      multiple: true,
-                      value: state.specialityTags,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({
-                          type: "specialityTags",
-                          payload: e.target.value,
-                        });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    {state.category &&
-                      categoris
-                        .find((category) => category.value === state.category)
-                        .specialityTags.map((subCategory) => (
-                          <MenuItem
-                            key={subCategory.value}
-                            value={subCategory.value}
-                          >
-                            {subCategory.name}
-                          </MenuItem>
-                        ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="cuisine"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Cuisine"
-                    SelectProps={{
-                      value: value,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({
-                          type: "cuisine",
-                          payload: e.target.value,
-                        });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    {state.category &&
-                      categoris
-                        .find((category) => category.value === state.category)
-                        .cuisineTypes.map((subCategory) => (
-                          <MenuItem
-                            key={subCategory.value}
-                            value={subCategory.value}
-                          >
-                            {subCategory.name}
-                          </MenuItem>
-                        ))}
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="menuItemName"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    fullWidth
-                    value={value}
-                    label="Menu Item Name"
-                    onChange={onChange}
-                    placeholder="Leonard"
-                    error={Boolean(errors.firstName)}
-                    aria-describedby="validation-basic-first-name"
-                    {...(errors.firstName && {
-                      helperText: "This field is required",
-                    })}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="price"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    fullWidth
-                    value={value}
-                    label="Menu Item Price"
-                    onChange={onChange}
-                    placeholder="RS 100"
-                    error={Boolean(errors.firstName)}
-                    aria-describedby="validation-basic-first-name"
-                    {...(errors.firstName && {
-                      helperText: "This field is required",
-                    })}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="preparationTime"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    fullWidth
-                    value={value}
-                    label="Preparation Time"
-                    onChange={onChange}
-                    placeholder="20 minutes"
-                    error={Boolean(errors.firstName)}
-                    aria-describedby="validation-basic-first-name"
-                    {...(errors.firstName && {
-                      helperText: "This field is required",
-                    })}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="calories"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    fullWidth
-                    value={value}
-                    label="Calories"
-                    onChange={onChange}
-                    placeholder="100"
-                    error={Boolean(errors.firstName)}
-                    aria-describedby="validation-basic-first-name"
-                    {...(errors.firstName && {
-                      helperText: "This field is required",
-                    })}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="avialableSizes"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Avialable Sizes"
-                    SelectProps={{
-                      value: value,
-                      multiple: true,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({
-                          type: "avialableSizes",
-                          payload: e.target.value,
-                        });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    <MenuItem value={"Small"}>Small</MenuItem>
-                    <MenuItem value={"Medium"}>Medium</MenuItem>
-                    <MenuItem value={"Large"}>Large</MenuItem>
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="allergens"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <CustomTextField
-                    select
-                    multiple
-                    fullWidth
-                    defaultValue=""
-                    label="Allergens"
-                    SelectProps={{
-                      value: state.allergens,
-                      multiple: true,
-                      onChange: (e) => {
-                        onChange(e);
-                        dispatch({
-                          type: "allergens",
-                          payload: e.target.value,
-                        });
-                      },
-                    }}
-                    id="validation-basic-select"
-                    error={Boolean(errors.select)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.select && {
-                      helperText: "This field is required",
-                    })}
-                  >
-                    <MenuItem value={"Dairy"}>Diary</MenuItem>
-                    <MenuItem value={"Gluten"}>Gluten</MenuItem>
-                    <MenuItem value={"Nuts"}>Nuts</MenuItem>
-                  </CustomTextField>
-                )}
-              />
-            </Grid>
+    <DatePickerWrapper>
+      <Grid container spacing={6} className="match-height">
+        <PageHeader
+          title={
+            <Typography variant="h4">
+              <LinkStyled href="link-to-restaurant" target="_blank">
+                Restaurant Name
+              </LinkStyled>
+            </Typography>
+          }
+          subtitle={
+            <Typography sx={{ color: "text.secondary" }}>
+              A catchy line that summarizes the restaurant's appeal.
+            </Typography>
+          }
+        />
+        <Grid item xs={12}>
+          <Card>
+            <CardHeader title="Add Menu Item" />
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)}>
+                <Grid container spacing={5}>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="category"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Category"
+                          SelectProps={{
+                            value: value,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "category",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          {categoris.map((category) => (
+                            <MenuItem
+                              key={category.value}
+                              value={category.value}
+                            >
+                              {category.name}
+                            </MenuItem>
+                          ))}
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="subCategory"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Sub Category"
+                          SelectProps={{
+                            value: value,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "subCategory",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          {state.category &&
+                            categoris
+                              .find(
+                                (category) => category.value === state.category,
+                              )
+                              .subCategories.map((subCategory) => (
+                                <MenuItem
+                                  key={subCategory.value}
+                                  value={subCategory.value}
+                                >
+                                  {subCategory.name}
+                                </MenuItem>
+                              ))}
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="specialityTags"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Speciality Tags"
+                          SelectProps={{
+                            multiple: true,
+                            value: state.specialityTags,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "specialityTags",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          {state.category &&
+                            categoris
+                              .find(
+                                (category) => category.value === state.category,
+                              )
+                              .specialityTags.map((subCategory) => (
+                                <MenuItem
+                                  key={subCategory.value}
+                                  value={subCategory.value}
+                                >
+                                  {subCategory.name}
+                                </MenuItem>
+                              ))}
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="cuisine"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Cuisine"
+                          SelectProps={{
+                            value: value,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "cuisine",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          {state.category &&
+                            categoris
+                              .find(
+                                (category) => category.value === state.category,
+                              )
+                              .cuisineTypes.map((subCategory) => (
+                                <MenuItem
+                                  key={subCategory.value}
+                                  value={subCategory.value}
+                                >
+                                  {subCategory.name}
+                                </MenuItem>
+                              ))}
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="menuItemName"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          fullWidth
+                          value={value}
+                          label="Menu Item Name"
+                          onChange={onChange}
+                          placeholder="Leonard"
+                          error={Boolean(errors.firstName)}
+                          aria-describedby="validation-basic-first-name"
+                          {...(errors.firstName && {
+                            helperText: "This field is required",
+                          })}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="price"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          fullWidth
+                          value={value}
+                          label="Menu Item Price"
+                          onChange={onChange}
+                          placeholder="RS 100"
+                          error={Boolean(errors.firstName)}
+                          aria-describedby="validation-basic-first-name"
+                          {...(errors.firstName && {
+                            helperText: "This field is required",
+                          })}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="preparationTime"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          fullWidth
+                          value={value}
+                          label="Preparation Time"
+                          onChange={onChange}
+                          placeholder="20 minutes"
+                          error={Boolean(errors.firstName)}
+                          aria-describedby="validation-basic-first-name"
+                          {...(errors.firstName && {
+                            helperText: "This field is required",
+                          })}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="calories"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          fullWidth
+                          value={value}
+                          label="Calories"
+                          onChange={onChange}
+                          placeholder="100"
+                          error={Boolean(errors.firstName)}
+                          aria-describedby="validation-basic-first-name"
+                          {...(errors.firstName && {
+                            helperText: "This field is required",
+                          })}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="avialableSizes"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          fullWidth
+                          defaultValue=""
+                          label="Avialable Sizes"
+                          SelectProps={{
+                            value: value,
+                            multiple: true,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "avialableSizes",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          <MenuItem value={"Small"}>Small</MenuItem>
+                          <MenuItem value={"Medium"}>Medium</MenuItem>
+                          <MenuItem value={"Large"}>Large</MenuItem>
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="allergens"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <CustomTextField
+                          select
+                          multiple
+                          fullWidth
+                          defaultValue=""
+                          label="Allergens"
+                          SelectProps={{
+                            value: state.allergens,
+                            multiple: true,
+                            onChange: (e) => {
+                              onChange(e);
+                              dispatch({
+                                type: "allergens",
+                                payload: e.target.value,
+                              });
+                            },
+                          }}
+                          id="validation-basic-select"
+                          error={Boolean(errors.select)}
+                          aria-describedby="validation-basic-select"
+                          {...(errors.select && {
+                            helperText: "This field is required",
+                          })}
+                        >
+                          <MenuItem value={"Dairy"}>Diary</MenuItem>
+                          <MenuItem value={"Gluten"}>Gluten</MenuItem>
+                          <MenuItem value={"Nuts"}>Nuts</MenuItem>
+                        </CustomTextField>
+                      )}
+                    />
+                  </Grid>
 
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="availability"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">Availability</FormLabel>
-                    <RadioGroup
-                      aria-label="availability"
+                  <Grid item xs={12} sm={6}>
+                    <Controller
                       name="availability"
-                      value={value}
-                      onChange={onChange}
-                      style={{ flexDirection: "row" }}
-                    >
-                      <FormControlLabel
-                        value="true"
-                        control={<Radio />}
-                        label="Available"
-                      />
-                      <FormControlLabel
-                        value="false"
-                        control={<Radio />}
-                        label="Not Available"
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Controller
-                name="customiseable"
-                control={control}
-                rules={{ required: true }}
-                render={({ field: { value, onChange } }) => (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        checked={value}
-                        onChange={(e) => onChange(e.target.checked)}
-                      />
-                    }
-                    label="Customiseable"
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12} sm={image ? 5 : 6}>
-              <Controller
-                name="itemImage"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <CustomInput
-                    type="file"
-                    {...field}
-                    label="Menu Item Image"
-                    onChange={(e) => {
-                      field.onChange(e);
-                      onImageSelect(e);
-                    }}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          <IconButton
-                            color="primary"
-                            aria-label="upload picture"
-                            component="span"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <FormControl component="fieldset">
+                          <FormLabel component="legend">Availability</FormLabel>
+                          <RadioGroup
+                            aria-label="availability"
+                            name="availability"
+                            value={value}
+                            onChange={onChange}
+                            style={{ flexDirection: "row" }}
                           >
-                            <Icon icon="bi:image" />
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                    error={Boolean(errors.itemImage)}
-                    aria-describedby="validation-basic-item-image"
-                    {...(errors.itemImage && {
-                      helperText: "This field is required",
-                    })}
-                  />
-                )}
-              />
-            </Grid>
-            {image && (
-              <Grid item xs={12} sm={1}>
-                <img
-                  src={image}
-                  alt="item"
-                  style={{
-                    width: 50,
-                    height: 50,
-                    objectFit: "contain",
-                    borderRadius: 50,
-                    marginTop: 15,
-                  }}
-                />
-              </Grid>
-            )}
-            <Grid item xs={12}>
-              <Controller
-                name="description"
-                control={control}
-                rules={{ required: true }}
-                render={({ field }) => (
-                  <CustomTextField
-                    rows={4}
-                    fullWidth
-                    multiline
-                    {...field}
-                    label="Menu Item Description"
-                    error={Boolean(errors.textarea)}
-                    aria-describedby="validation-basic-textarea"
-                    {...(errors.textarea && {
-                      helperText: "This field is required",
-                    })}
-                  />
-                )}
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Button type="submit" variant="contained">
-                Submit
-              </Button>
-            </Grid>
-          </Grid>
-        </form>
-      </CardContent>
-    </Card>
+                            <FormControlLabel
+                              value="true"
+                              control={<Radio />}
+                              label="Available"
+                            />
+                            <FormControlLabel
+                              value="false"
+                              control={<Radio />}
+                              label="Not Available"
+                            />
+                          </RadioGroup>
+                        </FormControl>
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Controller
+                      name="customiseable"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field: { value, onChange } }) => (
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              checked={value}
+                              onChange={(e) => onChange(e.target.checked)}
+                            />
+                          }
+                          label="Customiseable"
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12} sm={image ? 5 : 6}>
+                    <Controller
+                      name="itemImage"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <CustomInput
+                          type="file"
+                          {...field}
+                          label="Menu Item Image"
+                          onChange={(e) => {
+                            field.onChange(e);
+                            onImageSelect(e);
+                          }}
+                          InputProps={{
+                            startAdornment: (
+                              <InputAdornment position="start">
+                                <IconButton
+                                  color="primary"
+                                  aria-label="upload picture"
+                                  component="span"
+                                >
+                                  <Icon icon="bi:image" />
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }}
+                          error={Boolean(errors.itemImage)}
+                          aria-describedby="validation-basic-item-image"
+                          {...(errors.itemImage && {
+                            helperText: "This field is required",
+                          })}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  {image && (
+                    <Grid item xs={12} sm={1}>
+                      <img
+                        src={image}
+                        alt="item"
+                        style={{
+                          width: 50,
+                          height: 50,
+                          objectFit: "contain",
+                          borderRadius: 50,
+                          marginTop: 15,
+                        }}
+                      />
+                    </Grid>
+                  )}
+                  <Grid item xs={12}>
+                    <Controller
+                      name="description"
+                      control={control}
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <CustomTextField
+                          rows={4}
+                          fullWidth
+                          multiline
+                          {...field}
+                          label="Menu Item Description"
+                          error={Boolean(errors.textarea)}
+                          aria-describedby="validation-basic-textarea"
+                          {...(errors.textarea && {
+                            helperText: "This field is required",
+                          })}
+                        />
+                      )}
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <Button type="submit" variant="contained">
+                      Submit
+                    </Button>
+                  </Grid>
+                </Grid>
+              </form>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+    </DatePickerWrapper>
   );
 };
 

@@ -150,7 +150,7 @@ const columns = [
     flex: 0.25,
     minWidth: 280,
     field: "fullName",
-    headerName: "Menu Item Name",
+    headerName: "Restaurant Name",
     renderCell: ({ row }) => {
       const { fullName, email } = row;
 
@@ -185,11 +185,36 @@ const columns = [
       );
     },
   },
+  // {
+  //   flex: 0.15,
+  //   field: "role",
+  //   minWidth: 170,
+  //   headerName: "Role",
+  //   renderCell: ({ row }) => {
+  //     return (
+  //       <Box sx={{ display: "flex", alignItems: "center" }}>
+  //         <CustomAvatar
+  //           skin="light"
+  //           sx={{ mr: 4, width: 30, height: 30 }}
+  //           color={userRoleObj[row.role].color || "primary"}
+  //         >
+  //           <Icon icon={userRoleObj[row.role].icon} />
+  //         </CustomAvatar>
+  //         <Typography
+  //           noWrap
+  //           sx={{ color: "text.secondary", textTransform: "capitalize" }}
+  //         >
+  //           {row.role}
+  //         </Typography>
+  //       </Box>
+  //     );
+  //   },
+  // },
   {
     flex: 0.15,
     minWidth: 120,
-    headerName: "Category",
-    field: "Category",
+    headerName: "Plan",
+    field: "currentPlan",
     renderCell: ({ row }) => {
       return (
         <Typography
@@ -208,8 +233,8 @@ const columns = [
   {
     flex: 0.15,
     minWidth: 190,
-    field: "Sub Category",
-    headerName: "Sub Category",
+    field: "billing",
+    headerName: "Billing",
     renderCell: ({ row }) => {
       return (
         <Typography noWrap sx={{ color: "text.secondary" }}>
@@ -219,49 +244,23 @@ const columns = [
     },
   },
   {
-    flex: 0.15,
-    minWidth: 190,
-    field: "Speciality Tags",
-    headerName: "Speciality Tags",
+    flex: 0.1,
+    minWidth: 110,
+    field: "status",
+    headerName: "Status",
     renderCell: ({ row }) => {
       return (
-        <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.billing}
-        </Typography>
+        <CustomChip
+          rounded
+          skin="light"
+          size="small"
+          label={row.status}
+          color={userStatusObj[row.status]}
+          sx={{ textTransform: "capitalize" }}
+        />
       );
     },
   },
-  {
-    flex: 0.15,
-    minWidth: 190,
-    field: "Cuisine",
-    headerName: "Cuisine",
-    renderCell: ({ row }) => {
-      return (
-        <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.billing}
-        </Typography>
-      );
-    },
-  },
-  // {
-  //   flex: 0.1,
-  //   minWidth: 110,
-  //   field: "status",
-  //   headerName: "Status",
-  //   renderCell: ({ row }) => {
-  //     return (
-  //       <CustomChip
-  //         rounded
-  //         skin="light"
-  //         size="small"
-  //         label={row.status}
-  //         color={userStatusObj[row.status]}
-  //         sx={{ textTransform: "capitalize" }}
-  //       />
-  //     );
-  //   },
-  // },
   {
     flex: 0.1,
     minWidth: 100,
