@@ -80,6 +80,10 @@ const StepAccountDetails = ({ handleNext }) => {
     }
   };
 
+  const handleNumberInput = (e) => {
+    const value = e.target.value.replace(/\D/g, "");
+  };
+
   // const handleChange = (event) => {
   //   setPersonName(event.target.value);
   // };
@@ -147,7 +151,7 @@ const StepAccountDetails = ({ handleNext }) => {
             <Controller
               name="tagline"
               control={control}
-              rules={{ required: "This field is required" }}
+              rules={{ required: true, minLength: 10 }}
               render={({ field: { value, onChange } }) => (
                 <CustomTextField
                   fullWidth
@@ -169,7 +173,7 @@ const StepAccountDetails = ({ handleNext }) => {
             <Controller
               name="restaurantName"
               control={control}
-              rules={{ required: "This field is required" }}
+              rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <CustomTextField
                   fullWidth
@@ -190,12 +194,19 @@ const StepAccountDetails = ({ handleNext }) => {
             <Controller
               name="registrationNumber"
               control={control}
-              rules={{ required: "This field is required" }}
+              rules={{
+                required: true,
+                pattern: /^[0-9]{5}-[0-9]{7}-[0-9]$|^[0-9]{13}$/,
+                maxLength: 13,
+                minLength: 13,
+              }}
               render={({ field: { value, onChange } }) => (
                 <CustomTextField
                   fullWidth
-                  label="Business Registration Number/CNIC"
+                  label="CNIC (Without Dashes)"
                   placeholder="00000-0000000-0"
+                  maxLength="13"
+                  type="tel"
                   value={value}
                   onChange={onChange}
                   error={Boolean(errors.registrationNumber)}
@@ -211,7 +222,7 @@ const StepAccountDetails = ({ handleNext }) => {
             <Controller
               name="email"
               control={control}
-              rules={{ required: "This field is required" }}
+              rules={{ required: true, pattern: /^\S+@\S+$/i }}
               render={({ field: { value, onChange } }) => (
                 <CustomTextField
                   fullWidth
@@ -242,7 +253,7 @@ const StepAccountDetails = ({ handleNext }) => {
             <Controller
               name="retaurantOwner"
               control={control}
-              rules={{ required: "This field is required" }}
+              rules={{ required: true }}
               render={({ field: { value, onChange } }) => (
                 <CustomTextField
                   fullWidth
