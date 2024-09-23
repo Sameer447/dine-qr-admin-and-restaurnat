@@ -19,17 +19,6 @@ import Icon from "src/@core/components/icon";
 import { useForm, Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 
-// const restaurantCategories = [
-//   "Fast Food",
-//   "Fine Dining",
-//   "Casual Dining",
-//   "Cafe",
-//   "Food Truck",
-//   "Buffet",
-//   "Barbecue",
-//   "Bakery",
-//   "Pizzeria",
-// ];
 
 const CustomInput = forwardRef(({ ...props }, ref) => {
   return (
@@ -50,7 +39,7 @@ const defaultValues = {
   email: "",
   retaurantOwner: "",
 };
-const StepAccountDetails = ({ handleNext }) => {
+const StepAccountDetails = ({ handleNext, setRestaurantData }) => {
   // ** States
   const [image, setImage] = useState(null);
   // ** Hooks
@@ -61,22 +50,20 @@ const StepAccountDetails = ({ handleNext }) => {
   } = useForm({ defaultValues });
 
   // ** Vars
-
   const onSubmit = (data) => {
     console.log("data :>> ", data);
-    toast.success("Form Submitted");
+    setRestaurantData({
+      ...data,
+    })
+    // toast.success("Form Submitted");
     handleNext();
   };
 
   const onImageSelect = (e) => {
-    const reader = new FileReader();
     const { files } = e.target;
     if (files && files.length !== 0) {
-      reader.onload = () => setImage(reader.result);
-      reader.readAsDataURL(files[0]);
-      if (reader.result !== null) {
-        return reader.result;
-      }
+      const url = URL.createObjectURL(files[0]);
+      setImage(url);
     }
   };
 
@@ -84,9 +71,6 @@ const StepAccountDetails = ({ handleNext }) => {
     const value = e.target.value.replace(/\D/g, "");
   };
 
-  // const handleChange = (event) => {
-  //   setPersonName(event.target.value);
-  // };
 
   return (
     <>
@@ -106,14 +90,13 @@ const StepAccountDetails = ({ handleNext }) => {
               name="logo"
               control={control}
               rules={{ required: "This field is required" }}
-              render={({ field: { value, onChange } }) => (
+              render={({ field: { onChange, ...field } }) => (
                 <CustomInput
                   type="file"
-                  // value={value}
-                  label="Restaurant Logo"
                   onChange={(e) => {
-                    onChange(e.target.files[0]);
-                    onImageSelect(e);
+                    const file = e.target.files[0];
+                    onChange(file); // Make sure form state is updated with the selected file
+                    onImageSelect(e); // Call the preview function
                   }}
                   InputProps={{
                     startAdornment: (
@@ -130,23 +113,30 @@ const StepAccountDetails = ({ handleNext }) => {
                   }}
                   error={Boolean(errors.logo)}
                   aria-describedby="validation-basic-item-image"
-                  {...(errors.itemImage && {
-                    helperText: "This field is required",
+                  {...(errors.logo && {
+                    helperText: errors.logo.message,
                   })}
                 />
               )}
             />
+
+            {image && (
+              <Box
+                sx={{
+                  display: "flex",
+                  justifyContent: "start",
+                  alignItems: "start",
+                  mt: 2,
+                }}
+              >
+                <img
+                  src={image}
+                  alt="item"
+                  style={{ width: "100px", height: "100px", objectFit: "cover" }}
+                />
+              </Box>
+            )}
           </Grid>
-          {/* <Grid item xs={12} sm={12}>
-          <FormControl fullWidth>
-            <CustomTextField
-              fullWidth
-              type="file"
-              label="Restaurant Banner"
-              placeholder="Upload a high-resolution Banner"
-            />
-          </FormControl>
-        </Grid> */}
           <Grid item xs={12} sm={12}>
             <Controller
               name="tagline"
@@ -240,15 +230,6 @@ const StepAccountDetails = ({ handleNext }) => {
               )}
             />
           </Grid>
-          {/* <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <CustomTextField
-              fullWidth
-              label="Phone Number"
-              placeholder="+92321123456"
-            />
-          </FormControl>
-        </Grid> */}
           <Grid item xs={12} sm={6}>
             <Controller
               name="retaurantOwner"
@@ -270,77 +251,6 @@ const StepAccountDetails = ({ handleNext }) => {
               )}
             />
           </Grid>
-          {/* <Grid item xs={12} sm={6}>
-          <FormControl fullWidth>
-            <CustomTextField
-              select
-              fullWidth
-              label="Restaurant Category"
-              id="select-multiple-placeholder"
-              SelectProps={{
-                multiple: true,
-                displayEmpty: true,
-                value: personName,
-                onChange: (e) => handleChange(e),
-                inputProps: { "aria-label": "Without label" },
-                renderValue: (selected) => {
-                  if (selected.length === 0) {
-                    return <em>Placeholder</em>;
-                  }
-
-                  return selected.join(", ");
-                },
-              }}
-            >
-              <MenuItem disabled value="">
-                <em>Restaurant Category</em>
-              </MenuItem>
-              {restaurantCategories.map((name) => (
-                <MenuItem key={name} value={name}>
-                  {name}
-                </MenuItem>
-              ))}
-            </CustomTextField>
-          </FormControl>
-        </Grid> */}
-          {/* <Grid item xs={12} sm={6}>
-          <CustomTextField
-            fullWidth
-            label='Password'
-            id='input-password'
-            placeholder='············'
-            type={values.showPassword ? 'text' : 'password'}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position='end'>
-                  <IconButton edge='end' onClick={handleClickShowPassword} onMouseDown={e => e.preventDefault()}>
-                    <Icon fontSize='1.25rem' icon={values.showPassword ? 'tabler:eye' : 'tabler:eye-off'} />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-          />
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <CustomTextField
-            fullWidth
-            label='Confirm Password'
-            id='input-confirm-password'
-            type={values.showConfirmPassword ? 'text' : 'password'}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position='end'>
-                  <IconButton edge='end' onMouseDown={e => e.preventDefault()} onClick={handleClickShowConfirmPassword}>
-                    <Icon fontSize='1.25rem' icon={values.showConfirmPassword ? 'tabler:eye' : 'tabler:eye-off'} />
-                  </IconButton>
-                </InputAdornment>
-              )
-            }}
-          />
-        </Grid>
-        <Grid item xs={12}>
-          <CustomTextField fullWidth label='Profile Link' placeholder='johndoe/profile' />
-        </Grid> */}
           <Grid
             item
             xs={12}
@@ -353,7 +263,6 @@ const StepAccountDetails = ({ handleNext }) => {
               </Button>
               <Button
                 variant="contained"
-                // onClick={handleNext}
                 type="submit"
                 sx={{ "& svg": { ml: 2 } }}
               >

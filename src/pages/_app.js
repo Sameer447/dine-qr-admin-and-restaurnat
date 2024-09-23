@@ -58,7 +58,7 @@ import "src/iconify-bundle/icons-bundle-react";
 
 // ** Global css styles
 import "../../styles/globals.css";
-import connectDB from "src/server/utils/dbconnect";
+import connectDB from "src/pages/utils/dbconnect";
 
 const clientSideEmotionCache = createEmotionCache();
 

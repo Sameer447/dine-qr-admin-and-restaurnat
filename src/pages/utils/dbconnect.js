@@ -8,9 +8,7 @@ const connectDB = async () => {
     let db;
     if (typeof mongoose?.connect === "function") {
       db = await mongoose?.connect(
-        "mongodb+srv://mubeenijaz773:mubeen7879@cluster0.dlofbt5.mongodb.net/test",
-        { useNewUrlParser: true, useUnifiedTopology: true },
-      );
+        "mongodb+srv://mubeenijaz773:mubeen7879@cluster0.dlofbt5.mongodb.net/test",);
     }
     connection.isConnected = db?.connections[0]?.readyState;
     console.log("Connected to MongoDB");

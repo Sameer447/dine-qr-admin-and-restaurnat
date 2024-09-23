@@ -41,11 +41,11 @@ const steps = [
     icon: 'tabler:users',
     subtitle: 'Restaurant Address Information'
   },
-  {
-    title: 'Billing',
-    icon: 'tabler:file-text',
-    subtitle: 'Payment Details'
-  }
+  // {
+  //   title: 'Billing',
+  //   icon: 'tabler:file-text',
+  //   subtitle: 'Payment Details'
+  // }
 ]
 
 const Step = styled(MuiStep)(({ theme }) => ({
@@ -90,12 +90,39 @@ const Step = styled(MuiStep)(({ theme }) => ({
 
 const RegisterMultiSteps = () => {
   // ** States
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStep, setActiveStep] = useState(0);
+  const [restaurantData, setRestaurantData] = useState({ 
+    logo: "",
+    tagline: "",
+    restaurantName: "",
+    registrationNumber: "",
+    email: "",
+    retaurantOwner: "" 
+   });  
 
   // ** Hooks & Var
   const { settings } = useSettings()
   const smallScreen = useMediaQuery(theme => theme.breakpoints.down('md'))
   const { direction } = settings
+  // const [restaurantData, setRestaurantData] = useState({
+  //   name: '',
+  //   type: '',
+  //   // other fields...
+  // });
+
+  // const validateStep = () => {
+  //   let tempErrors = {};
+  //   if (activeStep === 0) {
+  //     if (!restaurantData.name) tempErrors.name = 'Restaurant name is required';
+  //     if (!restaurantData.type) tempErrors.type = 'Restaurant type is required';
+  //     // Add other field validations here...
+  //   }
+  //   // You can add validations for other steps similarly
+  
+  //   setErrors(tempErrors);
+  //   return Object.keys(tempErrors).length === 0; // Returns true if no errors
+  // };
+  
 
   // Handle Stepper
   const handleNext = () => {
@@ -111,11 +138,11 @@ const RegisterMultiSteps = () => {
   const getStepContent = step => {
     switch (step) {
       case 0:
-        return <StepAccountDetails handleNext={handleNext} />
+        return <StepAccountDetails handleNext={handleNext} setRestaurantData={setRestaurantData} />
       case 1:
-        return <StepPersonalInfo handleNext={handleNext} handlePrev={handlePrev} />
-      case 2:
-        return <StepBillingDetails handlePrev={handlePrev} />
+        return <StepPersonalInfo handleNext={handleNext} handlePrev={handlePrev} restaurantData={restaurantData} />
+      // case 2:
+      //   return <StepBillingDetails handlePrev={handlePrev} />
       default:
         return null
     }
@@ -137,9 +164,8 @@ const RegisterMultiSteps = () => {
         >
           {steps.map((step, index) => {
             const RenderAvatar = activeStep >= index ? CustomAvatar : Avatar
-
             return (
-              <Step key={index} onClick={() => setActiveStep(index)}>
+              <Step key={index} >
                 <StepLabel>
                   <div className='step-label'>
                     <RenderAvatar
