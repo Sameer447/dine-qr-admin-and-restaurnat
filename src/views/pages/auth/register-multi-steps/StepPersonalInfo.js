@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** MUI Components
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -14,6 +15,7 @@ import { useForm, Controller } from "react-hook-form";
 import toast from "react-hot-toast";
 import { ServiceUrl } from "src/@core/utils/global";
 import axios from "axios";
+import { duration } from "@mui/material";
 
 const defaultValues = {
   mobile: "",
@@ -25,12 +27,14 @@ const defaultValues = {
 };
 
 const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
-
-  const { control, handleSubmit, formState: { errors } } = useForm({ defaultValues });
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({ defaultValues });
 
   const onSubmit = async (formData) => {
     try {
-
       const email = restaurantData.email;
       const res = await axios.get(`/api/Emailcheck/${email}/emailcheck`, {
         headers: {
@@ -38,7 +42,7 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
         },
       });
 
-      console.log('res:', res);
+      console.log("res:", res);
 
       // else if (res.status === 405) {
       //   toast.error(res.data.message || "Error in email");
@@ -50,118 +54,61 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
 
       if (res.status === 200) {
         toast.success("Account Already Exist");
-   
       } else {
-   
         const completeData = new FormData();
         // Append restaurant details
-        completeData.append('userType', 'Resturant');
-        completeData.append('email', restaurantData.email);
-        completeData.append('logo', restaurantData.logo);
-        completeData.append('tagline', restaurantData.tagline);
-        completeData.append('restaurantName', restaurantData.restaurantName);
-        completeData.append('cnicNumber', restaurantData.registrationNumber);
-        completeData.append('restaurantOwner', restaurantData.retaurantOwner);
+        completeData.append("userType", "Resturant");
+        completeData.append("email", restaurantData.email);
+        completeData.append("logo", restaurantData.logo);
+        completeData.append("tagline", restaurantData.tagline);
+        completeData.append("restaurantName", restaurantData.restaurantName);
+        completeData.append("cnicNumber", restaurantData.registrationNumber);
+        completeData.append("restaurantOwner", restaurantData.retaurantOwner);
 
         // Append address details
-        completeData.append('mobile', formData.mobile);
-        completeData.append('zipcode', formData.zipcode);
-        completeData.append('address', formData.address);
-        completeData.append('landmark', formData.landmark);
-        completeData.append('city', formData.city);
-        completeData.append('state', formData.state);
+        completeData.append("mobile", formData.mobile);
+        completeData.append("zipcode", formData.zipcode);
+        completeData.append("address", formData.address);
+        completeData.append("landmark", formData.landmark);
+        completeData.append("city", formData.city);
+        completeData.append("state", formData.state);
 
-        const response = await axios.post(`/api/Verification_SignUp/verification`, completeData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        const response = await axios.post(
+          `/api/Verification_SignUp/verification`,
+          completeData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           },
-        });
-
+        );
         if (response.status === 200) {
           // console.log('User created:', response.data.createdUser);
-          console.log('Verification complete:', response.data);
-          toast.success("Form Submitted");
+          const res = await axios.post("/api/signup/signup", completeData, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          });
+          console.log("res:", res);
+
+          toast.success(
+            "We have sent you an email for verification click on the link to verify your account and set your password",
+            10000,
+          );
           // handleNext(); // Move to the next step after success
         } else if (response.status === 400) {
-          console.error('Error creating account:', response.data.message);
+          console.error("Error creating account:", response.data.message);
           toast.error(response.data.message);
         } else if (response.status === 500) {
-          console.error('Error creating account:', response.data.message);
+          console.error("Error creating account:", response.data.message);
           toast.error(response.data.message);
         }
       }
     } catch (error) {
-      console.error('Error signing up:', error);
+      console.error("Error signing up:", error);
       toast.error(error);
     }
   };
-
-  // const onSubmit = async (formData) => {
-  //   try {
-
-  //     const email = restaurantData.email;
-  //     const res = await axios.get(`/api/Emailcheck/${email}/emailcheck`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-
-  //     if (res.status === 200) {
-  //       toast.success("Account Already Exist");
-  //     } else if (res.status === 405) {
-  //       toast.error(res.data.message);
-  //     } else if (res.status === 404) {
-  //       toast.error(res.data.message);
-  //     } else if (res.status === 500) {
-  //       toast.error(res.data.message);
-  //     } else {
-  //       const completeData = new FormData();
-
-  //       // Append restaurant details
-  //       completeData.append('userType', 'Resturant');
-  //       completeData.append('email', restaurantData.email);
-  //       completeData.append('logo', restaurantData.logo);
-  //       completeData.append('tagline', restaurantData.tagline);
-  //       completeData.append('restaurantName', restaurantData.restaurantName);
-  //       completeData.append('cnicNumber', restaurantData.registrationNumber);
-  //       completeData.append('restaurantOwner', restaurantData.retaurantOwner);
-
-  //       // Append address details
-  //       completeData.append('mobile', formData.mobile);
-  //       completeData.append('zipcode', formData.zipcode);
-  //       completeData.append('address', formData.address);
-  //       completeData.append('landmark', formData.landmark);
-  //       completeData.append('city', formData.city);
-  //       completeData.append('state', formData.state);
-  //       completeData.append('password', 'Ameen123*');
-
-
-  //       const response = await axios.post(`/api/signup/signup`, completeData, {
-  //         headers: {
-  //           'Content-Type': 'multipart/form-data',
-  //         },
-  //       });
-
-  //       if (response.status === 200) {
-
-  //         console.log('User created:', response.data.createdUser);
-  //         toast.success("Form Submitted");
-  //         // handleNext(); // Move to the next step after success
-  //       } else if (response.status === 400) {
-  //         console.error('Error creating account:', response.data.message);
-  //         toast.error(response.data.message);
-  //       } else if (response.status === 500) {
-  //         console.error('Error creating account:', response.data.message);
-  //         toast.error(response.data.message);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error('Error signing up:', error);
-  //     toast.error(error);
-  //   }
-  // };
-
-
   return (
     <>
       <Box sx={{ mb: 6 }}>
@@ -204,7 +151,12 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
             <Controller
               name="zipcode"
               control={control}
-              rules={{ required: true, minLength: 5, maxLength: 5, pattern: [0 - 9][5], }}
+              rules={{
+                required: true,
+                minLength: 5,
+                maxLength: 5,
+                pattern: [0 - 9][5],
+              }}
               render={({ field: { value, onChange } }) => (
                 <CustomTextField
                   fullWidth
@@ -334,7 +286,8 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
 
 export default StepPersonalDetails;
 
-{/* <>
+{
+  /* <>
     <Box sx={{ mb: 6 }}>
       <Typography variant="h3" sx={{ mb: 1.5 }}>
         Restaurant Address Information
@@ -458,4 +411,5 @@ export default StepPersonalDetails;
         </Grid>
       </Grid>
     </form>
-  </> */}
+  </> */
+}
