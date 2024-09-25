@@ -70,7 +70,9 @@ const defaultValues = {
 const ResetPassword = () => {
   // ** Hooks
   const router = useRouter();
-  const { token } = router.query;
+  const { token , type } = router.query;
+  console.log("token", token);
+  console.log("type", type);
   const theme = useTheme();
   const [values, setValues] = useState({
     showNewPassword: false,
@@ -92,7 +94,7 @@ const ResetPassword = () => {
       token,
       newPassword: data.newPassword,
     };
-    const response = fetch("/api/SetNewPassword/reset-password", {
+    const response = fetch(`/api/SetNewPassword/${'reset'}/password`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

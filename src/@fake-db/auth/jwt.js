@@ -1,4 +1,5 @@
 // ** JWT import
+import axios from 'axios'
 import jwt from 'jsonwebtoken'
 
 // ** Mock Adapter
@@ -7,7 +8,7 @@ import mock from 'src/@fake-db/mock'
 // ** Default AuthConfig
 import defaultAuthConfig from 'src/configs/auth'
 
-const users = [
+const usersData = [
   {
     id: 1,
     role: 'admin',
@@ -32,15 +33,30 @@ const jwtConfig = {
   expirationTime: process.env.NEXT_PUBLIC_JWT_EXPIRATION,
   refreshTokenSecret: process.env.NEXT_PUBLIC_JWT_REFRESH_TOKEN_SECRET
 }
-mock.onPost('/jwt/login').reply(request => {
-  const { email, password } = JSON.parse(request.data)
+mock.onPost('/jwt/login').reply(async (request) => {
+  const { email, password } = JSON.parse(request.data);
+  let user = null;
 
   let error = {
     email: ['Something went wrong']
   }
-  const user = users.find(u => u.email === email && u.password === password)
+  // const user = users.find(u => u.email === email && u.password === password)
+  const responseData = await axios.post(`/api/Login/verify-login`, {
+    email,
+    password
+  }, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+
+  if (responseData.status === 200) {
+    user = responseData.data.user;
+    console.log('find in user :>> ', user);
+  }
+
   if (user) {
-    const accessToken = jwt.sign({ id: user.id }, jwtConfig.secret, { expiresIn: jwtConfig.expirationTime })
+    const accessToken = jwt.sign({ id: user._id }, jwtConfig.secret, { expiresIn: jwtConfig.expirationTime })
 
     const response = {
       accessToken,
@@ -55,22 +71,24 @@ mock.onPost('/jwt/login').reply(request => {
 
     return [400, { error }]
   }
-})
+});
+
+
 mock.onPost('/jwt/register').reply(request => {
   if (request.data.length > 0) {
     const { email, password, username } = JSON.parse(request.data)
-    const isEmailAlreadyInUse = users.find(user => user.email === email)
-    const isUsernameAlreadyInUse = users.find(user => user.username === username)
+    const isEmailAlreadyInUse = usersData.find(user => user.email === email)
+    const isUsernameAlreadyInUse = usersData.find(user => user.username === username)
 
     const error = {
       email: isEmailAlreadyInUse ? 'This email is already in use.' : null,
       username: isUsernameAlreadyInUse ? 'This username is already in use.' : null
     }
     if (!error.username && !error.email) {
-      const { length } = users
+      const { length } = usersData
       let lastIndex = 0
       if (length) {
-        lastIndex = users[length - 1].id
+        lastIndex = usersData[length - 1].id
       }
 
       const userData = {
@@ -82,7 +100,7 @@ mock.onPost('/jwt/register').reply(request => {
         fullName: '',
         role: 'admin'
       }
-      users.push(userData)
+      usersData.push(userData)
       const accessToken = jwt.sign({ id: userData.id }, jwtConfig.secret)
       const user = { ...userData }
       delete user.password
@@ -95,23 +113,27 @@ mock.onPost('/jwt/register').reply(request => {
   } else {
     return [401, { error: 'Invalid Data' }]
   }
-})
-mock.onGet('/auth/me').reply(config => {
-  // ** Get token from header
-  // @ts-ignore
-  const token = config.headers.Authorization
+});
 
-  // ** Default response
-  let response = [200, {}]
 
+mock.onGet('/auth/me').reply((config) => {
+  return new Promise((resolve) => {
+    // ** Get token from header and remove 'Bearer' prefix
+    const token = config.headers.Authorization?.split(' ')[1];
+    console.log('token without Bearer :>> ', token);
+
+    // ** Default response
+    let response = [200, {}];
+    
   // ** Checks if the token is valid or expired
-  jwt.verify(token, jwtConfig.secret, (err, decoded) => {
+  jwt.verify(token, jwtConfig.secret, async (err, decoded) => {
     // ** If token is expired
     if (err) {
       // ** If onTokenExpiration === 'logout' then send 401 error
       if (defaultAuthConfig.onTokenExpiration === 'logout') {
         // ** 401 response will logout user from AuthContext file
         response = [401, { error: { error: 'Invalid User' } }]
+        resolve(response); // Resolve here to return 401 immediately
       } else {
         // ** If onTokenExpiration === 'refreshToken' then generate the new token
         const oldTokenDecoded = jwt.decode(token, { complete: true })
@@ -121,33 +143,81 @@ mock.onGet('/auth/me').reply(config => {
         const { id: userId } = oldTokenDecoded.payload
 
         // ** Get user that matches id in token
-        const user = users.find(u => u.id === userId)
+        // const user = usersData.find(u => u.id === userId)
+        try {
+          const responseData = await axios.get(`/api/getuser`, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            params: {
+              _id: userId, // Pass userId as a query parameter
+            },
+          });
+          if (responseData.status === 200) {
+            const user = responseData.data.user;
+
+            // Create new access token and store it
+            const accessToken = jwt.sign({ id: user._id }, jwtConfig.secret, {
+              expiresIn: jwtConfig.expirationTime,
+            });
+
+            window.localStorage.setItem(
+              defaultAuthConfig.storageTokenKeyName,
+              accessToken
+            );
+
+            console.log('user in me endpoint :>> ', user);
+
+            response = [200, { userData: { ...user, password: undefined } }];
+            resolve(response); // Return the final userData response
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          resolve([500, { error: 'Server error' }]); // Resolve with error
+        }
 
         // ** Sign a new token
-        const accessToken = jwt.sign({ id: userId }, jwtConfig.secret, {
-          expiresIn: jwtConfig.expirationTime
-        })
+        // const accessToken = jwt.sign({ id: userId }, jwtConfig.secret, {
+        //   expiresIn: jwtConfig.expirationTime
+        // })
 
-        // ** Set new token in localStorage
-        window.localStorage.setItem(defaultAuthConfig.storageTokenKeyName, accessToken)
-        const obj = { userData: { ...user, password: undefined } }
+        // // ** Set new token in localStorage
+        // window.localStorage.setItem(defaultAuthConfig.storageTokenKeyName, accessToken)
+        // const obj = { userData: { ...user, password: undefined } }
 
-        // ** return 200 with user data
-        response = [200, obj]
+        // // ** return 200 with user data
+        // response = [200, obj]
+
+
       }
     } else {
       // ** If token is valid do nothing
       // @ts-ignore
-      const userId = decoded.id
+      const userId = decoded.id;
 
-      // ** Get user that matches id in token
-      const userData = JSON.parse(JSON.stringify(users.find(u => u.id === userId)))
-      delete userData.password
+        try {
+          const responseData = await axios.get(`/api/getuser`, {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            params: {
+              _id: userId,
+            },
+          });
 
-      // ** return 200 with user data
-      response = [200, { userData }]
-    }
-  })
+          if (responseData.status === 200) {
+            const userData = responseData.data.user;
+            delete userData.password; // Remove password from the response
+            console.log('userData :>> ', userData);
 
-  return response
-})
+            response = [200, { userData }];
+            resolve(response); // Return the final response
+          }
+        } catch (error) {
+          console.error('Error fetching user data:', error);
+          resolve([500, { error: 'Server error' }]); // Resolve with error
+        }
+      }
+    });
+  });
+});

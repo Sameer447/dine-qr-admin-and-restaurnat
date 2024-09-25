@@ -1,14 +1,11 @@
 // ** React Imports
 import { useState } from "react";
-
+import { useRouter } from "next/navigation";
 // ** Next Imports
 import Link from "next/link";
 
 // ** MUI Components
-import Alert from "@mui/material/Alert";
 import Button from "@mui/material/Button";
-import Divider from "@mui/material/Divider";
-import Checkbox from "@mui/material/Checkbox";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import Box from "@mui/material/Box";
@@ -41,6 +38,9 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 
 // ** Demo Imports
 import FooterIllustrationsV2 from "src/views/pages/auth/FooterIllustrationsV2";
+import axios from "axios";
+import toast from "react-hot-toast";
+import { Checkbox, CircularProgress } from "@mui/material";
 
 // ** Styled Components
 const LoginIllustration = styled("img")(({ theme }) => ({
@@ -91,10 +91,12 @@ const defaultValues = {
 };
 
 const LoginPage = () => {
+  const router = useRouter();
   const [rememberMe, setRememberMe] = useState(true);
   const [isSuperAdmin, setIsSuperAdmin] = useState(false);
   const [isRestaurantAdmin, setIsRestaurantAdmin] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // ** Hooks
   const auth = useAuth();
@@ -117,15 +119,71 @@ const LoginPage = () => {
     resolver: yupResolver(schema),
   });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const { email, password } = data;
-    auth.login({ email, password, rememberMe, isSuperAdmin }, () => {
+    setIsLoaded(true);
+
+    try {
+      await auth.login({ email, password, rememberMe, isSuperAdmin });
+      toast.success("Logged in successfully");
+    } catch (error) {
+      const errorMessage = error?.response?.data?.error || "Email or Password is invalid";
+      toast.error(errorMessage);
       setError("email", {
         type: "manual",
-        message: "Email or Password is invalid",
+        message: errorMessage,
       });
-    });
+    } finally {
+      setIsLoaded(false);
+    }
+
+
+    // try {
+      // const response = await axios.post(`/api/Login/verify-login`, {
+      //   email,
+      //   password
+      // }, {
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      // });
+
+      // console.log('response :>> ', response.data);
+
+      // // Successful login
+      // if (response.status === 200) {
+      //   const user = response.data.user;
+    //     console.log('Logged in user :>> ', user);
+
+    //     // Redirect based on user type
+    //     if (user.role === "Resturant") {
+    //       const restaurantID = user._id;
+    //       router.push(`/Admin?resturant_id=${encodeURIComponent(restaurantID)}`);
+    //     } else if (user.role === "Admin") {
+    //       router.push('/SuperAdmin');
+    //     }
+
+    //     // Display success toast
+    //     toast.success("Logged in successfully");
+
+    //     // Save user data in localStorage
+    //     localStorage.setItem('current_user', JSON.stringify(user));
+    //     localStorage.setItem('_id', user._id);
+    //     localStorage.setItem('role', user.role);
+    //   } else {
+    //     // Handle failure cases (401: Incorrect password, 404: User not found)
+    //     toast.error(response.data.message);
+    //   }
+    // } catch (error) {
+    //   // Network or server error
+    //   console.error('Error during login:', error);
+    //   toast.error('An error occurred during login. Please try again.');
+    // } finally {
+    //   }
+    //   setIsLoaded(false);
   };
+
+
   const imageSource =
     skin === "bordered"
       ? "auth-v2-login-illustration-bordered"
@@ -205,7 +263,7 @@ const LoginPage = () => {
                 Please sign-in to your account and start the adventure
               </Typography>
             </Box>
-            <Alert
+            {/* <Alert
               icon={false}
               sx={{
                 py: 3,
@@ -222,7 +280,7 @@ const LoginPage = () => {
                 Restaurant: <strong>client@vuexy.com</strong> / Pass:{" "}
                 <strong>client</strong>
               </Typography>
-            </Alert>
+            </Alert> */}
             <form
               noValidate
               autoComplete="off"
@@ -241,7 +299,7 @@ const LoginPage = () => {
                       value={value}
                       onBlur={onBlur}
                       onChange={onChange}
-                      placeholder="admin@vuexy.com"
+                      placeholder="Enter Email"
                       error={Boolean(errors.email)}
                       {...(errors.email && {
                         helperText: errors.email.message,
@@ -263,6 +321,7 @@ const LoginPage = () => {
                       label="Password"
                       onChange={onChange}
                       id="auth-login-v2-password"
+                      placeholder="Enter Password"
                       error={Boolean(errors.password)}
                       {...(errors.password && {
                         helperText: errors.password.message,
@@ -290,7 +349,7 @@ const LoginPage = () => {
                   )}
                 />
               </Box>
-              <Box
+              {/* <Box
                 sx={{
                   mb: 1.75,
                   display: "flex",
@@ -333,17 +392,18 @@ const LoginPage = () => {
                     />
                   }
                 />
-              </Box>
+              </Box> */}
               <Box
                 sx={{
-                  mb: 1.75,
+                  mb: 2.75,
+                  mt: 2.75,
                   display: "flex",
                   flexWrap: "wrap",
-                  alignItems: "center",
-                  justifyContent: "space-between",
+                  alignItems: "end",
+                  justifyContent: "end",
                 }}
               >
-                <FormControlLabel
+                {/* <FormControlLabel
                   label="Remember Me"
                   control={
                     <Checkbox
@@ -351,7 +411,7 @@ const LoginPage = () => {
                       onChange={(e) => setRememberMe(e.target.checked)}
                     />
                   }
-                />
+                /> */}
                 <Typography component={LinkStyled} href="/forgot-password">
                   Forgot Password?
                 </Typography>
@@ -362,7 +422,11 @@ const LoginPage = () => {
                 variant="contained"
                 sx={{ mb: 4 }}
               >
-                Login
+                {isLoaded ? (
+                  <CircularProgress size={24} thickness={6} color="inherit" />
+                ) : (
+                  <text>Login</text>
+                )}
               </Button>
               <Box
                 sx={{

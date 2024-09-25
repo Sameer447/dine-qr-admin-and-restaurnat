@@ -42,6 +42,7 @@ const UserDropdown = (props) => {
   // ** States
   const [anchorEl, setAnchorEl] = useState(null);
   const [userRole, setUserRole] = useState(null);
+  const [userData, setUserData] = useState(null);
 
   // ** Hooks
   const router = useRouter();
@@ -51,9 +52,17 @@ const UserDropdown = (props) => {
   const { direction } = settings;
 
   useEffect(() => {
-    const user = JSON.parse(localStorage.getItem("isSuperAdmin"));
-    setUserRole(user);
+    const user = JSON.parse(localStorage.getItem("userData"));
+    if (user) {
+      if (user?.role === "admin") {
+        setUserRole(true);
+      } else if (user.role === "Resturant") {
+        setUserRole(false);
+      }
+      setUserData(user);
+    }
   }, []);
+
 
   const handleDropdownOpen = (event) => {
     setAnchorEl(event.currentTarget);
@@ -143,8 +152,8 @@ const UserDropdown = (props) => {
                 flexDirection: "column",
               }}
             >
-              <Typography sx={{ fontWeight: 500 }}>John Doe</Typography>
-              <Typography variant="body2">Admin</Typography>
+           <Typography sx={{ fontWeight: 500 }}>{userData?.restaurantDetails?.restaurantName}</Typography>
+              <Typography variant="body2">{userData?.role}</Typography>
             </Box>
           </Box>
         </Box>

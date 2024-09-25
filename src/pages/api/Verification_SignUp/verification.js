@@ -13,15 +13,9 @@ export const config = {
   },
 };
 
-// Required fields for validation
-const requiredFields = [
-  "userType", "email", "tagline", "restaurantName", "cnicNumber",
-  "restaurantOwner", "mobile", "zipcode", "address", "landmark", "city", "state"
-];
-
 const validateFields = (fields) => {
   const requiredFields = [
-    "userType", "email", "tagline", "restaurantName", "cnicNumber",
+    "role", "email", "tagline", "restaurantName", "cnicNumber",
     "restaurantOwner", "mobile", "zipcode", "address", "landmark", "city", "state"
   ];
 
@@ -57,7 +51,7 @@ const parseForm = (req, uploadDir) => {
 };
 
 // Send verification email
-const sendVerificationEmail = async (email, userType, verificationLink, htmlContent) => {
+const sendVerificationEmail = async (email, role, verificationLink, htmlContent) => {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -96,7 +90,7 @@ export default async function handler(req, res) {
     }
 
     const {
-      userType, email, tagline, restaurantName, cnicNumber,
+      role, email, tagline, restaurantName, cnicNumber,
       restaurantOwner, mobile, zipcode, address, landmark,
       city, state
     } = fields;
@@ -125,7 +119,7 @@ export default async function handler(req, res) {
     // Prepare user data
     const userData = {
       email: email[0],
-      userType: userType[0],
+      role: role[0],
       restaurantDetails: {
         logo: imageFilename || '',
         tagline: tagline[0],
@@ -145,13 +139,14 @@ export default async function handler(req, res) {
 
     // Generate verification token and link
     const token = generateVerificationToken(userData);
-    const verificationLink = `${verificationLinkBaseUrl}?token=${token}`;
+    const type = "set-password";
+    const verificationLink = `${verificationLinkBaseUrl}?type=${type}&token=${token}`;
     console.log("verificationLink...", verificationLink);
 
     // Generate email content based on user type
     let htmlContent;
-    console.log("userType...", userType);
-    if (userType[0] === "Resturant") {
+    console.log("role...", role);
+    if (role[0] === "Resturant") {
       htmlContent = `
       <div style="background-color: #f0f4f8; padding: 40px; font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
@@ -196,7 +191,7 @@ export default async function handler(req, res) {
         </div>
       </div>
     `;
-    } else if (userType[0] === "Admin") {
+    } else if (role[0] === "Admin") {
       htmlContent = `
         <div style="background: linear-gradient(135deg, #3b82f6, #eff6ff); padding: 20px;">
           <div style="background-color: #ffffff; padding: 30px; border-radius: 10px;">
@@ -212,7 +207,7 @@ export default async function handler(req, res) {
     }
 
     // Send verification email
-     const response  =  await sendVerificationEmail(email[0], userType[0], verificationLink, htmlContent);
+     const response  =  await sendVerificationEmail(email[0], role[0], verificationLink, htmlContent);
      console.log("response send email ...", response);
      return res.status(200).json({ message: "Verification email sent successfully" });
 

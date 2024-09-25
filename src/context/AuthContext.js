@@ -33,12 +33,13 @@ const AuthProvider = ({ children }) => {
       const storedToken = window.localStorage.getItem(
         authConfig.storageTokenKeyName,
       );
+      console.log("storedToken", storedToken); 
       if (storedToken) {
         setLoading(true);
         await axios
           .get(authConfig.meEndpoint, {
             headers: {
-              Authorization: storedToken,
+              Authorization: `Bearer ${storedToken}`,
             },
           })
           .then(async (response) => {
@@ -66,37 +67,47 @@ const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogin = (params, errorCallback) => {
-    axios
-      .post(authConfig.loginEndpoint, params)
-      .then(async (response) => {
-        params.rememberMe
-          ? window.localStorage.setItem(
-              authConfig.storageTokenKeyName,
-              response.data.accessToken,
-            )
-          : null;
-        params.isSuperAdmin
-          ? window.localStorage.setItem(authConfig.isSuperAdmin, true)
-          : window.localStorage.setItem(authConfig.isSuperAdmin, false);
-        const returnUrl = router.query.returnUrl;
-        setUser({ ...response.data.userData });
-        params.rememberMe
-          ? window.localStorage.setItem(
-              "userData",
-              JSON.stringify(response.data.userData),
-            )
-          : null;
-        console.log("returnUrl", returnUrl);
+  const handleLogin = async (params, errorCallback) => {
+    console.log("params", params);
+    try {
+      const response = await axios.post(authConfig.loginEndpoint, params);
 
-        const redirectURL = returnUrl && returnUrl !== "/" ? returnUrl : "/";
-        console.log("redirectURL", redirectURL);
+      const { accessToken, userData } = response.data;
+      console.log("accessToken", accessToken);
+      console.log("userData", userData);
 
-        router.replace(redirectURL);
-      })
-      .catch((err) => {
-        if (errorCallback) errorCallback(err);
-      });
+      if (userData) {
+        window.localStorage.setItem(
+          authConfig.storageTokenKeyName,
+          accessToken,
+        )
+      }
+
+      if (userData.role === "superAdmin") {
+        window.localStorage.setItem(authConfig.isSuperAdmin, true);
+      } else if (userData.role === "Resturant") {
+        window.localStorage.setItem(authConfig.isSuperAdmin, false);
+      }
+
+      const returnUrl = router.query.returnUrl;
+      setUser({ ...userData });
+      if (userData) {
+        window.localStorage.setItem(
+          "userData",
+          JSON.stringify(userData),
+        );
+      }
+      console.log("returnUrl", returnUrl);
+
+      const redirectURL = returnUrl && returnUrl !== "/" ? returnUrl : "/";
+      console.log("redirectURL", redirectURL);
+
+      router.replace(redirectURL);
+   
+    } catch (error) {
+      const errorMessage = error?.response?.data?.error || "Login failed, please try again";
+      if (errorCallback) errorCallback(errorMessage);
+    }
   };
 
   const handleLogout = () => {

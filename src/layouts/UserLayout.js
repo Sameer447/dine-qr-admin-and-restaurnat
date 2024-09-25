@@ -23,9 +23,8 @@ const UserLayout = ({ children, contentHeightFixed }) => {
   // ** Hooks
   const { settings, saveSettings } = useSettings();
   const getUserRole = () => {
-    const user = JSON.parse(localStorage.getItem("isSuperAdmin"));
-    console.log("user", user);
-    return user;
+    const userStatus = JSON.parse(localStorage.getItem("isSuperAdmin"));
+    return userStatus;
   };
   const userRole = getUserRole();
 
