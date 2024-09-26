@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { useState } from "react";
 import { useRouter } from "next/navigation";
@@ -127,7 +128,8 @@ const LoginPage = () => {
       await auth.login({ email, password, rememberMe, isSuperAdmin });
       toast.success("Logged in successfully");
     } catch (error) {
-      const errorMessage = error?.response?.data?.error || "Email or Password is invalid";
+      const errorMessage =
+        error?.response?.data?.error || "Email or Password is invalid";
       toast.error(errorMessage);
       setError("email", {
         type: "manual",
@@ -137,22 +139,21 @@ const LoginPage = () => {
       setIsLoaded(false);
     }
 
-
     // try {
-      // const response = await axios.post(`/api/Login/verify-login`, {
-      //   email,
-      //   password
-      // }, {
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // });
+    // const response = await axios.post(`/api/Login/verify-login`, {
+    //   email,
+    //   password
+    // }, {
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // });
 
-      // console.log('response :>> ', response.data);
+    // console.log('response :>> ', response.data);
 
-      // // Successful login
-      // if (response.status === 200) {
-      //   const user = response.data.user;
+    // // Successful login
+    // if (response.status === 200) {
+    //   const user = response.data.user;
     //     console.log('Logged in user :>> ', user);
 
     //     // Redirect based on user type
@@ -182,7 +183,6 @@ const LoginPage = () => {
     //   }
     //   setIsLoaded(false);
   };
-
 
   const imageSource =
     skin === "bordered"

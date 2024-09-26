@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as formidable from "formidable";
 import { v4 as uuidv4 } from "uuid";
 import * as path from "path";
@@ -15,27 +16,35 @@ const saltRounds = 10;
 
 const validateFields = (fields) => {
   const requiredFields = [
-    'role', 'email', 'tagline', 'password', 'restaurantName',
-    'cnicNumber', 'restaurantOwner', 'mobile', 'zipcode',
-    'address', 'landmark', 'city', 'state'
+    "role",
+    "email",
+    "tagline",
+    "restaurantName",
+    "cnicNumber",
+    "restaurantOwner",
+    "mobile",
+    "zipcode",
+    "address",
+    "landmark",
+    "city",
+    "state",
   ];
-
   for (const field of requiredFields) {
     if (!fields[field] || fields[field].length === 0) {
       return `${field} is required.`;
     }
   }
-  return null; // No validation errors
+  return null;
 };
 
 // Main API handler
 export default async function handler(req, res) {
   console.log("Received request:", req.method);
-  if (req.method !== 'POST') {
+  if (req.method !== "POST") {
     return res.status(405).json({ message: "Method Not Allowed" });
   }
 
-  const uploadDir = path.join(process.cwd(), '/data');
+  const uploadDir = path.join(process.cwd(), "/data");
   const form = new formidable.IncomingForm({
     uploadDir,
     keepExtensions: true,
@@ -44,7 +53,7 @@ export default async function handler(req, res) {
   // Parse the incoming form data
   form.parse(req, async (err, fields, files) => {
     if (err) {
-      console.error('Error parsing the form:', err);
+      console.error("Error parsing the form:", err);
       return res.status(500).json({ message: "Error parsing form data" });
     }
 
@@ -57,13 +66,22 @@ export default async function handler(req, res) {
     try {
       // Destructure the fields for easier access
       const {
-        role, email, tagline, restaurantName, cnicNumber,
-        restaurantOwner, mobile, zipcode, address, landmark,
-        city, state, password
+        role,
+        email,
+        tagline,
+        restaurantName,
+        cnicNumber,
+        restaurantOwner,
+        mobile,
+        zipcode,
+        address,
+        landmark,
+        city,
+        state,
       } = fields;
 
       // Handle file upload
-      let imageFilename = '';
+      let imageFilename = "";
       const uploadedFile = files.logo;
 
       if (uploadedFile && uploadedFile.length > 0) {
@@ -75,18 +93,18 @@ export default async function handler(req, res) {
       }
 
       // Hash the password
-      const hash = await bcrypt.hash(password[0], saltRounds);
+      // const hash = await bcrypt.hash(password[0], saltRounds);
 
       // Create the user in the database
       const createdUser = await User.create({
         email: email[0],
-        password: hash,
+        // password: hash,
         role: role[0],
         restaurantDetails: {
           logo: imageFilename,
           tagline: tagline[0],
           restaurantName: restaurantName[0],
-          cnicNumber: cnicNumber[0].replace(/[^0-9]/g, ''),
+          cnicNumber: cnicNumber[0].replace(/[^0-9]/g, ""),
           restaurantOwner: restaurantOwner[0],
         },
         addressDetails: {
@@ -99,16 +117,15 @@ export default async function handler(req, res) {
         },
       });
 
-      return res.status(200).json({ message: "User created successfully", createdUser });
+      return res
+        .status(200)
+        .json({ message: "User created successfully", createdUser });
     } catch (error) {
-      console.error('Error handling signup:', error);
+      console.error("Error handling signup:", error);
       return res.status(500).json({ message: "Error processing signup" });
     }
   });
 }
-
-
-
 
 // import User from "../../models/user";
 // import bcrypt from 'bcrypt';
@@ -119,7 +136,7 @@ export default async function handler(req, res) {
 //     try {
 //       console.log("hit Signup..?", req.formData());
 
-      // const { role, email, password, username, restaurantDetails, addressDetails } = req.body;
+// const { role, email, password, username, restaurantDetails, addressDetails } = req.body;
 
 // // Validate input fields
 // if (!email || !password || !role) {
@@ -149,7 +166,7 @@ export default async function handler(req, res) {
 //   password: hash,
 //   role,
 //   restaurantDetails: {
-//     logo: logo || '', 
+//     logo: logo || '',
 //     tagline: restaurantDetails.tagline || '',
 //     restaurantName: restaurantDetails.restaurantName,
 //     cnicNumber: restaurantDetails.cnicNumber.replace(/[^0-9]/g, ''),
@@ -174,8 +191,6 @@ export default async function handler(req, res) {
 //     return res.status(405).json({ message: "Method Not Allowed" });
 //   }
 // }
-
-
 
 // // Parse the request body to get the input fields
 //    const { role, email, password, username, restaurantDetails, addressDetails } = await request.json();
@@ -207,7 +222,7 @@ export default async function handler(req, res) {
 //   //     password: hash,
 //   //     role
 //   //   });
-//   // } else 
+//   // } else
 //   if (role === "Resturant") {
 //     // Additional checks or validations for restaurant fields can be added here
 
@@ -240,7 +255,6 @@ export default async function handler(req, res) {
 //     return NextResponse.json({ status: 400, message: "Invalid user type" });
 //   }
 
-
 // export async function POST(request) {
 //   console.log("hit..?");
 
@@ -249,7 +263,6 @@ export default async function handler(req, res) {
 //     let hash;
 //     let createdUser;
 //     console.log("hit..?",role, resturantname, phonenum, cnic, email, username, password , resturant);
-
 
 //     if (!password || password.trim().length === 0) {
 //       return NextResponse.json({ status: 400, message: "Password cannot be empty" });
@@ -275,7 +288,6 @@ export default async function handler(req, res) {
 //   }
 // }
 
-
 // export async function POST(request) {
 //   var { resturantname, phonenum,cnic,email, password } = await request.json();
 //    cnic = cnic.replace(/[^0-9]/g, '')
@@ -286,24 +298,14 @@ export default async function handler(req, res) {
 //   return NextResponse.json(
 //     {
 //       msg: "User created Successfully",
-//       obj: user 
+//       obj: user
 //     },
 //     { status: 200 }
 //   );
 // }
 
-
 export async function GET(request) {
   const Users = await User.find();
-  console.log(Users)
-  return NextResponse.json(
-    { Users },
-    { status: 200 }
-  );
+  console.log(Users);
+  return NextResponse.json({ Users }, { status: 200 });
 }
-
-
-
-
-
-

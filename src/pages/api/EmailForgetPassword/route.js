@@ -73,11 +73,11 @@ export async function POST(request) {
     </body>
     </html>
   `;
-  
+
     const mailOptions = {
       from: user,
       to: email,
-      subject: "Verification Code",
+      subject: "Reset Password Request",
       html: htmlContent,
     };
 
@@ -85,7 +85,7 @@ export async function POST(request) {
 
     if (info.messageId) {
       console.log("Email sent successfully");
-      return NextResponse.json({ status: 200 , code:verificationCode });
+      return NextResponse.json({ status: 200, code: verificationCode });
     } else {
       console.error("Email sending failed");
       return NextResponse.json({ status: 400 });

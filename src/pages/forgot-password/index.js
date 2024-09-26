@@ -21,6 +21,7 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 import FooterIllustrationsV2 from "src/views/pages/auth/FooterIllustrationsV2";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
+import toast from "react-hot-toast";
 
 // Styled Components
 const ForgotPasswordIllustration = styled("img")(({ theme }) => ({
@@ -68,20 +69,26 @@ const ForgotPassword = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm({});
+  } = useForm({ defaultValues });
 
   // ** Vars
   const hidden = useMediaQuery(theme.breakpoints.down("md"));
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     const { email } = data;
-    const response = fetch("/api/EmailForgetPassword/emailforgetpassword", {
+    const response = await fetch("/api/ForgotPassword/route", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(email),
     });
+    console.log("response", response);
+    if (!response?.data?.error) {
+      toast.success("Reset email link sent successfully", 10000);
+    } else {
+      toast.error("User not found", 10000);
+    }
   };
 
   return (

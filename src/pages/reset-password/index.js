@@ -17,6 +17,7 @@ import CardContent from "@mui/material/CardContent";
 import InputAdornment from "@mui/material/InputAdornment";
 // ** Custom Component Import
 import CustomTextField from "src/@core/components/mui/text-field";
+import toast from "react-hot-toast";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
@@ -70,7 +71,7 @@ const defaultValues = {
 const ResetPassword = () => {
   // ** Hooks
   const router = useRouter();
-  const { token , type } = router.query;
+  const { token, type } = router.query;
   console.log("token", token);
   console.log("type", type);
   const theme = useTheme();
@@ -88,21 +89,33 @@ const ResetPassword = () => {
   // ** Vars
   const hidden = useMediaQuery(theme.breakpoints.down("md"));
 
-  const onSubmit = (data) => {
-    console.log(data);
-    const body = {
-      token,
-      newPassword: data.newPassword,
-    };
-    const response = fetch(`/api/SetNewPassword/${'reset'}/password`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
-    if (response.status === 200) {
-      router.push("/login");
+  const onSubmit = async (data) => {
+    if (data.newPassword === data.confirmNewPassword) {
+      const body = {
+        token,
+        newPassword: data.newPassword,
+      };
+      const response = await fetch(`/api/SetNewPassword/password`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+      console.log("response", response);
+
+      if (response?.status === 200) {
+        if (!response.error) {
+          toast.success(
+            `Password ${
+              type === "reset-password" ? "Reset" : "Set"
+            } Successfully`,
+          );
+        }
+        router.push("/login");
+      } else {
+        toast.error("Something wend wrong", 10000);
+      }
     }
   };
 
@@ -196,7 +209,7 @@ const ResetPassword = () => {
                   lineHeight: 1.385,
                 }}
               >
-                Reset Password? 🔒
+                {`${type === "reset-password" ? "Reset" : "Set"}`} Password? 🔒
               </Typography>
               {/* <Typography sx={{ color: "text.secondary" }}>
                 Enter your email and we&prime;ll send you instructions to reset
@@ -327,7 +340,11 @@ const ResetPassword = () => {
                     variant="contained"
                     sx={{ mb: 4 }}
                   >
-                    Submit
+                    {`${
+                      type === "reset-password"
+                        ? "Reset Password"
+                        : "Set Password"
+                    }`}
                   </Button>
                 </Grid>
               </Grid>

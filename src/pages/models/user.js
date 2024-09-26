@@ -12,6 +12,9 @@ var UserSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    password: {
+      type: String,
+    },
     restaurantDetails: {
       logo: {
         type: String,

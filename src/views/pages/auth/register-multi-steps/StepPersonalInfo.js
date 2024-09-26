@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** MUI Components
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
@@ -11,7 +12,7 @@ import CustomTextField from "src/@core/components/mui/text-field";
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
 import { useForm, Controller } from "react-hook-form";
-import toast, { LoaderIcon } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { ServiceUrl } from "src/@core/utils/global";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
@@ -27,8 +28,12 @@ const defaultValues = {
 };
 
 const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
-
-  const { control, handleSubmit, formState: { errors } , resetField , } = useForm({ defaultValues });
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    resetField,
+  } = useForm({ defaultValues });
   const [loading, setLoading] = useState(false);
 
   const onSubmit = async (formData) => {
@@ -41,7 +46,7 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
         },
       });
 
-      console.log('res:', res);
+      console.log("res:", res);
 
       if (res.status === 200) {
         toast.success("Account Already Exist");
@@ -49,30 +54,45 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
       } else {
         const completeData = new FormData();
         // Append restaurant details
-        completeData.append('role', 'Resturant');
-        completeData.append('email', restaurantData.email);
-        completeData.append('logo', restaurantData.logo);
-        completeData.append('tagline', restaurantData.tagline);
-        completeData.append('restaurantName', restaurantData.restaurantName);
-        completeData.append('cnicNumber', restaurantData.registrationNumber);
-        completeData.append('restaurantOwner', restaurantData.retaurantOwner);
+        completeData.append("role", "Resturant");
+        completeData.append("email", restaurantData.email);
+        completeData.append("logo", restaurantData.logo);
+        completeData.append("tagline", restaurantData.tagline);
+        completeData.append("restaurantName", restaurantData.restaurantName);
+        completeData.append("cnicNumber", restaurantData.registrationNumber);
+        completeData.append("restaurantOwner", restaurantData.retaurantOwner);
 
         // Append address details
-        completeData.append('mobile', formData.mobile);
-        completeData.append('zipcode', formData.zipcode);
-        completeData.append('address', formData.address);
-        completeData.append('landmark', formData.landmark);
-        completeData.append('city', formData.city);
-        completeData.append('state', formData.state);
+        completeData.append("mobile", formData.mobile);
+        completeData.append("zipcode", formData.zipcode);
+        completeData.append("address", formData.address);
+        completeData.append("landmark", formData.landmark);
+        completeData.append("city", formData.city);
+        completeData.append("state", formData.state);
 
-        const response = await axios.post(`/api/Verification_SignUp/verification`, completeData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        const response = await axios.post(
+          `/api/Verification_SignUp/verification`,
+          completeData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           },
-        });
+        );
 
         if (response.status === 200) {
           toast.success("We have sent you an email please verify your account");
+          const register = await axios.post(
+            "/api/signup/signup",
+            completeData,
+            {
+              headers: {
+                "Content-Type": "multipart/form-data",
+              },
+            },
+          );
+          console.log("User created:", register?.data);
+
           setLoading(false);
           resetField("address");
           resetField("city");
@@ -82,18 +102,18 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
           resetField("zipcode");
           handlePrev();
         } else if (response.status === 400) {
-          console.error('Error creating account:', response.data.message);
-          toast.error(response.data.message);
+          console.error("Error creating account:", response.data.message);
+          toast.error(response.data.message, 10000);
           setLoading(false);
         } else if (response.status === 500) {
-          console.error('Error creating account:', response.data.message);
-          toast.error(response.data.message);
+          console.error("Error creating account:", response.data.message);
+          toast.error(response.data.message, 10000);
           setLoading(false);
         }
       }
     } catch (error) {
-      console.error('Error signing up:', error);
-      toast.error(error);
+      console.error("Error signing up:", error);
+      toast.error(error, 10000);
       setLoading(false);
     } finally {
       setLoading(false);
@@ -139,7 +159,6 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
   //       completeData.append('state', formData.state);
   //       completeData.append('password', 'Ameen123*');
 
-
   //       const response = await axios.post(`/api/signup/signup`, completeData, {
   //         headers: {
   //           'Content-Type': 'multipart/form-data',
@@ -164,7 +183,6 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
   //     toast.error(error);
   //   }
   // };
-
 
   return (
     <>
@@ -208,7 +226,12 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
             <Controller
               name="zipcode"
               control={control}
-              rules={{ required: true, minLength: 5, maxLength: 5, pattern: [0 - 9][5], }}
+              rules={{
+                required: true,
+                minLength: 5,
+                maxLength: 5,
+                pattern: [0 - 9][5],
+              }}
               render={({ field: { value, onChange } }) => (
                 <CustomTextField
                   fullWidth
@@ -329,9 +352,7 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
                 {loading ? (
                   <CircularProgress size={24} thickness={6} color="inherit" />
                 ) : (
-                  <text>
-                    Submit
-                  </text>
+                  <text>Submit</text>
                 )}
               </Button>
             </Box>
@@ -343,7 +364,6 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
 };
 
 export default StepPersonalDetails;
-
 
 {
   /* <>
