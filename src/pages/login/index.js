@@ -87,8 +87,8 @@ const schema = yup.object().shape({
 });
 
 const defaultValues = {
-  password: "admin",
-  email: "admin@vuexy.com",
+  password: "",
+  email: "",
 };
 
 const LoginPage = () => {
@@ -122,14 +122,42 @@ const LoginPage = () => {
 
   const onSubmit = async (data) => {
     const { email, password } = data;
+    if (!email) {
+      setError("email", {
+        type: "manual",
+        message: "Email is required",
+      });
+      return;
+    } else if (!password) {
+      setError("password", {
+        type: "manual",
+        message: "Password is required",
+      });
+      return;
+    }
     setIsLoaded(true);
-
     try {
-      await auth.login({ email, password, rememberMe, isSuperAdmin });
-      toast.success("Logged in successfully");
+      const response = await axios.post(`/api/Login/verify-login`, {
+        email,
+        password
+      }, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        const user = response.data;
+        console.log('Logged in user :>> ', user);
+        await auth.login({ email, password, rememberMe, isSuperAdmin });
+        toast.success("Logged in successfully");
+      } else {
+        console.log('response :>> ', response.data);
+        toast.error(response.data.message);
+      }
     } catch (error) {
       const errorMessage =
-        error?.response?.data?.error || "Email or Password is invalid";
+        error?.message || "Email or Password is invalid";
       toast.error(errorMessage);
       setError("email", {
         type: "manual",
@@ -138,51 +166,52 @@ const LoginPage = () => {
     } finally {
       setIsLoaded(false);
     }
-
-    // try {
-    // const response = await axios.post(`/api/Login/verify-login`, {
-    //   email,
-    //   password
-    // }, {
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    // });
-
-    // console.log('response :>> ', response.data);
-
-    // // Successful login
-    // if (response.status === 200) {
-    //   const user = response.data.user;
-    //     console.log('Logged in user :>> ', user);
-
-    //     // Redirect based on user type
-    //     if (user.role === "Resturant") {
-    //       const restaurantID = user._id;
-    //       router.push(`/Admin?resturant_id=${encodeURIComponent(restaurantID)}`);
-    //     } else if (user.role === "Admin") {
-    //       router.push('/SuperAdmin');
-    //     }
-
-    //     // Display success toast
-    //     toast.success("Logged in successfully");
-
-    //     // Save user data in localStorage
-    //     localStorage.setItem('current_user', JSON.stringify(user));
-    //     localStorage.setItem('_id', user._id);
-    //     localStorage.setItem('role', user.role);
-    //   } else {
-    //     // Handle failure cases (401: Incorrect password, 404: User not found)
-    //     toast.error(response.data.message);
-    //   }
-    // } catch (error) {
-    //   // Network or server error
-    //   console.error('Error during login:', error);
-    //   toast.error('An error occurred during login. Please try again.');
-    // } finally {
-    //   }
-    //   setIsLoaded(false);
   };
+
+  // try {
+  // const response = await axios.post(`/api/Login/verify-login`, {
+  //   email,
+  //   password
+  // }, {
+  //   headers: {
+  //     'Content-Type': 'application/json',
+  //   },
+  // });
+
+  // console.log('response :>> ', response.data);
+
+  // // Successful login
+  // if (response.status === 200) {
+  //   const user = response.data.user;
+  //     console.log('Logged in user :>> ', user);
+
+  //     // Redirect based on user type
+  //     if (user.role === "Resturant") {
+  //       const restaurantID = user._id;
+  //       router.push(`/Admin?resturant_id=${encodeURIComponent(restaurantID)}`);
+  //     } else if (user.role === "Admin") {
+  //       router.push('/SuperAdmin');
+  //     }
+
+  //     // Display success toast
+  //     toast.success("Logged in successfully");
+
+  //     // Save user data in localStorage
+  //     localStorage.setItem('current_user', JSON.stringify(user));
+  //     localStorage.setItem('_id', user._id);
+  //     localStorage.setItem('role', user.role);
+  //   } else {
+  //     // Handle failure cases (401: Incorrect password, 404: User not found)
+  //     toast.error(response.data.message);
+  //   }
+  // } catch (error) {
+  //   // Network or server error
+  //   console.error('Error during login:', error);
+  //   toast.error('An error occurred during login. Please try again.');
+  // } finally {
+  //   }
+  //   setIsLoaded(false);
+  // };
 
   const imageSource =
     skin === "bordered"

@@ -1,6 +1,7 @@
 // @ts-nocheck
 // ** Next Import
 import Link from "next/link";
+import * as yup from "yup";
 
 // ** MUI Components
 import Button from "@mui/material/Button";
@@ -22,6 +23,9 @@ import FooterIllustrationsV2 from "src/views/pages/auth/FooterIllustrationsV2";
 import { Controller, useForm } from "react-hook-form";
 import { useRouter } from "next/router";
 import toast from "react-hot-toast";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useState } from "react";
+import { CircularProgress } from "@mui/material";
 
 // Styled Components
 const ForgotPasswordIllustration = styled("img")(({ theme }) => ({
@@ -58,38 +62,74 @@ const LinkStyled = styled(Link)(({ theme }) => ({
   color: theme.palette.primary.main,
   fontSize: theme.typography.body1.fontSize,
 }));
-const defaultValues = {
-  email: "",
-};
+
+// Validation schema using Yup
+const schema = yup.object().shape({
+  email: yup
+    .string()
+    .email("Invalid email format")
+    .matches(
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.(com|ai|org|net|edu|gov|mil|int|io|tech|co|biz|info|me|tv|xyz)$/i,
+      "Email must be a valid domain ending with .com, .ai, etc."
+    )
+    .required("Email is required"),
+});
+
 const ForgotPassword = () => {
   // ** Hooks
-  const navigation = useRouter();
+  const router = useRouter();
   const theme = useTheme();
+  const hidden = useMediaQuery(theme.breakpoints.down("md"));
+  const [loading, setLoading] = useState(false);
+  // ** React Hook Form
   const {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm({ defaultValues });
+  } = useForm({
+    resolver: yupResolver(schema), // Use yupResolver to integrate Yup validation schema
+    defaultValues: {
+      email: "",
+    },
+  });
 
-  // ** Vars
-  const hidden = useMediaQuery(theme.breakpoints.down("md"));
-
+  // Submit handler for form
   const onSubmit = async (data) => {
     const { email } = data;
-    const response = await fetch("/api/ForgotPassword/route", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(email),
-    });
-    console.log("response", response);
-    if (!response?.data?.error) {
-      toast.success("Reset email link sent successfully", 10000);
-    } else {
-      toast.error("User not found", 10000);
+
+    try {
+      setLoading(true);
+      const response = await fetch("/api/ForgotPassword/route", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(email),
+      });
+
+      if (response.ok) {
+        toast.success("Reset email link sent successfully", {
+          autoClose: 10000,
+        });
+        router.push('/login')
+        setLoading(false);
+      } else {
+        const errorData = await response.json();
+        toast.error(errorData?.error || "User not found", {
+          autoClose: 10000,
+        });
+        setLoading(false);
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.", {
+        autoClose: 10000,
+      });
+      setLoading(false);
+    } finally {
+      setLoading(false);
     }
   };
+
 
   return (
     <Box className="content-right" sx={{ backgroundColor: "background.paper" }}>
@@ -173,15 +213,10 @@ const ForgotPassword = () => {
                 your password
               </Typography>
             </Box>
-            <form
-              noValidate
-              autoComplete="off"
-              onSubmit={handleSubmit(onSubmit)}
-            >
+            <form noValidate autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
               <Controller
                 name="email"
                 control={control}
-                rules={{ required: false }}
                 render={({ field: { value, onChange } }) => (
                   <CustomTextField
                     fullWidth
@@ -194,20 +229,13 @@ const ForgotPassword = () => {
                     sx={{ display: "flex", mb: 4 }}
                     id="validation-basic-select"
                     error={Boolean(errors.email)}
-                    aria-describedby="validation-basic-select"
-                    {...(errors.email && {
-                      helperText: "This field is required",
-                    })}
+                    helperText={errors.email?.message}
                   />
                 )}
               />
-              <Button
-                fullWidth
-                type="submit"
-                variant="contained"
-                sx={{ mb: 4 }}
-              >
-                Send reset link
+              <Button fullWidth type="submit" variant="contained" sx={{ mb: 4 , py: 3 }}>
+                {loading ? <CircularProgress size={24} thickness={6} color="inherit" />
+                  : "Send reset link"}
               </Button>
               <Typography
                 sx={{

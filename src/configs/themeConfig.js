@@ -4,6 +4,20 @@
  * ! IMPORTANT: Make sure you clear the browser local storage in order to see the config changes in the template.
  * ! To clear local storage, you may refer https://www.leadshook.com/help/how-to-clear-local-storage-in-google-chrome-browser/.
  */
+
+
+// Function to get the restaurant name from local storage
+// export const getRestaurantNameFromLocalStorage = () => {
+//   if (typeof window !== "undefined") {
+//     const restaurantData = localStorage.getItem("userData") ? JSON?.parse(localStorage.getItem("userData")) : undefined;
+//     if(restaurantData?.role === "Resturant") {
+//       return restaurantData.restaurantDetails.restaurantName || null;
+//     } 
+//   }
+//   return null;
+// };
+
+
 const themeConfig = {
   // ** Layout Configs
   templateName: 'DineQR' /* App Name */,
@@ -36,5 +50,13 @@ const themeConfig = {
   disableCustomizer: false /* true | false */,
   toastPosition: 'top-right' /* top-left | top-center | top-right | bottom-left | bottom-center | bottom-right */
 }
+
+
+// Dynamically update the template name if the restaurant name exists in local storage
+// const restaurantName = getRestaurantNameFromLocalStorage();
+// if (restaurantName) {
+//   themeConfig.templateName = restaurantName;
+// }
+
 
 export default themeConfig

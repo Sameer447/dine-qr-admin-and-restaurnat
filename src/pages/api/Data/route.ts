@@ -25,7 +25,6 @@ export async function GET() {
     console.log("delete hit..?")
     try {
       const { id } =  await request.json();
-     console.log(id);
       // Validate if the ID is valid mongoose ObjectId
    
       // Find and delete the item by ID

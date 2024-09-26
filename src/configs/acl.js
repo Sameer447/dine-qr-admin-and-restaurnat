@@ -9,7 +9,6 @@ export const AppAbility = Ability
  */
 const defineRulesFor = (role, subject) => {
   const { can, rules } = new AbilityBuilder(AppAbility);
-  console.log('role', role)
   // if (role === 'superAdmin') {
     can('manage', 'all')
   // } else if (role === 'Resturant') {

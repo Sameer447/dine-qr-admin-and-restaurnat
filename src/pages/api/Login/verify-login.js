@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
-    return res.status(405).json({ message: "Method not allowed" });
+    return res.status(400).json({ message: "Method not allowed" });
   }
 
   const { email, password } = req.body;
@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     const user = await User.findOne({ email }).lean();
 
     if (!user) {
-      return res.status(404).json({ status: 404, message: "User Not Found" });
+      return res.status(400).json({ status: 404, message: "User Not Found" });
     }
 
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
@@ -20,11 +20,10 @@ export default async function handler(req, res) {
     if (!isPasswordCorrect) {
       return res
         .status(401)
-        .json({ status: 401, message: "Incorrect Password" });
+        .json({ status: 400, message: "Incorrect Password" });
     }
 
     const { password: _, ...userData } = user;
-    console.log("User logged in successfully", userData);
     return res
       .status(200)
       .json({

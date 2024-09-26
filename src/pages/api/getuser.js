@@ -7,8 +7,7 @@ export default async function handler(req, res) {
     }
   
     const { _id } = req.query; // Retrieve the _id from the query parameters
-    console.log("Get user data hit!!?", _id);
-  
+    
     try {
       const user = await User.findById(_id).lean();
   

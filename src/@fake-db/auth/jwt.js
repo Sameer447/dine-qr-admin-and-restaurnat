@@ -34,51 +34,52 @@ const jwtConfig = {
   expirationTime: process.env.NEXT_PUBLIC_JWT_EXPIRATION,
   refreshTokenSecret: process.env.NEXT_PUBLIC_JWT_REFRESH_TOKEN_SECRET,
 };
+
+
 mock.onPost("/jwt/login").reply(async (request) => {
   const { email, password } = JSON.parse(request.data);
-  let user = null;
 
-  let error = {
-    email: ["Something went wrong"],
-  };
-  // const user = users.find(u => u.email === email && u.password === password)
-  const responseData = await axios.post(
-    `/api/Login/verify-login`,
-    {
-      email,
-      password,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    },
-  );
-
-  if (responseData.status === 200) {
-    user = responseData.data.user;
-    console.log("find in user :>> ", user);
+  // Validate email and password input
+  if (!email || !password) {
+    return [400, { error: { email: ["Email and password are required"] } }];
   }
 
-  if (user) {
-    const accessToken = jwt.sign({ id: user._id }, jwtConfig.secret, {
-      expiresIn: jwtConfig.expirationTime,
-    });
+  try {
+    // Verify credentials via the actual API
+    const responseData = await axios.post(
+      `/api/Login/verify-login`,
+      { email, password },
+      { headers: { "Content-Type": "application/json" } },
+    );
 
-    const response = {
-      accessToken,
-      userData: { ...user, password: undefined },
-    };
+    // If the user is found
+    if (responseData.status === 200 && responseData.data?.user) {
+      const user = responseData.data.user;
 
-    return [200, response];
-  } else {
-    error = {
-      email: ["email or Password is Invalid"],
-    };
+      // Generate JWT token
+      const accessToken = jwt.sign({ id: user._id }, jwtConfig.secret, {
+        expiresIn: jwtConfig.expirationTime,
+      });
 
-    return [400, { error }];
+      // Send back token and userData in response
+      return [200, { accessToken, userData: { ...user, password: undefined } }];
+    } else {
+      // If credentials are invalid, return an error
+      return [400, { error: { email: ["Email or password is incorrect"] } }];
+    }
+  } catch (error) {
+    console.error("Error verifying login: ", error.message);
+
+    // Server error handling
+    if (error.response?.status === 500) {
+      return [500, { error: { general: ["Server error, please try again later"] } }];
+    }
+
+    // Handle other unexpected errors
+    return [400, { error: { general: ["An unexpected error occurred"] } }];
   }
 });
+
 
 mock.onPost("/jwt/register").reply((request) => {
   if (request.data.length > 0) {
@@ -125,105 +126,67 @@ mock.onPost("/jwt/register").reply((request) => {
   }
 });
 
+
 mock.onGet("/auth/me").reply((config) => {
   return new Promise((resolve) => {
-    // ** Get token from header and remove 'Bearer' prefix
     const token = config.headers.Authorization?.split(" ")[1];
-    console.log("token without Bearer :>> ", token);
+    if (!token) {
+      resolve([401, { error: "Unauthorized access, token is missing" }]);
+      return;
+    }
 
-    // ** Default response
-    let response = [200, {}];
-
-    // ** Checks if the token is valid or expired
     jwt.verify(token, jwtConfig.secret, async (err, decoded) => {
-      // ** If token is expired
       if (err) {
-        // ** If onTokenExpiration === 'logout' then send 401 error
-        if (defaultAuthConfig.onTokenExpiration === "logout") {
-          // ** 401 response will logout user from AuthContext file
-          response = [401, { error: { error: "Invalid User" } }];
-          resolve(response); // Resolve here to return 401 immediately
-        } else {
-          // ** If onTokenExpiration === 'refreshToken' then generate the new token
-          const oldTokenDecoded = jwt.decode(token, { complete: true });
-          console.log("oldTokenDecoded", oldTokenDecoded);
+        // Handle token expiration or invalid token
+        if (err.name === "TokenExpiredError") {
+          // Token expired, check config for refresh or logout
+          if (defaultAuthConfig.onTokenExpiration === "logout") {
+            resolve([401, { error: "Session expired, please login again" }]);
+          } else if (defaultAuthConfig.onTokenExpiration === "refreshToken") {
+            const oldTokenDecoded = jwt.decode(token, { complete: true });
+            const { id: userId } = oldTokenDecoded.payload;
 
-          // ** Get user id from old token
-          // @ts-ignore
-          const { id: userId } = oldTokenDecoded?.payload;
-
-          // ** Get user that matches id in token
-          // const user = usersData.find(u => u.id === userId)
-          try {
-            const responseData = await axios.get(`/api/getuser`, {
-              headers: {
-                "Content-Type": "application/json",
-              },
-              params: {
-                _id: userId, // Pass userId as a query parameter
-              },
-            });
-            if (responseData.status === 200) {
-              const user = responseData.data.user;
-
-              // Create new access token and store it
-              const accessToken = jwt.sign({ id: user._id }, jwtConfig.secret, {
-                expiresIn: jwtConfig.expirationTime,
+            try {
+              const responseData = await axios.get(`/api/getuser`, {
+                params: { _id: userId },
               });
 
-              window.localStorage.setItem(
-                defaultAuthConfig.storageTokenKeyName,
-                accessToken,
-              );
+              if (responseData.status === 200) {
+                const user = responseData.data.user;
+                const newToken = jwt.sign({ id: user._id }, jwtConfig.secret, {
+                  expiresIn: jwtConfig.expirationTime,
+                });
 
-              console.log("user in me endpoint :>> ", user);
+                window.localStorage.setItem(
+                  defaultAuthConfig.storageTokenKeyName,
+                  newToken,
+                );
 
-              response = [200, { userData: { ...user, password: undefined } }];
-              resolve(response); // Return the final userData response
+                resolve([200, { userData: { ...user, password: undefined } }]);
+              }
+            } catch (error) {
+              resolve([500, { error: "Server error while refreshing token" }]);
             }
-          } catch (error) {
-            console.error("Error fetching user data:", error);
-            resolve([500, { error: "Server error" }]); // Resolve with error
           }
-
-          // ** Sign a new token
-          // const accessToken = jwt.sign({ id: userId }, jwtConfig.secret, {
-          //   expiresIn: jwtConfig.expirationTime
-          // })
-
-          // // ** Set new token in localStorage
-          // window.localStorage.setItem(defaultAuthConfig.storageTokenKeyName, accessToken)
-          // const obj = { userData: { ...user, password: undefined } }
-
-          // // ** return 200 with user data
-          // response = [200, obj]
+        } else {
+          resolve([401, { error: "Invalid token, please login again" }]);
         }
       } else {
-        // ** If token is valid do nothing
-        // @ts-ignore
+        // Token is valid, get the user information
         const userId = decoded.id;
 
         try {
           const responseData = await axios.get(`/api/getuser`, {
-            headers: {
-              "Content-Type": "application/json",
-            },
-            params: {
-              _id: userId,
-            },
+            params: { _id: userId },
           });
 
           if (responseData.status === 200) {
             const userData = responseData.data.user;
-            delete userData.password; // Remove password from the response
-            console.log("userData :>> ", userData);
-
-            response = [200, { userData }];
-            resolve(response); // Return the final response
+            delete userData.password;
+            resolve([200, { userData }]);
           }
         } catch (error) {
-          console.error("Error fetching user data:", error);
-          resolve([500, { error: "Server error" }]); // Resolve with error
+          resolve([500, { error: "Error fetching user data" }]);
         }
       }
     });

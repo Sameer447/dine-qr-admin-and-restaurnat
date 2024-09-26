@@ -41,14 +41,17 @@ export default async function handler(req, res) {
     const resetToken = jwt.sign(
       { email: email },
       process.env.NEXT_PUBLIC_JWT_SECRET,
-      { expiresIn: "24h" },
+      { expiresIn: "5m" },
     );
     const resetLink = `${process.env.NEXT_PUBLIC_URL}/reset-password?type=reset-password&token=${resetToken}`;
     let htmlContent;
     htmlContent = `
       <div style="background-color: #f0f4f8; padding: 40px; font-family: Arial, sans-serif;">
         <div style="max-width: 600px; margin: 0 auto; background-color: white; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);">
-          <div style="padding: 30px;">
+        <div style="background-color: #3b82f6; color: white; padding: 20px; text-align: center;">
+            <h1 style="margin: 0; font-size: 24px;">Welcome to Dine QR!</h1>
+          </div>  
+        <div style="padding: 30px;">
             <p style="font-size: 16px; color: #333333; line-height: 1.6;">
               To reset your password please click the button below:
             </p>

@@ -51,7 +51,6 @@ const StepAccountDetails = ({ handleNext, setRestaurantData }) => {
 
   // ** Vars
   const onSubmit = (data) => {
-    console.log("data :>> ", data);
     setRestaurantData({
       ...data,
     })

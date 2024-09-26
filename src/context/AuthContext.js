@@ -33,7 +33,6 @@ const AuthProvider = ({ children }) => {
       const storedToken = window.localStorage.getItem(
         authConfig.storageTokenKeyName,
       );
-      console.log("storedToken", storedToken); 
       if (storedToken) {
         setLoading(true);
         await axios
@@ -67,22 +66,21 @@ const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleLogin = async (params, errorCallback) => {
-    console.log("params", params);
-    try {
-      const response = await axios.post(authConfig.loginEndpoint, params);
+// handleLogin Function with Error Handling and Callback
+const handleLogin = async (params, errorCallback) => {
 
-      const { accessToken, userData } = response.data;
-      console.log("accessToken", accessToken);
-      console.log("userData", userData);
+  try {
+    // Call the mock login endpoint
+    const response = await axios.post(authConfig.loginEndpoint, params);
 
-      if (userData) {
-        window.localStorage.setItem(
-          authConfig.storageTokenKeyName,
-          accessToken,
-        )
-      }
+    const { accessToken, userData } = response.data;
 
+    // Store the accessToken and userData in localStorage
+    if (userData) {
+      window.localStorage.setItem(authConfig.storageTokenKeyName, accessToken);
+      window.localStorage.setItem("userData", JSON.stringify(userData));
+    }
+  
       if (userData.role === "superAdmin") {
         window.localStorage.setItem(authConfig.isSuperAdmin, true);
       } else if (userData.role === "Resturant") {
@@ -91,24 +89,19 @@ const AuthProvider = ({ children }) => {
 
       const returnUrl = router.query.returnUrl;
       setUser({ ...userData });
-      if (userData) {
-        window.localStorage.setItem(
-          "userData",
-          JSON.stringify(userData),
-        );
-      }
-      console.log("returnUrl", returnUrl);
-
+    
       const redirectURL = returnUrl && returnUrl !== "/" ? returnUrl : "/";
-      console.log("redirectURL", redirectURL);
 
       router.replace(redirectURL);
    
-    } catch (error) {
-      const errorMessage = error?.response?.data?.error || "Login failed, please try again";
-      if (errorCallback) errorCallback(errorMessage);
-    }
-  };
+     } catch (error) {
+    // Get the error message based on response status
+    const errorMessage = error?.response?.data?.error || "Login failed, please try again";
+    
+    // Pass the error message back to the calling function via callback
+    if (errorCallback) errorCallback(errorMessage);
+  }
+};
 
   const handleLogout = () => {
     setUser(null);

@@ -15,7 +15,6 @@ export async function AddToCart(
   images,
   userid,
 ) {
-  console.log("userid:", userid);
 
   try {
     await AddToCartItems.create({

@@ -75,7 +75,7 @@ const CustomInput = forwardRef(({ ...props }, ref) => {
   );
 });
 
-const MenuForm = () => {
+const MenuForm = ({restaurantData}) => {
   // ** States
   const [state, dispatch] = useReducer(reducer, initialState);
   const [image, setImage] = useState(null);
@@ -94,13 +94,13 @@ const MenuForm = () => {
           title={
             <Typography variant="h4">
               <LinkStyled href="link-to-restaurant" target="_blank">
-                Restaurant Name
+                {restaurantData?.restaurantDetails?.restaurantName || "Restaurant Name"}
               </LinkStyled>
             </Typography>
           }
           subtitle={
             <Typography sx={{ color: "text.secondary" }}>
-              A catchy line that summarizes the restaurant's appeal.
+              {restaurantData?.restaurantDetails?.tagline || "A catchy line that summarizes the restaurant's appeal."}
             </Typography>
           }
         />
