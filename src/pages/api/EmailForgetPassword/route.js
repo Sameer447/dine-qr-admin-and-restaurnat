@@ -84,10 +84,8 @@ export async function POST(request) {
     const info = await transporter.sendMail(mailOptions);
 
     if (info.messageId) {
-      console.log("Email sent successfully");
       return NextResponse.json({ status: 200, code: verificationCode });
     } else {
-      console.error("Email sending failed");
       return NextResponse.json({ status: 400 });
     }
   } catch (error) {

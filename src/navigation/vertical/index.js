@@ -14,7 +14,7 @@ const navigation = (role) => {
           : {
               title: "Restaurants",
               icon: "tabler:home",
-              path: "/apps/restaurants/list",
+              path: "/dashboards/restaurants/list",
             },
       ].filter(Boolean), // Filter out null values
     },

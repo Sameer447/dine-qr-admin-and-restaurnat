@@ -87,8 +87,8 @@ const schema = yup.object().shape({
 });
 
 const defaultValues = {
-  password: "",
-  email: "",
+  password: "Ameen123*",
+  email: "sameershoukat526@gmail.com",
 };
 
 const LoginPage = () => {
@@ -137,27 +137,28 @@ const LoginPage = () => {
     }
     setIsLoaded(true);
     try {
-      const response = await axios.post(`/api/Login/verify-login`, {
-        email,
-        password
-      }, {
-        headers: {
-          'Content-Type': 'application/json',
+      const response = await axios.post(
+        `/api/Login/verify-login`,
+        {
+          email,
+          password,
         },
-      });
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+        },
+      );
 
       if (response.status === 200) {
         const user = response.data;
-        console.log('Logged in user :>> ', user);
         await auth.login({ email, password, rememberMe, isSuperAdmin });
         toast.success("Logged in successfully");
       } else {
-        console.log('response :>> ', response.data);
         toast.error(response.data.message);
       }
     } catch (error) {
-      const errorMessage =
-        error?.message || "Email or Password is invalid";
+      const errorMessage = error?.message || "Email or Password is invalid";
       toast.error(errorMessage);
       setError("email", {
         type: "manual",

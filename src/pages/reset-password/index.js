@@ -28,7 +28,13 @@ import BlankLayout from "src/@core/layouts/BlankLayout";
 // ** Demo Imports
 import FooterIllustrationsV2 from "src/views/pages/auth/FooterIllustrationsV2";
 import { Controller, useForm } from "react-hook-form";
-import { CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import {
+  CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
 import axios from "axios";
 
 // Styled Components
@@ -89,20 +95,19 @@ const ResetPassword = () => {
     // Function to check token expiration
     const checkTokenExpiration = async () => {
       if (token) {
-
         const body = {
           token,
         };
 
         try {
-          const response = await fetch(`/api/CheckTokenExpiration`, { // Create an API endpoint to validate the token
+          const response = await fetch(`/api/CheckTokenExpiration`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
             },
             body: JSON.stringify(body),
           });
- 
+
           if (!response.ok) {
             const errorData = await response.json();
             if (response.status === 401) {
@@ -131,12 +136,11 @@ const ResetPassword = () => {
     control,
     handleSubmit,
     formState: { errors },
-    watch
+    watch,
   } = useForm({
-    defaultValues, // <- Adding default values here
-    mode: 'onSubmit', // <- Ensure form is submitted onSubmit
+    defaultValues,
+    mode: "onSubmit",
   });
-
 
   // ** Vars
   const hidden = useMediaQuery(theme.breakpoints.down("md"));
@@ -162,7 +166,8 @@ const ResetPassword = () => {
         if (response?.status === 200) {
           if (!response.error) {
             toast.success(
-              `Password ${type === "reset-password" ? "Reset" : "Set"
+              `Password ${
+                type === "reset-password" ? "Reset" : "Set"
               } Successfully`,
             );
           }
@@ -171,20 +176,20 @@ const ResetPassword = () => {
         } else {
           const errorData = await response.json();
           if (response.status === 401) {
-            toast.error(errorData.message); // Show token expiration message
-            router.push("/login"); // Redirect to login
+            toast.error(errorData.message);
+            router.push("/login");
           } else {
             toast.error(errorData.message || "Something went wrong");
             setLoading(false);
           }
         }
       } else {
-        console.log("Password does not match");
+        // console.log("Password does not match");
         toast.error("Password does not match", 10000);
         setLoading(false);
       }
     } catch (error) {
-      console.log("error", error);
+      // console.log("error", error);
       toast.error("Something went wrong", 10000);
       setLoading(false);
     } finally {
@@ -209,11 +214,17 @@ const ResetPassword = () => {
 
   return (
     <Box className="content-right" sx={{ backgroundColor: "background.paper" }}>
-      
-      <Dialog open={isTokenExpired} >
-        <DialogTitle sx={{ fontSize: 25 }}  >{type === "set-password" ? "Set Password Link Expired" : "Reset Password Link Expired"}</DialogTitle>
+      <Dialog open={isTokenExpired}>
+        <DialogTitle sx={{ fontSize: 25 }}>
+          {type === "set-password"
+            ? "Set Password Link Expired"
+            : "Reset Password Link Expired"}
+        </DialogTitle>
         <DialogContent>
-          <p>Your {type === "set-password" ? "set password" : "reset password"} link has expired. Please request a new link to proceed.</p>
+          <p>
+            Your {type === "set-password" ? "set password" : "reset password"}{" "}
+            link has expired. Please request a new link to proceed.
+          </p>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
@@ -221,7 +232,7 @@ const ResetPassword = () => {
           </Button>
         </DialogActions>
       </Dialog>
-      
+
       {!hidden ? (
         <Box
           sx={{
@@ -348,7 +359,9 @@ const ResetPassword = () => {
                                 <Icon
                                   fontSize="1.25rem"
                                   icon={
-                                    values.showNewPassword ? "tabler:eye" : "tabler:eye-off"
+                                    values.showNewPassword
+                                      ? "tabler:eye"
+                                      : "tabler:eye-off"
                                   }
                                 />
                               </IconButton>
@@ -368,7 +381,8 @@ const ResetPassword = () => {
                     rules={{
                       required: "Please confirm your new password",
                       validate: (value) =>
-                        value === watch('newPassword') || "Passwords do not match",
+                        value === watch("newPassword") ||
+                        "Passwords do not match",
                     }}
                     render={({ field: { value, onChange } }) => (
                       <CustomTextField
@@ -379,7 +393,9 @@ const ResetPassword = () => {
                         label="Confirm New Password"
                         id="input-confirm-new-password"
                         error={Boolean(errors.confirmNewPassword)}
-                        type={values.showConfirmNewPassword ? "text" : "password"}
+                        type={
+                          values.showConfirmNewPassword ? "text" : "password"
+                        }
                         helperText={errors.confirmNewPassword?.message}
                         InputProps={{
                           endAdornment: (
@@ -419,17 +435,30 @@ const ResetPassword = () => {
                   >
                     <li>Minimum 8 characters long - the more, the better</li>
                     <li>At least one lowercase & one uppercase character</li>
-                    <li>At least one number, symbol, or whitespace character</li>
+                    <li>
+                      At least one number, symbol, or whitespace character
+                    </li>
                   </Box>
                 </Grid>
 
                 {/* Submit Button */}
                 <Grid item xs={12}>
-                  <Button fullWidth type="submit" variant="contained" sx={{ mb: 4 }}>
+                  <Button
+                    fullWidth
+                    type="submit"
+                    variant="contained"
+                    sx={{ mb: 4 }}
+                  >
                     {loaing ? (
-                      <CircularProgress size={24} thickness={6} color="inherit" />
+                      <CircularProgress
+                        size={24}
+                        thickness={6}
+                        color="inherit"
+                      />
+                    ) : type === "reset-password" ? (
+                      "Reset Password"
                     ) : (
-                      type === "reset-password" ? "Reset Password" : "Set Password"
+                      "Set Password"
                     )}
                   </Button>
                 </Grid>

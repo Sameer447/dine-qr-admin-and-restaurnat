@@ -45,36 +45,37 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
           "Content-Type": "application/json",
         },
       });
-
-      console.log('res:', res);
-
       if (res.status === 200) {
         toast.success("Account Already Exist");
         setLoading(false);
       } else {
         const completeData = new FormData();
         // Append restaurant details
-        completeData.append('role', 'Resturant');
-        completeData.append('email', restaurantData.email);
-        completeData.append('logo', restaurantData.logo);
-        completeData.append('tagline', restaurantData.tagline);
-        completeData.append('restaurantName', restaurantData.restaurantName);
-        completeData.append('cnicNumber', restaurantData.registrationNumber);
-        completeData.append('restaurantOwner', restaurantData.retaurantOwner);
+        completeData.append("role", "Resturant");
+        completeData.append("email", restaurantData.email);
+        completeData.append("logo", restaurantData.logo);
+        completeData.append("tagline", restaurantData.tagline);
+        completeData.append("restaurantName", restaurantData.restaurantName);
+        completeData.append("cnicNumber", restaurantData.registrationNumber);
+        completeData.append("restaurantOwner", restaurantData.retaurantOwner);
 
         // Append address details
-        completeData.append('mobile', formData.mobile);
-        completeData.append('zipcode', formData.zipcode);
-        completeData.append('address', formData.address);
-        completeData.append('landmark', formData.landmark);
-        completeData.append('city', formData.city);
-        completeData.append('state', formData.state);
+        completeData.append("mobile", formData.mobile);
+        completeData.append("zipcode", formData.zipcode);
+        completeData.append("address", formData.address);
+        completeData.append("landmark", formData.landmark);
+        completeData.append("city", formData.city);
+        completeData.append("state", formData.state);
 
-        const response = await axios.post(`/api/Verification_SignUp/verification`, completeData, {
-          headers: {
-            'Content-Type': 'multipart/form-data',
+        const response = await axios.post(
+          `/api/Verification_SignUp/verification`,
+          completeData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
           },
-        });
+        );
 
         if (response.status === 200) {
           toast.success("We have sent you an email please verify your account");
@@ -87,17 +88,17 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
           resetField("zipcode");
           handlePrev();
         } else if (response.status === 400) {
-          console.error('Error creating account:', response.data.message);
+          console.error("Error creating account:", response.data.message);
           toast.error(response.data.message);
           setLoading(false);
         } else if (response.status === 500) {
-          console.error('Error creating account:', response.data.message);
+          console.error("Error creating account:", response.data.message);
           toast.error(response.data.message);
           setLoading(false);
         }
       }
     } catch (error) {
-      console.error('Error signing up:', error);
+      console.error("Error signing up:", error);
       toast.error(error);
       setLoading(false);
     } finally {

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import jwt from "jsonwebtoken";
 import User from "../../models/user";
 import bcrypt from "bcryptjs";
@@ -30,9 +31,7 @@ export default async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: "User not found." });
       }
-
       const hashedPassword = await bcrypt.hash(newPassword, 10);
-
       user.password = hashedPassword;
       user.isActivated = true;
       await user.save();
@@ -42,9 +41,7 @@ export default async (req, res) => {
         status: 200,
         error: false,
       });
-    } 
-    
-    else if (type === "set-password") {
+    } else if (type === "set-password") {
       const { userData } = decoded; // Extract user data from the token
       const { email, role, restaurantDetails, addressDetails } = userData;
 
@@ -70,19 +67,20 @@ export default async (req, res) => {
         status: 200,
         error: false,
       });
-    } 
-    
-    else {
+    } else {
       return res.status(400).json({ message: "Invalid request type." });
     }
-
   } catch (error) {
     if (error instanceof jwt.TokenExpiredError) {
-      return res.status(401).json({ message: "Token has expired. Please log in again." });
+      return res
+        .status(401)
+        .json({ message: "Token has expired. Please log in again." });
     }
 
     if (error instanceof jwt.JsonWebTokenError) {
-      return res.status(400).json({ message: "Invalid token. Please try again." });
+      return res
+        .status(400)
+        .json({ message: "Invalid token. Please try again." });
     }
 
     console.error("Error processing request:", error);

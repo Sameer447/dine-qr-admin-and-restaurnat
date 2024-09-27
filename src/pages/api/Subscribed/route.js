@@ -2,11 +2,6 @@ import subscribe from "../../models/subscribe";
 import User from "../../models/user";
 import { NextResponse } from "next/server";
 
-
-
-
-
-
 export async function POST(request) {
   const { email } = await request.json();
 
@@ -20,8 +15,10 @@ export async function POST(request) {
   } else {
     // If the email doesn't exist, save it to the database
     const user = await subscribe.create({ email });
-    console.log(user);
-
-    return NextResponse.json({ status: 200, obj:user, message: "Email subscribed successfully" });
+    return NextResponse.json({
+      status: 200,
+      obj: user,
+      message: "Email subscribed successfully",
+    });
   }
 }

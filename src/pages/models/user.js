@@ -1,9 +1,16 @@
 import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
 var UserSchema = new mongoose.Schema(
   {
+    id: {
+      type: String,
+      default: uuidv4, // Set default value to a unique UUID
+    },
     email: {
       type: String,
+      required: true,
+      unique: true,
     },
     role: {
       type: String,
@@ -58,7 +65,12 @@ var UserSchema = new mongoose.Schema(
     timestamps: true,
   },
 );
-
+UserSchema.pre("save", function (next) {
+  if (!this.id) {
+    this.id = uuidv4();
+  }
+  next();
+});
 const User =
   mongoose.models.users_dineqr || mongoose.model("users_dineqr", UserSchema);
 

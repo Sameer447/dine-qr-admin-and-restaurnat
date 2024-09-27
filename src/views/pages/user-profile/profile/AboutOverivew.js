@@ -1,76 +1,86 @@
+// @ts-nocheck
 // ** MUI Components
-import Box from '@mui/material/Box'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import Typography from '@mui/material/Typography'
-import CardContent from '@mui/material/CardContent'
+import Box from "@mui/material/Box";
+import Grid from "@mui/material/Grid";
+import Card from "@mui/material/Card";
+import Typography from "@mui/material/Typography";
+import CardContent from "@mui/material/CardContent";
 
 // ** Icon Imports
-import Icon from 'src/@core/components/icon'
+import Icon from "src/@core/components/icon";
 
-const renderList = arr => {
+const renderList = (arr) => {
   if (arr && arr.length) {
     return arr.map((item, index) => {
       return (
         <Box
           key={index}
           sx={{
-            display: 'flex',
-            '&:not(:last-of-type)': { mb: 3 },
-            '& svg': { color: 'text.secondary' }
+            display: "flex",
+            "&:not(:last-of-type)": { mb: 3 },
+            "& svg": { color: "text.secondary" },
           }}
         >
-          <Box sx={{ display: 'flex', mr: 2 }}>
-            <Icon fontSize='1.25rem' icon={item.icon} />
+          <Box sx={{ display: "flex", mr: 2 }}>
+            <Icon fontSize="1.25rem" icon={item.icon} />
           </Box>
 
-          <Box sx={{ columnGap: 2, display: 'flex', flexWrap: 'wrap', alignItems: 'center' }}>
-            <Typography sx={{ fontWeight: 500, color: 'text.secondary' }}>
-              {`${item.property.charAt(0).toUpperCase() + item.property.slice(1)}:`}
+          <Box
+            sx={{
+              columnGap: 2,
+              display: "flex",
+              flexWrap: "wrap",
+              alignItems: "center",
+            }}
+          >
+            <Typography sx={{ fontWeight: 500, color: "text.secondary" }}>
+              {`${
+                item.property.charAt(0).toUpperCase() + item.property.slice(1)
+              }:`}
             </Typography>
-            <Typography sx={{ color: 'text.secondary' }}>
+            <Typography sx={{ color: "text.secondary" }}>
               {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
             </Typography>
           </Box>
         </Box>
-      )
-    })
+      );
+    });
   } else {
-    return null
+    return null;
   }
-}
+};
 
-const renderTeams = arr => {
+const renderTeams = (arr) => {
   if (arr && arr.length) {
     return arr.map((item, index) => {
       return (
         <Box
           key={index}
           sx={{
-            display: 'flex',
-            alignItems: 'center',
-            '&:not(:last-of-type)': { mb: 3 },
-            '& svg': { color: `${item.color}.main` }
+            display: "flex",
+            alignItems: "center",
+            "&:not(:last-of-type)": { mb: 3 },
+            "& svg": { color: `${item.color}.main` },
           }}
         >
-          <Icon fontSize='1.25rem' icon={item.icon} />
+          <Icon fontSize="1.25rem" icon={item.icon} />
 
-          <Typography sx={{ mx: 2, fontWeight: 500, color: 'text.secondary' }}>
+          <Typography sx={{ mx: 2, fontWeight: 500, color: "text.secondary" }}>
             {item.property.charAt(0).toUpperCase() + item.property.slice(1)}
           </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>
+          <Typography sx={{ color: "text.secondary" }}>
             {item.value.charAt(0).toUpperCase() + item.value.slice(1)}
           </Typography>
         </Box>
-      )
-    })
+      );
+    });
   } else {
-    return null
+    return null;
   }
-}
+};
 
-const AboutOverivew = props => {
-  const { teams, about, contacts, overview } = props
+const AboutOverivew = (props) => {
+  const { teams, about, contacts, overview } = props;
 
   return (
     <Grid container spacing={6}>
@@ -78,23 +88,44 @@ const AboutOverivew = props => {
         <Card>
           <CardContent>
             <Box sx={{ mb: 6 }}>
-              <Typography variant='body2' sx={{ mb: 4, color: 'text.disabled', textTransform: 'uppercase' }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  mb: 4,
+                  color: "text.disabled",
+                  textTransform: "uppercase",
+                }}
+              >
                 About
               </Typography>
               {renderList(about)}
             </Box>
-            <Box sx={{ mb: 6 }}>
-              <Typography variant='body2' sx={{ mb: 4, color: 'text.disabled', textTransform: 'uppercase' }}>
+            {/* <Box sx={{ mb: 6 }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  mb: 4,
+                  color: "text.disabled",
+                  textTransform: "uppercase",
+                }}
+              >
                 Contacts
               </Typography>
               {renderList(contacts)}
-            </Box>
-            <div>
-              <Typography variant='body2' sx={{ mb: 4, color: 'text.disabled', textTransform: 'uppercase' }}>
+            </Box> */}
+            {/* <div>
+              <Typography
+                variant="body2"
+                sx={{
+                  mb: 4,
+                  color: "text.disabled",
+                  textTransform: "uppercase",
+                }}
+              >
                 Teams
               </Typography>
               {renderTeams(teams)}
-            </div>
+            </div> */}
           </CardContent>
         </Card>
       </Grid>
@@ -102,7 +133,14 @@ const AboutOverivew = props => {
         <Card>
           <CardContent>
             <div>
-              <Typography variant='body2' sx={{ mb: 4, color: 'text.disabled', textTransform: 'uppercase' }}>
+              <Typography
+                variant="body2"
+                sx={{
+                  mb: 4,
+                  color: "text.disabled",
+                  textTransform: "uppercase",
+                }}
+              >
                 Overview
               </Typography>
               {renderList(overview)}
@@ -111,7 +149,7 @@ const AboutOverivew = props => {
         </Card>
       </Grid>
     </Grid>
-  )
-}
+  );
+};
 
-export default AboutOverivew
+export default AboutOverivew;

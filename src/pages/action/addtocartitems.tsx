@@ -15,7 +15,6 @@ export async function AddToCart(
   images,
   userid,
 ) {
-
   try {
     await AddToCartItems.create({
       food_name: food_name,
@@ -40,8 +39,6 @@ export async function AddToCart(
 }
 
 export async function PlaceOrder(userid, carlists) {
-  console.log("userid:", userid);
-
   try {
     // const cartItem = {
     //     food_name,
@@ -105,10 +102,8 @@ export async function PlaceOrder(userid, carlists) {
 
 export async function GetOrders(userId) {
   try {
-    console.log("userId:", userId);
     // Find the order document for the user or create a new one
     const getorder = await Order.findOne({ userid: userId }).lean();
-    console.log("order:", getorder);
     return {
       success: true,
       message: "Fetch Orders successfully!",
@@ -124,7 +119,6 @@ export async function DeleteOrderInDatabase(orderid) {
   try {
     // Find the order document for the user or create a new one
     const updateorder = await Order.findByIdAndRemove(orderid).lean();
-    console.log("updateorder:", updateorder);
     return {
       success: true,
       message: "updateorder Orders successfully!",

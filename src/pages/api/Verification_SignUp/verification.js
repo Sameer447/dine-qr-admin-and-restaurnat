@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 import * as path from "path";
 import * as fs from "fs";
 import { generateVerificationToken } from "../../utils/jwt";
-import { pass, user, verificationLinkBaseUrl } from "../../../@core/utils/global";
+import {
+  pass,
+  user,
+  verificationLinkBaseUrl,
+} from "../../../@core/utils/global";
 
 // Disable body parsing (since we are using formidable for multipart form data)
 export const config = {
@@ -15,8 +19,18 @@ export const config = {
 
 const validateFields = (fields) => {
   const requiredFields = [
-    "role", "email", "tagline", "restaurantName", "cnicNumber",
-    "restaurantOwner", "mobile", "zipcode", "address", "landmark", "city", "state"
+    "role",
+    "email",
+    "tagline",
+    "restaurantName",
+    "cnicNumber",
+    "restaurantOwner",
+    "mobile",
+    "zipcode",
+    "address",
+    "landmark",
+    "city",
+    "state",
   ];
 
   for (const field of requiredFields) {
@@ -27,13 +41,12 @@ const validateFields = (fields) => {
     let valueToCheck = Array.isArray(fieldValue) ? fieldValue[0] : fieldValue;
 
     // Ensure the value is a string before trimming
-    if (typeof valueToCheck !== 'string' || valueToCheck.trim().length === 0) {
+    if (typeof valueToCheck !== "string" || valueToCheck.trim().length === 0) {
       return `${field} is required.`;
     }
   }
   return null; // No validation errors
 };
-
 
 // Async wrapper for formidable form parsing
 const parseForm = (req, uploadDir) => {
@@ -51,7 +64,12 @@ const parseForm = (req, uploadDir) => {
 };
 
 // Send verification email
-const sendVerificationEmail = async (email, role, verificationLink, htmlContent) => {
+const sendVerificationEmail = async (
+  email,
+  role,
+  verificationLink,
+  htmlContent,
+) => {
   const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
     port: 465,
@@ -90,12 +108,21 @@ export default async function handler(req, res) {
     }
 
     const {
-      role, email, tagline, restaurantName, cnicNumber,
-      restaurantOwner, mobile, zipcode, address, landmark,
-      city, state
+      role,
+      email,
+      tagline,
+      restaurantName,
+      cnicNumber,
+      restaurantOwner,
+      mobile,
+      zipcode,
+      address,
+      landmark,
+      city,
+      state,
     } = fields;
 
-    let imageFilename = '';
+    let imageFilename = "";
     const uploadedFile = files.logo;
 
     // Handle logo file upload if present
@@ -108,7 +135,10 @@ export default async function handler(req, res) {
       // File validation (optional but recommended)
       const allowedTypes = ["image/jpeg", "image/png"];
       const maxSize = 5 * 1024 * 1024; // 5MB
-      if (!allowedTypes.includes(uploadedFile[0].mimetype) || uploadedFile[0].size > maxSize) {
+      if (
+        !allowedTypes.includes(uploadedFile[0].mimetype) ||
+        uploadedFile[0].size > maxSize
+      ) {
         return res.status(400).json({ message: "Invalid file type or size" });
       }
 
@@ -121,11 +151,11 @@ export default async function handler(req, res) {
       email: email[0],
       role: role[0],
       restaurantDetails: {
-        logo: imageFilename || '',
+        logo: imageFilename || "",
         tagline: tagline[0],
         restaurantName: restaurantName[0],
         cnicNumber: cnicNumber[0],
-        restaurantOwner: restaurantOwner[0]
+        restaurantOwner: restaurantOwner[0],
       },
       addressDetails: {
         mobile: mobile[0],
@@ -134,18 +164,15 @@ export default async function handler(req, res) {
         landmark: landmark[0],
         city: city[0],
         state: state[0],
-      }
+      },
     };
 
     // Generate verification token and link
     const token = generateVerificationToken(userData);
     const type = "set-password";
     const verificationLink = `${verificationLinkBaseUrl}?type=${type}&token=${token}`;
-    console.log("verificationLink...", verificationLink);
-
     // Generate email content based on user type
     let htmlContent;
-    console.log("role...", role);
     if (role[0] === "Resturant") {
       htmlContent = `
       <div style="background-color: #f0f4f8; padding: 40px; font-family: Arial, sans-serif;">
@@ -207,10 +234,15 @@ export default async function handler(req, res) {
     }
 
     // Send verification email
-     const response  =  await sendVerificationEmail(email[0], role[0], verificationLink, htmlContent);
-     console.log("response send email ...", response);
-     return res.status(200).json({ message: "Verification email sent successfully" });
-
+    const response = await sendVerificationEmail(
+      email[0],
+      role[0],
+      verificationLink,
+      htmlContent,
+    );
+    return res
+      .status(200)
+      .json({ message: "Verification email sent successfully" });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({ message: "Internal server error" });
