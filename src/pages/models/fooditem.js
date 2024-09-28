@@ -2,22 +2,34 @@ import mongoose from "mongoose";
 import User from "./user";
 
 var FoodSchema = new mongoose.Schema({
-  userid: {
-    type: String,
-  },
   food_name: {
     type: String,
+    required: true,
   },
   description: {
     type: String,
+    required: true,
   },
   price: {
-    type: String,
+    type: Number,
+    required: true,
   },
-  calories_burned: {
-    type: String,
+  preparationTime: {
+    type: Number,
+    required: true,
   },
-  categories: {
+  cuisine: {
+    type: String,
+    required: true,
+  },
+  calories: {
+    type: Number,
+  },
+  category: {
+    type: String,
+    required: true,
+  },
+  subCategory: {
     type: String,
   },
   images: [
@@ -25,11 +37,27 @@ var FoodSchema = new mongoose.Schema({
       name: String,
     },
   ],
+  allergens: {
+    type: [String],
+  },
+  specialityTags: {
+    type: [String],
+  },
+  availableSizes: {
+    type: [String],
+  },
+  availability: {
+    type: Boolean,
+    default: true,
+  },
+  customiseable: {
+    type: Boolean,
+    default: false,
+  },
   restaurant_id: {
     type: String,
-    ref: User
-  }
-
+    ref: User,
+  },
 });
 
 const FoodItems = mongoose.models.fooditems || mongoose.model("fooditems", FoodSchema);

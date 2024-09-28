@@ -34,6 +34,8 @@ import PageHeader from "src/@core/components/page-header";
 // ** Icon Imports
 import { categoris } from "src/@fake-db/categories";
 import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
+import axios from "axios";
+import { CircularProgress } from "@mui/material";
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: "none",
@@ -85,29 +87,71 @@ const CustomInput = forwardRef(({ ...props }, ref) => {
   );
 });
 
-const AddMenuItemForm = ({restaurantData}) => {
+const AddMenuItemForm = ({ restaurantData }) => {
   // ** States
   const [state, dispatch] = useReducer(reducer, initialState);
   const [image, setImage] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   // ** Hooks
   const {
     control,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors },
   } = useForm({ defaultValues: initialState });
 
-  const onSubmit = () => toast.success("Form Submitted");
+  const onSubmit = async (data) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+
+      formData.append('category', data.category);
+      formData.append('subCategory', data.subCategory);
+      formData.append('cuisine', data.cuisine);
+      formData.append('menuItemName', data.menuItemName);
+      formData.append('description', data.description);
+      formData.append('preparationTime', data.preparationTime);
+      formData.append('price', data.price);
+      formData.append('calories', data.calories);
+      formData.append('availability', data.availability);
+      formData.append('customiseable', data.customiseable);
+
+      data.specialityTags.forEach(tag => formData.append('specialityTags', tag));
+      data.allergens.forEach(allergen => formData.append('allergens', allergen));
+      data.avialableSizes.forEach(size => formData.append('availableSizes', size));
+
+      formData.append('itemImage', data.itemImage);
+      formData.append('restaurant_id', restaurantData._id)
+
+
+      const response = await axios.post(`/api/Add/fooditems`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      if (response.status === 200 || response.status === 201) {
+        toast.success(response.data.message || 'Menu item added Successfully!');
+        setLoading(false);
+        setImage(null);
+        reset();
+      } else {
+        toast.error(response.data.message || 'Error in saving menu item!');
+        setLoading(false);
+      }
+    } catch (error) {
+      console.error('Error saving menu item:', error);
+      setLoading(false);
+    }
+  };
 
   const onImageSelect = (e) => {
-    const reader = new FileReader();
-    const { files } = e.target;
-    if (files && files.length !== 0) {
-      reader.onload = () => setImage(reader.result);
-      reader.readAsDataURL(files[0]);
-      if (reader.result !== null) {
-        dispatch({ type: "itemImage", payload: reader.result });
-      }
+    const file = e.target.files[0];
+    if (file) {
+      setValue('itemImage', file);
+      setImage(URL.createObjectURL(file));
     }
   };
 
@@ -138,29 +182,19 @@ const AddMenuItemForm = ({restaurantData}) => {
                     <Controller
                       name="category"
                       control={control}
-                      rules={{ required: true }}
-                      render={({ field: { value, onChange } }) => (
+                      rules={{ required: true, message: "Category is required" }}
+                      render={({ field }) => (
                         <CustomTextField
                           select
                           fullWidth
-                          defaultValue=""
                           label="Category"
-                          SelectProps={{
-                            value: value,
-                            onChange: (e) => {
-                              onChange(e);
-                              dispatch({
-                                type: "category",
-                                payload: e.target.value,
-                              });
-                            },
+                          value={state.category}
+                          onChange={(e) => {
+                            field.onChange(e);
+                            dispatch({ type: "category", payload: e.target.value });
                           }}
-                          id="validation-basic-select"
-                          error={Boolean(errors.select)}
-                          aria-describedby="validation-basic-select"
-                          {...(errors.select && {
-                            helperText: "This field is required",
-                          })}
+                          error={!!errors.category}
+                          helperText={errors.category ? "This field is required" : ""}
                         >
                           {categoris.map((category) => (
                             <MenuItem
@@ -178,40 +212,31 @@ const AddMenuItemForm = ({restaurantData}) => {
                     <Controller
                       name="subCategory"
                       control={control}
-                      rules={{ required: true }}
-                      render={({ field: { value, onChange } }) => (
+                      rules={{
+                        required: "Subcategory is required", // Custom error message
+                      }}
+                      render={({ field: { value, onChange }, fieldState: { error } }) => (
                         <CustomTextField
                           select
                           fullWidth
-                          defaultValue=""
                           label="Sub Category"
-                          SelectProps={{
-                            value: value,
-                            onChange: (e) => {
-                              onChange(e);
-                              dispatch({
-                                type: "subCategory",
-                                payload: e.target.value,
-                              });
-                            },
+                          value={value}
+                          onChange={(e) => {
+                            onChange(e.target.value);
+                            dispatch({
+                              type: "subCategory",
+                              payload: e.target.value, // Update the reducer state
+                            });
                           }}
+                          error={Boolean(error)} // Handle error display
+                          helperText={error ? error.message : ""} // Display error message
                           id="validation-basic-select"
-                          error={Boolean(errors.select)}
-                          aria-describedby="validation-basic-select"
-                          {...(errors.select && {
-                            helperText: "This field is required",
-                          })}
                         >
                           {state.category &&
                             categoris
-                              .find(
-                                (category) => category.value === state.category,
-                              )
-                              .subCategories.map((subCategory) => (
-                                <MenuItem
-                                  key={subCategory.value}
-                                  value={subCategory.value}
-                                >
+                              .find((category) => category.value === state.category) // Ensure category exists
+                              ?.subCategories?.map((subCategory) => ( // Safely access subCategories
+                                <MenuItem key={subCategory.value} value={subCategory.value}>
                                   {subCategory.name}
                                 </MenuItem>
                               ))}
@@ -219,6 +244,7 @@ const AddMenuItemForm = ({restaurantData}) => {
                       )}
                     />
                   </Grid>
+
                   <Grid item xs={12} sm={6}>
                     <Controller
                       name="specialityTags"
@@ -242,9 +268,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                             },
                           }}
                           id="validation-basic-select"
-                          error={Boolean(errors.select)}
+                          error={Boolean(errors.specialityTags)}
                           aria-describedby="validation-basic-select"
-                          {...(errors.select && {
+                          {...(errors.specialityTags && {
                             helperText: "This field is required",
                           })}
                         >
@@ -287,9 +313,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                             },
                           }}
                           id="validation-basic-select"
-                          error={Boolean(errors.select)}
+                          error={Boolean(errors.cuisine)}
                           aria-describedby="validation-basic-select"
-                          {...(errors.select && {
+                          {...(errors.cuisine && {
                             helperText: "This field is required",
                           })}
                         >
@@ -322,9 +348,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                           label="Menu Item Name"
                           onChange={onChange}
                           placeholder="Leonard"
-                          error={Boolean(errors.firstName)}
+                          error={Boolean(errors.menuItemName)}
                           aria-describedby="validation-basic-first-name"
-                          {...(errors.firstName && {
+                          {...(errors.menuItemName && {
                             helperText: "This field is required",
                           })}
                         />
@@ -343,9 +369,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                           label="Menu Item Price"
                           onChange={onChange}
                           placeholder="RS 100"
-                          error={Boolean(errors.firstName)}
+                          error={Boolean(errors.price)}
                           aria-describedby="validation-basic-first-name"
-                          {...(errors.firstName && {
+                          {...(errors.price && {
                             helperText: "This field is required",
                           })}
                         />
@@ -364,9 +390,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                           label="Preparation Time"
                           onChange={onChange}
                           placeholder="20 minutes"
-                          error={Boolean(errors.firstName)}
+                          error={Boolean(errors.preparationTime)}
                           aria-describedby="validation-basic-first-name"
-                          {...(errors.firstName && {
+                          {...(errors.preparationTime && {
                             helperText: "This field is required",
                           })}
                         />
@@ -385,9 +411,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                           label="Calories"
                           onChange={onChange}
                           placeholder="100"
-                          error={Boolean(errors.firstName)}
+                          error={Boolean(errors.calories)}
                           aria-describedby="validation-basic-first-name"
-                          {...(errors.firstName && {
+                          {...(errors.calories && {
                             helperText: "This field is required",
                           })}
                         />
@@ -417,9 +443,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                             },
                           }}
                           id="validation-basic-select"
-                          error={Boolean(errors.select)}
+                          error={Boolean(errors.avialableSizes)}
                           aria-describedby="validation-basic-select"
-                          {...(errors.select && {
+                          {...(errors.avialableSizes && {
                             helperText: "This field is required",
                           })}
                         >
@@ -443,7 +469,7 @@ const AddMenuItemForm = ({restaurantData}) => {
                           defaultValue=""
                           label="Allergens"
                           SelectProps={{
-                            value: state.allergens,
+                            value: value,
                             multiple: true,
                             onChange: (e) => {
                               onChange(e);
@@ -454,9 +480,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                             },
                           }}
                           id="validation-basic-select"
-                          error={Boolean(errors.select)}
+                          error={Boolean(errors.allergens)}
                           aria-describedby="validation-basic-select"
-                          {...(errors.select && {
+                          {...(errors.allergens && {
                             helperText: "This field is required",
                           })}
                         >
@@ -512,6 +538,9 @@ const AddMenuItemForm = ({restaurantData}) => {
                             />
                           }
                           label="Customiseable"
+                          {...(errors.customiseable && {
+                            helperText: "This Customiseable is required",
+                          })}
                         />
                       )}
                     />
@@ -520,15 +549,14 @@ const AddMenuItemForm = ({restaurantData}) => {
                     <Controller
                       name="itemImage"
                       control={control}
-                      rules={{ required: true }}
+                      rules={{ required: "Image is required" }}  // Custom error message
                       render={({ field }) => (
                         <CustomInput
                           type="file"
-                          {...field}
                           label="Menu Item Image"
                           onChange={(e) => {
-                            field.onChange(e);
-                            onImageSelect(e);
+                            field.onChange(e.target.files);  // Store file object in form state
+                            onImageSelect(e);  // Handle image preview
                           }}
                           InputProps={{
                             startAdornment: (
@@ -546,27 +574,30 @@ const AddMenuItemForm = ({restaurantData}) => {
                           error={Boolean(errors.itemImage)}
                           aria-describedby="validation-basic-item-image"
                           {...(errors.itemImage && {
-                            helperText: "This field is required",
+                            helperText: errors.itemImage.message,  // Show the validation message
                           })}
                         />
                       )}
                     />
                   </Grid>
+
                   {image && (
                     <Grid item xs={12} sm={1}>
                       <img
                         src={image}
                         alt="item"
                         style={{
-                          width: 50,
-                          height: 50,
+                          width: 75,
+                          height: 75,
                           objectFit: "contain",
                           borderRadius: 50,
                           marginTop: 15,
+                          marginBottom: 15,
                         }}
                       />
                     </Grid>
                   )}
+
                   <Grid item xs={12}>
                     <Controller
                       name="description"
@@ -581,7 +612,7 @@ const AddMenuItemForm = ({restaurantData}) => {
                           label="Menu Item Description"
                           error={Boolean(errors.textarea)}
                           aria-describedby="validation-basic-textarea"
-                          {...(errors.textarea && {
+                          {...(errors.description && {
                             helperText: "This field is required",
                           })}
                         />
@@ -589,8 +620,12 @@ const AddMenuItemForm = ({restaurantData}) => {
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <Button type="submit" variant="contained">
-                      Submit
+                    <Button variant="contained" type="submit">
+                      {loading ? (
+                        <CircularProgress size={24} thickness={6} color="inherit" />
+                      ) : (
+                        <text>Submit</text>
+                      )}
                     </Button>
                   </Grid>
                 </Grid>
