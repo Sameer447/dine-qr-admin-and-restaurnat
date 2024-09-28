@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { useEffect } from "react";
 
@@ -38,6 +39,7 @@ const AclGuard = (props) => {
   let ability;
   useEffect(() => {
     let userRole = JSON.parse(localStorage.getItem("isSuperAdmin"));
+
     if (auth?.user && auth?.user?.role && !guestGuard && router.route === "/") {
       const homeRoute = getHomeRoute(userRole);
       router.replace(homeRoute);

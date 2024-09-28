@@ -1,4 +1,6 @@
+// @ts-nocheck
 // ** React Imports
+import React from "react";
 import { useState, useEffect, useCallback } from "react";
 
 // ** Next Imports
@@ -33,7 +35,7 @@ import CardStatsHorizontalWithDetails from "src/@core/components/card-statistics
 import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
-import { fetchData, deleteUser } from "src/store/apps/user";
+import { fetchData, deleteRestaurant } from "src/store/apps/restaurants";
 
 // ** Third Party Components
 import axios from "axios";
@@ -59,9 +61,12 @@ const userStatusObj = {
 
 // ** renders client column
 const renderClient = (row) => {
-  if (row.avatar.length) {
+  if (row.logo) {
     return (
-      <CustomAvatar src={row.avatar} sx={{ mr: 2.5, width: 38, height: 38 }} />
+      <CustomAvatar
+        src={"http://localhost:3000/api/?data=" + row.logo}
+        sx={{ mr: 2.5, width: 38, height: 38 }}
+      />
     );
   } else {
     return (
@@ -76,7 +81,7 @@ const renderClient = (row) => {
           fontSize: (theme) => theme.typography.body1.fontSize,
         }}
       >
-        {getInitials(row.fullName ? row.fullName : "John Doe")}
+        {getInitials(row.restaurantName ? row.restaurantName : "John Doe")}
       </CustomAvatar>
     );
   }
@@ -99,7 +104,7 @@ const RowOptions = ({ id }) => {
   };
 
   const handleDelete = () => {
-    dispatch(deleteUser(id));
+    dispatch(deleteRestaurant(id));
     handleRowOptionsClose();
   };
 
@@ -152,11 +157,10 @@ const columns = [
     field: "fullName",
     headerName: "Restaurant Name",
     renderCell: ({ row }) => {
-      const { fullName, email } = row;
-
+      const { restaurantDetails, email } = row;
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {renderClient(row)}
+          {renderClient(restaurantDetails)}
           <Box
             sx={{
               display: "flex",
@@ -167,7 +171,7 @@ const columns = [
             <Typography
               noWrap
               component={Link}
-              href="/apps/user/view/account"
+              href={`/dashboards/restaurants/view/account?id=${row.id}`}
               sx={{
                 fontWeight: 500,
                 textDecoration: "none",
@@ -175,7 +179,7 @@ const columns = [
                 "&:hover": { color: "primary.main" },
               }}
             >
-              {fullName}
+              {restaurantDetails?.restaurantName}
             </Typography>
             <Typography noWrap variant="body2" sx={{ color: "text.disabled" }}>
               {email}
@@ -225,7 +229,7 @@ const columns = [
             textTransform: "capitalize",
           }}
         >
-          {row.currentPlan}
+          {row?.restaurantDetails?.currentPlan || "Basic"}
         </Typography>
       );
     },
@@ -238,7 +242,7 @@ const columns = [
     renderCell: ({ row }) => {
       return (
         <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.billing}
+          {row?.restaurantDetails?.billing || "Auto Debit"}
         </Typography>
       );
     },
@@ -254,8 +258,8 @@ const columns = [
           rounded
           skin="light"
           size="small"
-          label={row.status}
-          color={userStatusObj[row.status]}
+          label={row?.isActivated ? "active" : "inactive"}
+          color={userStatusObj[row?.isActivated ? "active" : "inactive"]}
           sx={{ textTransform: "capitalize" }}
         />
       );
@@ -285,17 +289,10 @@ const UserList = ({ apiData }) => {
 
   // ** Hooks
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.user);
+  const store = useSelector((state) => state.restaurants);
   useEffect(() => {
-    dispatch(
-      fetchData({
-        role,
-        status,
-        q: value,
-        currentPlan: plan,
-      }),
-    );
-  }, [dispatch, plan, role, status, value]);
+    dispatch(fetchData());
+  }, []);
 
   const handleFilter = useCallback((val) => {
     setValue(val);

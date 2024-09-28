@@ -1,21 +1,26 @@
+// @ts-nocheck
 // ** MUI Imports
-import Grid from '@mui/material/Grid'
+import Grid from "@mui/material/Grid";
 
 // ** Demo Components Imports
-import UserViewLeft from 'src/views/apps/user/view/UserViewLeft'
-import UserViewRight from 'src/views/apps/user/view/UserViewRight'
+import UserViewLeft from "src/views/apps/restaurants/view/UserViewLeft";
+import UserViewRight from "src/views/apps/restaurants/view/UserViewRight";
 
-const UserView = ({ tab, invoiceData }) => {
+const UserView = ({ tab, invoiceData, userData }) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12} md={5} lg={4}>
-        <UserViewLeft />
+        <UserViewLeft userData={userData} />
       </Grid>
       <Grid item xs={12} md={7} lg={8}>
-        <UserViewRight tab={tab} invoiceData={invoiceData} />
+        <UserViewRight
+          tab={tab}
+          invoiceData={invoiceData}
+          userData={userData}
+        />
       </Grid>
     </Grid>
-  )
-}
+  );
+};
 
-export default UserView
+export default UserView;

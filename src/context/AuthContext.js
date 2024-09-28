@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { createContext, useEffect, useState } from "react";
 
@@ -66,21 +67,22 @@ const AuthProvider = ({ children }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-// handleLogin Function with Error Handling and Callback
-const handleLogin = async (params, errorCallback) => {
+  // handleLogin Function with Error Handling and Callback
+  const handleLogin = async (params, errorCallback) => {
+    try {
+      // Call the mock login endpoint
+      const response = await axios.post(authConfig.loginEndpoint, params);
 
-  try {
-    // Call the mock login endpoint
-    const response = await axios.post(authConfig.loginEndpoint, params);
+      const { accessToken, userData } = response.data;
 
-    const { accessToken, userData } = response.data;
-
-    // Store the accessToken and userData in localStorage
-    if (userData) {
-      window.localStorage.setItem(authConfig.storageTokenKeyName, accessToken);
-      window.localStorage.setItem("userData", JSON.stringify(userData));
-    }
-  
+      // Store the accessToken and userData in localStorage
+      if (userData) {
+        window.localStorage.setItem(
+          authConfig.storageTokenKeyName,
+          accessToken,
+        );
+        window.localStorage.setItem("userData", JSON.stringify(userData));
+      }
       if (userData.role === "superAdmin") {
         window.localStorage.setItem(authConfig.isSuperAdmin, true);
       } else if (userData.role === "Resturant") {
@@ -89,19 +91,19 @@ const handleLogin = async (params, errorCallback) => {
 
       const returnUrl = router.query.returnUrl;
       setUser({ ...userData });
-    
+
       const redirectURL = returnUrl && returnUrl !== "/" ? returnUrl : "/";
 
       router.replace(redirectURL);
-   
-     } catch (error) {
-    // Get the error message based on response status
-    const errorMessage = error?.response?.data?.error || "Login failed, please try again";
-    
-    // Pass the error message back to the calling function via callback
-    if (errorCallback) errorCallback(errorMessage);
-  }
-};
+    } catch (error) {
+      // Get the error message based on response status
+      const errorMessage =
+        error?.response?.data?.error || "Login failed, please try again";
+
+      // Pass the error message back to the calling function via callback
+      if (errorCallback) errorCallback(errorMessage);
+    }
+  };
 
   const handleLogout = () => {
     setUser(null);

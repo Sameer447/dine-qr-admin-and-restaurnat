@@ -1,14 +1,17 @@
-"use server"
+"use server";
 
 import nodemailer from "nodemailer";
-import {  user, pass  } from "../global";
+import { user, pass } from "../global";
 
-
-
-export async function ContactUser(userid  , firstName , lastName ,phone ,email , message ) {
+export async function ContactUser(
+  userid,
+  firstName,
+  lastName,
+  phone,
+  email,
+  message,
+) {
   try {
-   
-
     // Validate the email address format
     if (!isValidEmail(email)) {
       throw new Error("Invalid email address format");
@@ -26,9 +29,8 @@ export async function ContactUser(userid  , firstName , lastName ,phone ,email ,
       },
     });
 
-  
-  // HTML email content with the verification link
-  const htmlContent = `
+    // HTML email content with the verification link
+    const htmlContent = `
   <p>New contact inquiry received:</p>
   <p>Name: UserId : ${userid} </p>
   <p>Name: ${firstName} ${lastName}</p>
@@ -37,34 +39,22 @@ export async function ContactUser(userid  , firstName , lastName ,phone ,email ,
   <p>Please respond to the inquiry promptly.</p>
   `;
 
-
-
     const mailOptions = {
       from: user,
       to: email,
-       subject: 'User Feedback',
+      subject: "User Feedback",
       html: htmlContent,
     };
 
- 
     const info = await transporter.sendMail(mailOptions);
 
     if (info.messageId) {
-
-
-   
-      console.log("Email sent successfully");
-
-   
-    
-    
     } else {
       console.error("Email sending failed");
- 
     }
   } catch (error) {
     console.error("Error sending email:", error.message);
-    return ({ status: 400, error: error.message });
+    return { status: 400, error: error.message };
   }
 }
 
@@ -74,4 +64,3 @@ function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
-

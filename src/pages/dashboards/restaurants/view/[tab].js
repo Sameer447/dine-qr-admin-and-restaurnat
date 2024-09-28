@@ -1,11 +1,23 @@
+// @ts-nocheck
 // ** Third Party Imports
 import axios from "axios";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
 // ** Demo Components Imports
-import UserViewPage from "src/views/apps/user/view/UserViewPage";
+import UserViewPage from "src/views/apps/restaurants/view/UserViewPage";
 
 const UserView = ({ tab, invoiceData }) => {
-  return <UserViewPage tab={tab} invoiceData={invoiceData} />;
+  const router = useRouter();
+  const [userData, setUserData] = useState(null);
+  useEffect(() => {
+    axios.get("/api/UserById/route?id=" + router.query.id).then((res) => {
+      setUserData(res.data);
+    });
+  }, [router.query.id]);
+  return (
+    <UserViewPage tab={tab} invoiceData={invoiceData} userData={userData} />
+  );
 };
 
 export const getStaticPaths = () => {

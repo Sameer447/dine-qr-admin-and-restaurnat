@@ -1,6 +1,6 @@
-import { AbilityBuilder, Ability } from '@casl/ability'
+import { AbilityBuilder, Ability } from "@casl/ability";
 
-export const AppAbility = Ability
+export const AppAbility = Ability;
 
 /**
  * Please define your own Ability rules according to your app requirements.
@@ -9,28 +9,28 @@ export const AppAbility = Ability
  */
 const defineRulesFor = (role, subject) => {
   const { can, rules } = new AbilityBuilder(AppAbility);
-  // if (role === 'superAdmin') {
-    can('manage', 'all')
-  // } else if (role === 'Resturant') {
-    can(['read'], 'acl-page')
-  // } else {
-    can(['read', 'create', 'update', 'delete'], subject)
-  // }
+  if (role === "superAdmin") {
+    can("manage", "all");
+  } else if (role === "Resturant") {
+    can("manage", "all");
+  } else {
+    can(["read", "create", "update", "delete"], subject);
+  }
 
-  return rules
-}
+  return rules;
+};
 
 export const buildAbilityFor = (role, subject) => {
   return new AppAbility(defineRulesFor(role, subject), {
     // https://casl.js.org/v5/en/guide/subject-type-detection
     // @ts-ignore
-    detectSubjectType: object => object.type
-  })
-}
+    detectSubjectType: (object) => object.type,
+  });
+};
 
 export const defaultACLObj = {
-  action: 'manage',
-  subject: 'all'
-}
+  action: "manage",
+  subject: "all",
+};
 
-export default defineRulesFor
+export default defineRulesFor;

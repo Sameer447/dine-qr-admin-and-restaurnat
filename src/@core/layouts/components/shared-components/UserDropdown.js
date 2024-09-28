@@ -63,7 +63,6 @@ const UserDropdown = (props) => {
     }
   }, []);
 
-
   const handleDropdownOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -152,7 +151,9 @@ const UserDropdown = (props) => {
                 flexDirection: "column",
               }}
             >
-           <Typography sx={{ fontWeight: 500 }}>{userData?.restaurantDetails?.restaurantName}</Typography>
+              <Typography sx={{ fontWeight: 500 }}>
+                {userData?.restaurantDetails?.restaurantName}
+              </Typography>
               <Typography variant="body2">{userData?.role}</Typography>
             </Box>
           </Box>
@@ -160,7 +161,7 @@ const UserDropdown = (props) => {
         {userRole && (
           <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
         )}
-        {!userRole ? (
+        {userRole ? (
           <MenuItemStyled
             sx={{ p: 0 }}
             onClick={() => handleDropdownClose("/pages/user-profile/profile")}
@@ -171,7 +172,7 @@ const UserDropdown = (props) => {
             </Box>
           </MenuItemStyled>
         ) : null}
-        {!userRole ? (
+        {userRole ? (
           <MenuItemStyled
             sx={{ p: 0 }}
             onClick={() =>
@@ -184,7 +185,7 @@ const UserDropdown = (props) => {
             </Box>
           </MenuItemStyled>
         ) : null}
-        {!userRole ? (
+        {userRole ? (
           <MenuItemStyled
             sx={{ p: 0 }}
             onClick={() =>
@@ -218,7 +219,7 @@ const UserDropdown = (props) => {
             FAQ
           </Box>
         </MenuItemStyled> */}
-        {!userRole ? (
+        {userRole ? (
           <MenuItemStyled
             sx={{ p: 0 }}
             onClick={() => handleDropdownClose("/pages/pricing")}
@@ -229,7 +230,7 @@ const UserDropdown = (props) => {
             </Box>
           </MenuItemStyled>
         ) : null}
-        {!userRole && (
+        {userRole && (
           <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
         )}
         <MenuItemStyled sx={{ p: 0 }} onClick={handleLogout}>
