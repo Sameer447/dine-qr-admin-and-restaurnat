@@ -117,9 +117,9 @@ const UserViewLeft = () => {
                   {getInitials(data.fullName)}
                 </CustomAvatar>
               )}
-              <Typography variant='h4' sx={{ mb: 3 }}>
+              {/* <Typography variant='h4' sx={{ mb: 3 }}>
                 {data.fullName}
-              </Typography>
+              </Typography> */}
               <CustomChip
                 rounded
                 skin='light'

@@ -12,6 +12,18 @@ export const fetchData = createAsyncThunk(
     return response.data;
   },
 );
+
+// ** Fetch Restaurants
+export const fetchMenuItems = createAsyncThunk(
+  "appRestaurants/fetchMenuItems",
+  async () => {
+    const user = localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData')) : null;
+    if(!user) return;
+    const response = await axios.get(`/api/get-food-items?restaurant_id=${user._id}`);   
+    return response.data;
+  },
+);
+
 // ** Add Restaurant
 export const addRestaurant = createAsyncThunk(
   "appRestaurants/addRestaurant",
@@ -41,16 +53,19 @@ export const deleteRestaurant = createAsyncThunk(
 export const appRestaurantsSlice = createSlice({
   name: "appRestaurants",
   initialState: {
-    data: [],
+    restaurants: [], // Array to store restaurant data
+    foodItems: [], // Array to store food items data
   },
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchData.fulfilled, (state, action) => {
-      state.data = action.payload;
-      //   state.total = action.payload.total;
-      //   state.params = action.payload.params;
-      //   state.allData = action.payload.allData;
+    builder
+    .addCase(fetchData.fulfilled, (state, action) => {
+      state.restaurants = action.payload; // Store fetched restaurant data
+    })
+    .addCase(fetchMenuItems.fulfilled, (state, action) => {
+      state.foodItems = action.payload; // Store fetched food items
     });
+
   },
 });
 

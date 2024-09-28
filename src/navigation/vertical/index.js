@@ -48,10 +48,10 @@ const navigation = (role) => {
         {
           title: "View",
           children: [
-            {
-              title: "Add Menu",
-              path: "/apps/menus/view/add-menu",
-            },
+            // {
+            //   title: "Add Menu",
+            //   path: "/apps/menus/view/add-menu",
+            // },
             {
               title: "Add Menu Item",
               path: "/apps/menus/view/add-menu-item",

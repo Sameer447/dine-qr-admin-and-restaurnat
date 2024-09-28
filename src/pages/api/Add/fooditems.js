@@ -124,9 +124,21 @@ export default async function handler(req, res) {
   }
 }
 
+
+// export default async function handlerData(req, res) {
+//   if (req.method === "GET") {
+//     console.log("hit get food items ??");
+//     const { restaurant_id } = req.query; 
+//      console.log("restaurant_id", restaurant_id);
+//     try {
+//       const foodItems = await FoodItems.find({ restaurant_id: restaurant_id });
+//       res.status(200).json(foodItems);
+//     } catch (error) {
+//       res.status(500).json({ message: error.message });
+//     }
+//   }
+// }
     
-
-
 // export async function GET(request) {
 //   const url = new URL(request.url);
 //   const filename = url.searchParams.get('filename');
