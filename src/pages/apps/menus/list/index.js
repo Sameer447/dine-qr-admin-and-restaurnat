@@ -266,7 +266,7 @@ const RowOptions = ({ id }) => {
 
 const columns = [
     {
-      flex: 0.25,
+      flex: 0.2,
       minWidth: 280,
       field: "food_name",
       headerName: "Menu Item Name",
@@ -277,35 +277,35 @@ const columns = [
       ),
     },
     {
-      flex: 0.25,
-      minWidth: 280,
-      field: "description",
-      headerName: "Description",
+      flex: 0.15,
+      minWidth: 80,
+      field: "category",
+      headerName: "Category",
       renderCell: ({ row }) => (
         <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.description}
-        </Typography>
-      ),
-    },
-    {
-      flex: 0.1,
-      minWidth: 100,
-      field: "price",
-      headerName: "Price",
-      renderCell: ({ row }) => (
-        <Typography noWrap>
-          ${row.price}
+          {row.category}
         </Typography>
       ),
     },
     {
       flex: 0.15,
       minWidth: 120,
-      field: "preparationTime",
-      headerName: "Preparation Time (min)",
+      field: "subCategory",
+      headerName: "Sub Category",
       renderCell: ({ row }) => (
         <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.preparationTime}
+          {row.subCategory}
+        </Typography>
+      ),
+    },
+    {
+      flex: 0.15,
+      minWidth: 120,
+      field: "calories",
+      headerName: "Calories",
+      renderCell: ({ row }) => (
+        <Typography noWrap sx={{ color: "text.secondary" }}>
+          {row.calories}
         </Typography>
       ),
     },
@@ -317,6 +317,17 @@ const columns = [
       renderCell: ({ row }) => (
         <Typography noWrap sx={{ color: "text.secondary" }}>
           {row.cuisine}
+        </Typography>
+      ),
+    },
+    {
+      flex: 0.1,
+      minWidth: 100,
+      field: "price",
+      headerName: "Price",
+      renderCell: ({ row }) => (
+        <Typography noWrap>
+          ${row.price}
         </Typography>
       ),
     },

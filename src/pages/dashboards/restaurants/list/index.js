@@ -289,7 +289,8 @@ const UserList = ({ apiData }) => {
 
   // ** Hooks
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.restaurants);
+  const store = useSelector((state) => state.restaurants.restaurants);
+  console.log("store", store);
   useEffect(() => {
     dispatch(fetchData());
   }, []);
@@ -397,7 +398,7 @@ const UserList = ({ apiData }) => {
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={store.data}
+            rows={store}
             columns={columns}
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
