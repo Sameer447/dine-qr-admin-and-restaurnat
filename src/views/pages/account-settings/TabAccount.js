@@ -264,59 +264,109 @@ const TabAccount = () => {
             <CardContent>
               <Grid container spacing={5}>
                 <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    fullWidth
-                    type="file"
-                    label="Upload High Quality Restaurant Banner"
-                    placeholder="banner"
-                    // value={formData.lastName}
-                    onChange={(e) =>
-                      handleFormChange("lastName", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantDetails.banner"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <CustomTextField
+                        fullWidth
+                        type="file"
+                        label="Upload High Quality Restaurant Banner"
+                        placeholder="banner"
+                        value={value}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Restaurant Full Name"
-                    placeholder="John"
-                    value={formData.restaurantDetails.restaurantName}
-                    onChange={(e) =>
-                      handleFormChange("restaurantName", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantDetails.restaurantName"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Restaurant Full Name"
+                        placeholder="John"
+                        value={value}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Restaurant Owner"
-                    placeholder="Doe"
-                    value={formData.restaurantDetails.restaurantOwner}
-                    onChange={(e) =>
-                      handleFormChange("restaurantOwner", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantDetails.restaurantOwner"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Restaurant Owner"
+                        placeholder="Doe"
+                        value={value}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="CNIC Number"
-                    placeholder="12345-1234567-1"
-                    value={formData.restaurantDetails.cnicNumber}
-                    onChange={(e) =>
-                      handleFormChange("cnicNumber", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantDetails.cnicNumber"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="CNIC Number"
+                        placeholder="12345-1234567-1"
+                        value={value}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Tagline"
-                    placeholder="Tagline"
-                    value={formData.restaurantDetails.tagline}
-                    onChange={(e) =>
-                      handleFormChange("tagline", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantDetails.tagline"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({
+                      field: { value, onChange },
+                      fieldState: { error },
+                    }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Tagline"
+                        placeholder="Tagline"
+                        value={value}
+                        onChange={onChange}
+                        error={!!error}
+                        helperText={error ? error.message : null}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
@@ -799,9 +849,64 @@ const TabAccount = () => {
                     }
                   />
                 </Grid>
-                {/* <Grid item xs={12} sm={6}>
-                  <PickersTime label={"Select Restaurant Off Time"} />
-                </Grid> */}
+                <Grid item xs={12} sm={12}>
+                  <CardHeader title="Social Links" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Facebook Link"
+                    placeholder="https://www.facebook.com/your-restaurant"
+                    value={formData.restaurantSocialMedia.facebook}
+                    onChange={(e) =>
+                      handleFormChange("facebook", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Twitter Link"
+                    placeholder="https://www.twitter.com/your-restaurant"
+                    value={formData.restaurantSocialMedia.twitter}
+                    onChange={(e) =>
+                      handleFormChange("twitter", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Instagram Link"
+                    placeholder="https://www.instagram.com/your-restaurant"
+                    value={formData.restaurantSocialMedia.instagram}
+                    onChange={(e) =>
+                      handleFormChange("instagram", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="LinkedIn Link"
+                    placeholder="https://www.linkedin.com/your-restaurant"
+                    value={formData.restaurantSocialMedia.linkedin}
+                    onChange={(e) =>
+                      handleFormChange("linkedin", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Portfolio Link"
+                    placeholder="https://www.portfolio.com/your-restaurant"
+                    value={formData.restaurantSocialMedia.portfolio}
+                    onChange={(e) =>
+                      handleFormChange("portfolio", e.target.value)
+                    }
+                  />
+                </Grid>
               </Grid>
             </CardContent>
             <CardContent>

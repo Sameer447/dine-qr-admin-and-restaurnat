@@ -78,6 +78,8 @@ function reducer(state, action) {
       return { ...state, specialityTags: action.payload };
     case "cuisine":
       return { ...state, cuisine: action.payload };
+    case "addOns":
+      return { ...state, addOns: action.payload };
     default:
       return state;
   }
@@ -110,6 +112,8 @@ const AddMenuItemForm = ({ restaurantData }) => {
   } = useForm({ defaultValues: initialState });
 
   const onSubmit = async (data) => {
+    console.log("data", data);
+
     try {
       setLoading(true);
       const formData = new FormData();
@@ -176,6 +180,8 @@ const AddMenuItemForm = ({ restaurantData }) => {
   };
   const addAddOn = () => {
     const updatedAddOns = [...state.addOns, { name: "", price: 0 }];
+    console.log("updatedAddOns", updatedAddOns);
+
     dispatch({ type: "addOns", payload: updatedAddOns });
     setValue("addOns", updatedAddOns);
   };
@@ -546,9 +552,14 @@ const AddMenuItemForm = ({ restaurantData }) => {
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <FormLabel style={{ marginBottom: 10 }}>Add Ons</FormLabel>
+                    <FormLabel>Add Ons</FormLabel>
                     {state.addOns.map((addOn, index) => (
-                      <Grid container spacing={2} key={index}>
+                      <Grid
+                        container
+                        spacing={2}
+                        key={index}
+                        sx={{ marginTop: 1 }}
+                      >
                         <Grid item xs={5}>
                           <CustomTextField
                             fullWidth
@@ -565,20 +576,23 @@ const AddMenuItemForm = ({ restaurantData }) => {
                             label="Add On Price"
                             value={addOn.price}
                             onChange={(e) =>
-                              handleAddOnChange(index, "price", e.target.value)
+                              handleAddOnChange(
+                                index,
+                                "price",
+                                parseFloat(e.target.value),
+                              )
                             }
                           />
                         </Grid>
                         <Grid
                           item
                           xs={2}
-                          style={{
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            alignItems: "center",
+                          sx={{
+                            display: "flex",
+                            alignSelf: "flex-end !important",
                           }}
                         >
-                          {index === state.addOns.length - 1 && (
+                          {index > 0 && (
                             <Button
                               variant="outlined"
                               color="secondary"
@@ -587,14 +601,16 @@ const AddMenuItemForm = ({ restaurantData }) => {
                               Remove
                             </Button>
                           )}
-                          <Button
-                            variant="outlined"
-                            color="primary"
-                            type="button"
-                            onClick={addAddOn}
-                          >
-                            Add
-                          </Button>
+                          {index + 1 === state.addOns.length && (
+                            <Button
+                              variant="outlined"
+                              color="primary"
+                              type="button"
+                              onClick={addAddOn}
+                            >
+                              Add
+                            </Button>
+                          )}
                         </Grid>
                       </Grid>
                     ))}

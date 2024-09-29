@@ -76,7 +76,7 @@ export default async function handler(req, res) {
       availability,
       customiseable,
       restaurant_id,
-      addones,
+      addOns,
     } = fields;
 
     const allergens = Array.isArray(fields["allergens"])
@@ -110,6 +110,15 @@ export default async function handler(req, res) {
       fs.renameSync(oldPath, newPath);
     }
 
+    // Parse addOns if provided
+    let parsedAddOns = [];
+    if (addOns) {
+      parsedAddOns = JSON.parse(addOns[0]).map((addOn) => ({
+        name: addOn.name,
+        price: parseFloat(addOn.price),
+      }));
+    }
+
     const savedItemData = await FoodItems.create({
       food_name: menuItemName[0],
       description: description ? description[0] : "",
@@ -130,6 +139,7 @@ export default async function handler(req, res) {
         },
       ],
       restaurant_id: restaurant_id[0],
+      addOns: parsedAddOns,
     });
 
     return res
@@ -140,59 +150,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ message: "Internal server error" });
   }
 }
-
-// export default async function handlerData(req, res) {
-//   if (req.method === "GET") {
-//     console.log("hit get food items ??");
-//     const { restaurant_id } = req.query;
-//      console.log("restaurant_id", restaurant_id);
-//     try {
-//       const foodItems = await FoodItems.find({ restaurant_id: restaurant_id });
-//       res.status(200).json(foodItems);
-//     } catch (error) {
-//       res.status(500).json({ message: error.message });
-//     }
-//   }
-// }
-
-// export async function GET(request) {
-//   const url = new URL(request.url);
-//   const filename = url.searchParams.get('filename');
-
-//   if (!filename) {
-//     return new Response(null, { status: 400, statusText: 'Bad Request' });
-//   }
-
-//   // Assuming the uploaded files are stored in the "/public/tmp" directory
-//   const path = `../data/${filename}`;
-
-//   try {
-//     // Read the file from the filesystem
-//     const fileData = await readFile(path);
-
-//     // Get the file extension
-//     const extension = filename.split('.').pop().toLowerCase();
-
-//     // Set the appropriate content type based on the file extension
-//     let contentType = 'application/octet-stream'; // Default content type for unknown file types
-
-//     if (extension === 'png') {
-//       contentType = 'image/png';
-//     } else if (extension === 'jpg' || extension === 'jpeg') {
-//       contentType = 'image/jpeg';
-//     }
-//     // Add more conditions for other supported file types as needed
-
-//     // Set the appropriate headers for the image or video response
-//     const headers = {
-//       'Content-Type': contentType,
-//       'Content-Length': fileData.length.toString(),
-//     };
-
-//     // Return the file as the response
-//     return new Response(fileData, { headers });
-//   } catch (error) {
-//     console.error(`Error reading file: ${error}`);
-//     return new Response(null, { status: 404, statusText: 'Not Found' });
-//   }
-// }
