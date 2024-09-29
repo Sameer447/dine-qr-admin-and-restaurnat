@@ -1,5 +1,6 @@
+// @ts-nocheck
 // ** React Imports
-"use client"
+"use client";
 import { forwardRef, useEffect, useReducer, useState } from "react";
 
 // ** MUI Imports
@@ -59,6 +60,12 @@ const initialState = {
   customiseable: false,
   customiseableOptions: [],
   calories: 0,
+  addOns: [
+    {
+      name: "",
+      price: 0,
+    },
+  ],
 };
 
 function reducer(state, action) {
@@ -107,42 +114,48 @@ const AddMenuItemForm = ({ restaurantData }) => {
       setLoading(true);
       const formData = new FormData();
 
-      formData.append('category', data.category);
-      formData.append('subCategory', data.subCategory);
-      formData.append('cuisine', data.cuisine);
-      formData.append('menuItemName', data.menuItemName);
-      formData.append('description', data.description);
-      formData.append('preparationTime', data.preparationTime);
-      formData.append('price', data.price);
-      formData.append('calories', data.calories);
-      formData.append('availability', data.availability);
-      formData.append('customiseable', data.customiseable);
+      formData.append("category", data.category);
+      formData.append("subCategory", data.subCategory);
+      formData.append("cuisine", data.cuisine);
+      formData.append("menuItemName", data.menuItemName);
+      formData.append("description", data.description);
+      formData.append("preparationTime", data.preparationTime);
+      formData.append("price", data.price);
+      formData.append("calories", data.calories);
+      formData.append("availability", data.availability);
+      formData.append("customiseable", data.customiseable);
 
-      data.specialityTags.forEach(tag => formData.append('specialityTags', tag));
-      data.allergens.forEach(allergen => formData.append('allergens', allergen));
-      data.avialableSizes.forEach(size => formData.append('availableSizes', size));
+      data.specialityTags.forEach((tag) =>
+        formData.append("specialityTags", tag),
+      );
+      data.allergens.forEach((allergen) =>
+        formData.append("allergens", allergen),
+      );
+      data.avialableSizes.forEach((size) =>
+        formData.append("availableSizes", size),
+      );
 
-      formData.append('itemImage', data.itemImage);
-      formData.append('restaurant_id', restaurantData._id)
-
+      formData.append("itemImage", data.itemImage);
+      formData.append("restaurant_id", restaurantData._id);
+      formData.append("addOns", JSON.stringify(data.addOns));
 
       const response = await axios.post(`/api/Add/fooditems`, formData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
       if (response.status === 200 || response.status === 201) {
-        toast.success(response.data.message || 'Menu item added Successfully!');
+        toast.success(response.data.message || "Menu item added Successfully!");
         setLoading(false);
         setImage(null);
         reset();
       } else {
-        toast.error(response.data.message || 'Error in saving menu item!');
+        toast.error(response.data.message || "Error in saving menu item!");
         setLoading(false);
       }
     } catch (error) {
-      console.error('Error saving menu item:', error);
+      console.error("Error saving menu item:", error);
       setLoading(false);
     }
   };
@@ -150,11 +163,28 @@ const AddMenuItemForm = ({ restaurantData }) => {
   const onImageSelect = (e) => {
     const file = e.target.files[0];
     if (file) {
-      setValue('itemImage', file);
+      setValue("itemImage", file);
       setImage(URL.createObjectURL(file));
     }
   };
 
+  const handleAddOnChange = (index, field, value) => {
+    const updatedAddOns = [...state.addOns];
+    updatedAddOns[index][field] = value;
+    dispatch({ type: "addOns", payload: updatedAddOns });
+    setValue("addOns", updatedAddOns);
+  };
+  const addAddOn = () => {
+    const updatedAddOns = [...state.addOns, { name: "", price: 0 }];
+    dispatch({ type: "addOns", payload: updatedAddOns });
+    setValue("addOns", updatedAddOns);
+  };
+
+  const removeAddOn = (index) => {
+    const updatedAddOns = state.addOns.filter((_, i) => i !== index);
+    dispatch({ type: "addOns", payload: updatedAddOns });
+    setValue("addOns", updatedAddOns);
+  };
   return (
     <DatePickerWrapper>
       <Grid container spacing={6} className="match-height">
@@ -162,13 +192,15 @@ const AddMenuItemForm = ({ restaurantData }) => {
           title={
             <Typography variant="h4">
               <LinkStyled href="link-to-restaurant" target="_blank">
-                {restaurantData?.restaurantDetails?.restaurantName || "Restaurant Name"}
+                {restaurantData?.restaurantDetails?.restaurantName ||
+                  "Restaurant Name"}
               </LinkStyled>
             </Typography>
           }
           subtitle={
             <Typography sx={{ color: "text.secondary" }}>
-              {restaurantData?.restaurantDetails?.tagline || "A catchy line that summarizes the restaurant's appeal."}
+              {restaurantData?.restaurantDetails?.tagline ||
+                "A catchy line that summarizes the restaurant's appeal."}
             </Typography>
           }
         />
@@ -182,7 +214,10 @@ const AddMenuItemForm = ({ restaurantData }) => {
                     <Controller
                       name="category"
                       control={control}
-                      rules={{ required: true, message: "Category is required" }}
+                      rules={{
+                        required: true,
+                        message: "Category is required",
+                      }}
                       render={({ field }) => (
                         <CustomTextField
                           select
@@ -191,10 +226,15 @@ const AddMenuItemForm = ({ restaurantData }) => {
                           value={state.category}
                           onChange={(e) => {
                             field.onChange(e);
-                            dispatch({ type: "category", payload: e.target.value });
+                            dispatch({
+                              type: "category",
+                              payload: e.target.value,
+                            });
                           }}
                           error={!!errors.category}
-                          helperText={errors.category ? "This field is required" : ""}
+                          helperText={
+                            errors.category ? "This field is required" : ""
+                          }
                         >
                           {categoris.map((category) => (
                             <MenuItem
@@ -215,7 +255,10 @@ const AddMenuItemForm = ({ restaurantData }) => {
                       rules={{
                         required: "Subcategory is required", // Custom error message
                       }}
-                      render={({ field: { value, onChange }, fieldState: { error } }) => (
+                      render={({
+                        field: { value, onChange },
+                        fieldState: { error },
+                      }) => (
                         <CustomTextField
                           select
                           fullWidth
@@ -234,12 +277,21 @@ const AddMenuItemForm = ({ restaurantData }) => {
                         >
                           {state.category &&
                             categoris
-                              .find((category) => category.value === state.category) // Ensure category exists
-                              ?.subCategories?.map((subCategory) => ( // Safely access subCategories
-                                <MenuItem key={subCategory.value} value={subCategory.value}>
-                                  {subCategory.name}
-                                </MenuItem>
-                              ))}
+                              .find(
+                                (category) => category.value === state.category,
+                              ) // Ensure category exists
+                              ?.subCategories?.map(
+                                (
+                                  subCategory, // Safely access subCategories
+                                ) => (
+                                  <MenuItem
+                                    key={subCategory.value}
+                                    value={subCategory.value}
+                                  >
+                                    {subCategory.name}
+                                  </MenuItem>
+                                ),
+                              )}
                         </CustomTextField>
                       )}
                     />
@@ -493,7 +545,60 @@ const AddMenuItemForm = ({ restaurantData }) => {
                       )}
                     />
                   </Grid>
-
+                  <Grid item xs={12}>
+                    <FormLabel style={{ marginBottom: 10 }}>Add Ons</FormLabel>
+                    {state.addOns.map((addOn, index) => (
+                      <Grid container spacing={2} key={index}>
+                        <Grid item xs={5}>
+                          <CustomTextField
+                            fullWidth
+                            label="Add On Name"
+                            value={addOn.name}
+                            onChange={(e) =>
+                              handleAddOnChange(index, "name", e.target.value)
+                            }
+                          />
+                        </Grid>
+                        <Grid item xs={5}>
+                          <CustomTextField
+                            fullWidth
+                            label="Add On Price"
+                            value={addOn.price}
+                            onChange={(e) =>
+                              handleAddOnChange(index, "price", e.target.value)
+                            }
+                          />
+                        </Grid>
+                        <Grid
+                          item
+                          xs={2}
+                          style={{
+                            flexDirection: "row",
+                            justifyContent: "space-between",
+                            alignItems: "center",
+                          }}
+                        >
+                          {index === state.addOns.length - 1 && (
+                            <Button
+                              variant="outlined"
+                              color="secondary"
+                              onClick={() => removeAddOn(index)}
+                            >
+                              Remove
+                            </Button>
+                          )}
+                          <Button
+                            variant="outlined"
+                            color="primary"
+                            type="button"
+                            onClick={addAddOn}
+                          >
+                            Add
+                          </Button>
+                        </Grid>
+                      </Grid>
+                    ))}
+                  </Grid>
                   <Grid item xs={12} sm={6}>
                     <Controller
                       name="availability"
@@ -549,14 +654,14 @@ const AddMenuItemForm = ({ restaurantData }) => {
                     <Controller
                       name="itemImage"
                       control={control}
-                      rules={{ required: "Image is required" }}  // Custom error message
+                      rules={{ required: "Image is required" }} // Custom error message
                       render={({ field }) => (
                         <CustomInput
                           type="file"
                           label="Menu Item Image"
                           onChange={(e) => {
-                            field.onChange(e.target.files);  // Store file object in form state
-                            onImageSelect(e);  // Handle image preview
+                            field.onChange(e.target.files);
+                            onImageSelect(e);
                           }}
                           InputProps={{
                             startAdornment: (
@@ -574,7 +679,7 @@ const AddMenuItemForm = ({ restaurantData }) => {
                           error={Boolean(errors.itemImage)}
                           aria-describedby="validation-basic-item-image"
                           {...(errors.itemImage && {
-                            helperText: errors.itemImage.message,  // Show the validation message
+                            helperText: errors.itemImage.message, // Show the validation message
                           })}
                         />
                       )}
@@ -603,12 +708,13 @@ const AddMenuItemForm = ({ restaurantData }) => {
                       name="description"
                       control={control}
                       rules={{ required: true }}
-                      render={({ field }) => (
+                      render={({ field: { value, onChange } }) => (
                         <CustomTextField
                           rows={4}
                           fullWidth
                           multiline
-                          {...field}
+                          value={value}
+                          onChange={onChange}
                           label="Menu Item Description"
                           error={Boolean(errors.textarea)}
                           aria-describedby="validation-basic-textarea"
@@ -622,7 +728,11 @@ const AddMenuItemForm = ({ restaurantData }) => {
                   <Grid item xs={12}>
                     <Button variant="contained" type="submit">
                       {loading ? (
-                        <CircularProgress size={24} thickness={6} color="inherit" />
+                        <CircularProgress
+                          size={24}
+                          thickness={6}
+                          color="inherit"
+                        />
                       ) : (
                         <text>Submit</text>
                       )}

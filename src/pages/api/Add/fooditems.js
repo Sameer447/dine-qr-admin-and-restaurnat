@@ -11,18 +11,24 @@ export const config = {
 };
 
 const validateFields = (fields) => {
-  const requiredFields = ["category", "menuItemName", "price", "preparationTime", "cuisine"];
+  const requiredFields = [
+    "category",
+    "menuItemName",
+    "price",
+    "preparationTime",
+    "cuisine",
+  ];
 
   for (const field of requiredFields) {
     const fieldValue = fields[field];
 
     let valueToCheck = Array.isArray(fieldValue) ? fieldValue[0] : fieldValue;
 
-    if (typeof valueToCheck !== 'string' || valueToCheck.trim().length === 0) {
+    if (typeof valueToCheck !== "string" || valueToCheck.trim().length === 0) {
       return `${field} is required.`;
     }
   }
-  return null; 
+  return null;
 };
 
 const parseForm = (req, uploadDir) => {
@@ -58,27 +64,32 @@ export default async function handler(req, res) {
       return res.status(400).json({ message: validationError });
     }
 
-    const {  
-      menuItemName, 
-      description, 
-      price, 
-      preparationTime, 
-      cuisine, 
-      calories, 
-      category, 
-      subCategory, 
-      availability, 
-      customiseable, 
-      restaurant_id
-     } = fields;
+    const {
+      menuItemName,
+      description,
+      price,
+      preparationTime,
+      cuisine,
+      calories,
+      category,
+      subCategory,
+      availability,
+      customiseable,
+      restaurant_id,
+      addones,
+    } = fields;
 
+    const allergens = Array.isArray(fields["allergens"])
+      ? fields["allergens"]
+      : [];
+    const specialityTags = Array.isArray(fields["specialityTags"])
+      ? fields["specialityTags"]
+      : [];
+    const availableSizes = Array.isArray(fields["availableSizes"])
+      ? fields["availableSizes"]
+      : [];
 
-    const allergens = Array.isArray(fields['allergens']) ? fields['allergens'] : [];
-    const specialityTags = Array.isArray(fields['specialityTags']) ? fields['specialityTags'] : [];
-    const availableSizes = Array.isArray(fields['availableSizes']) ? fields['availableSizes'] : [];
-
-
-    let imageFilename = '';
+    let imageFilename = "";
     const uploadedFile = files.itemImage;
 
     if (uploadedFile && uploadedFile.length > 0) {
@@ -89,46 +100,51 @@ export default async function handler(req, res) {
 
       const allowedTypes = ["image/jpeg", "image/png"];
       const maxSize = 5 * 1024 * 1024;
-      if (!allowedTypes.includes(uploadedFile[0].mimetype) || uploadedFile[0].size > maxSize) {
+      if (
+        !allowedTypes.includes(uploadedFile[0].mimetype) ||
+        uploadedFile[0].size > maxSize
+      ) {
         return res.status(400).json({ message: "Invalid file type or size" });
       }
 
       fs.renameSync(oldPath, newPath);
     }
 
-    const savedItemData =  await FoodItems.create({
+    const savedItemData = await FoodItems.create({
       food_name: menuItemName[0],
-      description: description ? description[0] : '',
+      description: description ? description[0] : "",
       price: parseFloat(price[0]),
       preparationTime: parseInt(preparationTime[0], 10),
       cuisine: cuisine[0],
       calories: calories ? parseInt(calories[0], 10) : null,
       category: category[0],
       subCategory: subCategory[0],
-      allergens: allergens, 
-      specialityTags: specialityTags, 
-      availableSizes: availableSizes, 
-      availability: availability[0] === 'true', 
-      customiseable: customiseable[0] === 'true', 
-      images: [{
-        name: imageFilename
-      }],
-      restaurant_id: restaurant_id[0] 
+      allergens: allergens,
+      specialityTags: specialityTags,
+      availableSizes: availableSizes,
+      availability: availability[0] === "true",
+      customiseable: customiseable[0] === "true",
+      images: [
+        {
+          name: imageFilename,
+        },
+      ],
+      restaurant_id: restaurant_id[0],
     });
 
-    return res.status(201).json({ message: "Menu item added successfully" , savedItemData });
-
+    return res
+      .status(201)
+      .json({ message: "Menu item added successfully", savedItemData });
   } catch (error) {
     console.error("Error:", error);
     return res.status(500).json({ message: "Internal server error" });
   }
 }
 
-
 // export default async function handlerData(req, res) {
 //   if (req.method === "GET") {
 //     console.log("hit get food items ??");
-//     const { restaurant_id } = req.query; 
+//     const { restaurant_id } = req.query;
 //      console.log("restaurant_id", restaurant_id);
 //     try {
 //       const foodItems = await FoodItems.find({ restaurant_id: restaurant_id });
@@ -138,7 +154,7 @@ export default async function handler(req, res) {
 //     }
 //   }
 // }
-    
+
 // export async function GET(request) {
 //   const url = new URL(request.url);
 //   const filename = url.searchParams.get('filename');
@@ -153,7 +169,7 @@ export default async function handler(req, res) {
 //   try {
 //     // Read the file from the filesystem
 //     const fileData = await readFile(path);
-    
+
 //     // Get the file extension
 //     const extension = filename.split('.').pop().toLowerCase();
 
@@ -164,7 +180,7 @@ export default async function handler(req, res) {
 //       contentType = 'image/png';
 //     } else if (extension === 'jpg' || extension === 'jpeg') {
 //       contentType = 'image/jpeg';
-//     } 
+//     }
 //     // Add more conditions for other supported file types as needed
 
 //     // Set the appropriate headers for the image or video response
@@ -180,4 +196,3 @@ export default async function handler(req, res) {
 //     return new Response(null, { status: 404, statusText: 'Not Found' });
 //   }
 // }
-

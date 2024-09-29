@@ -1,5 +1,6 @@
+// @ts-nocheck
 // ** React Imports
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -20,7 +21,9 @@ import FormHelperText from "@mui/material/FormHelperText";
 import InputAdornment from "@mui/material/InputAdornment";
 import Button from "@mui/material/Button";
 import FormControlLabel from "@mui/material/FormControlLabel";
-
+import DatePicker from "react-datepicker";
+import CustomInput from "src/views/forms/form-elements/pickers/PickersCustomInput";
+import "react-datepicker/dist/react-datepicker.css";
 // ** Custom Component Import
 import CustomTextField from "src/@core/components/mui/text-field";
 
@@ -29,19 +32,84 @@ import { useForm, Controller } from "react-hook-form";
 
 // ** Icon Imports
 import Icon from "src/@core/components/icon";
+import PickersTime from "../../forms/form-elements/pickers/PickersTime";
 
 const initialData = {
-  state: "",
-  number: "",
-  address: "",
-  zipCode: "",
-  currency: "usd",
-  firstName: "John",
-  language: "arabic",
-  timezone: "gmt-12",
-  country: "australia",
-  organization: "Pixinvent",
-  email: "john.doe@example.com",
+  email: "",
+  role: "Resturant",
+  isActivated: true,
+  restaurantDetails: {
+    logo: "",
+    banner: "",
+    restaurantName: "",
+    cnicNumber: "",
+    restaurantOwner: "",
+  },
+  addressDetails: {
+    address: "",
+    state: "",
+    zipcode: "",
+    mobile: "",
+    city: "",
+    landmark: "",
+  },
+  restaurantContactUs: {
+    heading: "",
+    subHeading: "",
+    description: "",
+  },
+  restaurantSocialMedia: {
+    facebook: "",
+    twitter: "",
+    instagram: "",
+    linkedin: "",
+    portfolio: "",
+  },
+  restaurantAboutUs: {
+    heading: "",
+    subHeading: "",
+    description: "",
+    banner: "",
+    logo: "",
+    qualities: [
+      {
+        description: "",
+      },
+      {
+        description: "",
+      },
+      {
+        description: "",
+      },
+    ],
+    features: {
+      description: "",
+      features: [
+        {
+          description: "",
+          logo: "",
+        },
+        {
+          description: "",
+          logo: "",
+        },
+        {
+          description: "",
+          logo: "",
+        },
+      ],
+    },
+    workingHours: {
+      days: "",
+      hours: "",
+      banner: "",
+    },
+    discount: {
+      description: "",
+      banner: "",
+      title: "",
+    },
+  },
 };
 
 const ImgStyled = styled("img")(({ theme }) => ({
@@ -76,6 +144,8 @@ const TabAccount = () => {
   const [formData, setFormData] = useState(initialData);
   const [imgSrc, setImgSrc] = useState("/images/avatars/15.png");
   const [secondDialogOpen, setSecondDialogOpen] = useState(false);
+  const [time, setTime] = useState(new Date());
+  const [dateTime, setDateTime] = useState(new Date());
 
   // ** Hooks
   const {
@@ -85,8 +155,45 @@ const TabAccount = () => {
   } = useForm({ defaultValues: { checkbox: false } });
   const handleClose = () => setOpen(false);
   const handleSecondDialogClose = () => setSecondDialogOpen(false);
-  const onSubmit = () => setOpen(true);
 
+  useEffect(() => {
+    let mounted = true;
+    if (mounted) {
+      const user = JSON.parse(localStorage.getItem("userData"));
+      console.log(`user`, user);
+
+      if (user) {
+        setFormData({
+          ...formData,
+          email: user.email,
+          number: user.phone,
+          restaurantDetails: {
+            ...formData.restaurantDetails,
+            logo: user.restaurantDetails.logo,
+            restaurantName: user.restaurantDetails.restaurantName,
+            restaurantOwner: user.restaurantDetails.restaurantOwner,
+            cnicNumber: user.restaurantDetails.cnicNumber,
+            tagline: user.restaurantDetails.tagline,
+          },
+          addressDetails: {
+            ...formData.addressDetails,
+            address: user.addressDetails.address,
+            state: user.addressDetails.state,
+            zipcode: user.addressDetails.zipcode,
+            mobile: user.addressDetails.mobile,
+          },
+        });
+        setImgSrc(
+          `/api/get-user-image?imageName=${user.restaurantDetails.logo}`,
+        );
+      }
+    }
+    return () => {
+      mounted = false;
+    };
+  }, []);
+
+  const onSubmit = () => setOpen(true);
   const handleConfirmation = (value) => {
     handleClose();
     setUserInput(value);
@@ -119,8 +226,8 @@ const TabAccount = () => {
       {/* Account Details Card */}
       <Grid item xs={12}>
         <Card>
-          <CardHeader title="Profile Details" />
           <form>
+            <CardHeader title="Profile Basic Informations" />
             <CardContent sx={{ pt: 0 }}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <ImgStyled src={imgSrc} alt="Profile Pic" />
@@ -140,13 +247,13 @@ const TabAccount = () => {
                       id="account-settings-upload-image"
                     />
                   </ButtonStyled>
-                  <ResetButtonStyled
+                  {/* <ResetButtonStyled
                     color="secondary"
                     variant="tonal"
                     onClick={handleInputImageReset}
                   >
                     Reset
-                  </ResetButtonStyled>
+                  </ResetButtonStyled> */}
                   <Typography sx={{ mt: 4, color: "text.disabled" }}>
                     Allowed PNG or JPEG. Max size of 800K.
                   </Typography>
@@ -168,14 +275,47 @@ const TabAccount = () => {
                     }
                   />
                 </Grid>
-                <Grid item xs={12} sm={12}>
+                <Grid item xs={12} sm={6}>
                   <CustomTextField
                     fullWidth
                     label="Restaurant Full Name"
                     placeholder="John"
-                    value={formData.firstName}
+                    value={formData.restaurantDetails.restaurantName}
                     onChange={(e) =>
-                      handleFormChange("firstName", e.target.value)
+                      handleFormChange("restaurantName", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Restaurant Owner"
+                    placeholder="Doe"
+                    value={formData.restaurantDetails.restaurantOwner}
+                    onChange={(e) =>
+                      handleFormChange("restaurantOwner", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="CNIC Number"
+                    placeholder="12345-1234567-1"
+                    value={formData.restaurantDetails.cnicNumber}
+                    onChange={(e) =>
+                      handleFormChange("cnicNumber", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Tagline"
+                    placeholder="Tagline"
+                    value={formData.restaurantDetails.tagline}
+                    onChange={(e) =>
+                      handleFormChange("tagline", e.target.value)
                     }
                   />
                 </Grid>
@@ -184,6 +324,7 @@ const TabAccount = () => {
                     fullWidth
                     type="email"
                     label="Email"
+                    disabled
                     value={formData.email}
                     placeholder="john.doe@example.com"
                     onChange={(e) => handleFormChange("email", e.target.value)}
@@ -192,26 +333,16 @@ const TabAccount = () => {
                 <Grid item xs={12} sm={6}>
                   <CustomTextField
                     fullWidth
-                    label="Organization"
-                    placeholder="Pixinvent"
-                    value={formData.organization}
-                    onChange={(e) =>
-                      handleFormChange("organization", e.target.value)
-                    }
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
                     type="number"
                     label="Phone Number"
-                    value={formData.number}
-                    placeholder="202 555 0111"
+                    disabled
+                    value={formData.addressDetails.mobile}
+                    placeholder="317 961 0447"
                     onChange={(e) => handleFormChange("number", e.target.value)}
                     InputProps={{
                       startAdornment: (
                         <InputAdornment position="start">
-                          US (+1)
+                          PK (+92)
                         </InputAdornment>
                       ),
                     }}
@@ -222,7 +353,7 @@ const TabAccount = () => {
                     fullWidth
                     label="Address"
                     placeholder="Address"
-                    value={formData.address}
+                    value={formData.addressDetails.address}
                     onChange={(e) =>
                       handleFormChange("address", e.target.value)
                     }
@@ -232,8 +363,8 @@ const TabAccount = () => {
                   <CustomTextField
                     fullWidth
                     label="State"
-                    placeholder="California"
-                    value={formData.state}
+                    placeholder="Punjab"
+                    value={formData.addressDetails.state}
                     onChange={(e) => handleFormChange("state", e.target.value)}
                   />
                 </Grid>
@@ -243,13 +374,13 @@ const TabAccount = () => {
                     type="number"
                     label="Zip Code"
                     placeholder="231465"
-                    value={formData.zipCode}
+                    value={formData.addressDetails.zipcode}
                     onChange={(e) =>
-                      handleFormChange("zipCode", e.target.value)
+                      handleFormChange("zipcode", e.target.value)
                     }
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                {/* <Grid item xs={12} sm={6}>
                   <CustomTextField
                     select
                     fullWidth
@@ -267,8 +398,8 @@ const TabAccount = () => {
                     <MenuItem value="united-kingdom">United Kingdom</MenuItem>
                     <MenuItem value="united-states">United States</MenuItem>
                   </CustomTextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Grid> */}
+                {/* <Grid item xs={12} sm={6}>
                   <CustomTextField
                     select
                     fullWidth
@@ -286,8 +417,8 @@ const TabAccount = () => {
                     <MenuItem value="german">German</MenuItem>
                     <MenuItem value="portuguese">Portuguese</MenuItem>
                   </CustomTextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Grid> */}
+                {/* <Grid item xs={12} sm={6}>
                   <CustomTextField
                     select
                     fullWidth
@@ -347,8 +478,8 @@ const TabAccount = () => {
                       (GMT-04:00) Caracas, La Paz
                     </MenuItem>
                   </CustomTextField>
-                </Grid>
-                <Grid item xs={12} sm={6}>
+                </Grid> */}
+                {/* <Grid item xs={12} sm={6}>
                   <CustomTextField
                     select
                     fullWidth
@@ -365,25 +496,331 @@ const TabAccount = () => {
                     <MenuItem value="pound">Pound</MenuItem>
                     <MenuItem value="bitcoin">Bitcoin</MenuItem>
                   </CustomTextField>
+                </Grid> */}
+              </Grid>
+            </CardContent>
+            <Divider />
+            <CardHeader title="Profile Contact Us Informations" />
+            <Divider />
+            <CardContent>
+              <Grid container spacing={5}>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Heading"
+                    placeholder="Get in Touch with Us or We’d Love to Hear from You! like that"
+                    value={formData.restaurantContactUs.heading}
+                    onChange={(e) =>
+                      handleFormChange("heading", e.target.value)
+                    }
+                  />
                 </Grid>
-
-                <Grid
-                  item
-                  xs={12}
-                  sx={{ pt: (theme) => `${theme.spacing(6.5)} !important` }}
-                >
-                  <Button variant="contained" sx={{ mr: 4 }}>
-                    Save Changes
-                  </Button>
-                  <Button
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Tagline"
+                    placeholder="Reach out for any inquiries or feedback"
+                    value={formData.restaurantContactUs.subHeading}
+                    onChange={(e) =>
+                      handleFormChange("subHeading", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="Description"
+                    placeholder="Briefly describe what your restaurant offers or how customers can contact you"
+                    value={formData.restaurantContactUs.description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+              </Grid>
+            </CardContent>
+            <Divider />
+            <CardHeader title="Profile About Us Informations" />
+            <Divider />
+            <CardContent>
+              <Grid container spacing={5}>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Tagline"
+                    placeholder="Enter your restaurant's tagline (e.g., 'Serving deliciousness since 2005')"
+                    value={formData.restaurantAboutUs.heading}
+                    onChange={(e) =>
+                      handleFormChange("heading", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Sub Heading"
+                    placeholder="Our Story"
+                    value={formData.restaurantAboutUs.subHeading}
+                    onChange={(e) =>
+                      handleFormChange("subHeading", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="History/Background"
+                    placeholder="Tell us the story of how your restaurant began."
+                    value={formData.restaurantAboutUs.description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CardHeader title="Qualities" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Quality 1"
+                    placeholder="List your restaurant's top qualities in one line"
+                    value={formData.restaurantAboutUs.qualities[0].description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Quality 2"
+                    placeholder="List your restaurant's top qualities in one line"
+                    value={formData.restaurantAboutUs.qualities[1].description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Quality 3"
+                    placeholder="List your restaurant's top qualities in one line"
+                    value={formData.restaurantAboutUs.qualities[2].description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="About us logo"
+                    type="file"
+                    placeholder="Upload your restaurant's about us logo"
+                    value={formData.restaurantAboutUs.logo}
+                    onChange={(e) => handleFormChange("logo", e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="About us side banner"
+                    type="file"
+                    placeholder="Upload your restaurant's about us side banner"
+                    value={formData.restaurantAboutUs.banner}
+                    onChange={(e) => handleFormChange("logo", e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CardHeader title="Features" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Restaurant's Core Value 1"
+                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                    value={
+                      formData.restaurantAboutUs.features.features[0]
+                        .description
+                    }
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Restaurant's Core Value 1 Logo"
+                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                    type="file"
+                    value={formData.restaurantAboutUs.features.features[0].logo}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Restaurant's Core Value 2"
+                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                    value={
+                      formData.restaurantAboutUs.features.features[1]
+                        .description
+                    }
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Restaurant's Core Value 2 Logo"
+                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                    type="file"
+                    value={formData.restaurantAboutUs.features.features[1].logo}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Restaurant's Core Value 3"
+                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                    value={
+                      formData.restaurantAboutUs.features.features[2]
+                        .description
+                    }
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Restaurant's Core Value 3 Logo"
+                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                    type="file"
+                    value={formData.restaurantAboutUs.features.features[2].logo}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="Description Max (100 characters)"
+                    placeholder="What principles guide the restaurant’s operations"
+                    value={formData.restaurantAboutUs.features.description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CardHeader title="Discounts" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Discount Title"
+                    placeholder="Enter the title of the discount"
+                    value={formData.restaurantAboutUs.discount.title}
+                    onChange={(e) => handleFormChange("title", e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <CustomTextField
+                    fullWidth
+                    label="Discount Banner"
+                    type="file"
+                    placeholder="Upload the discount banner"
+                    value={formData.restaurantAboutUs.discount.banner}
+                    onChange={(e) => handleFormChange("banner", e.target.value)}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CustomTextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="Discount Description"
+                    placeholder="Enter the description of the discount"
+                    value={formData.restaurantAboutUs.discount.description}
+                    onChange={(e) =>
+                      handleFormChange("description", e.target.value)
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CardHeader title="Working Hours" />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <DatePicker
+                    showTimeSelect
+                    selected={time}
+                    timeIntervals={30}
+                    showTimeSelectOnly
+                    dateFormat="h:mm aa"
+                    id="time-only-picker"
+                    popperPlacement={"top-start"}
+                    onChange={(date) => setTime(date)}
+                    customInput={
+                      <CustomInput label={"Select Restaurant On Time"} />
+                    }
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <DatePicker
+                    showTimeSelect
+                    selected={time}
+                    timeIntervals={30}
+                    showTimeSelectOnly
+                    dateFormat="h:mm aa"
+                    id="time-only-picker"
+                    popperPlacement={"top-start"}
+                    onChange={(date) => setTime(date)}
+                    customInput={
+                      <CustomInput label={"Select Restaurant Off Time"} />
+                    }
+                  />
+                </Grid>
+                {/* <Grid item xs={12} sm={6}>
+                  <PickersTime label={"Select Restaurant Off Time"} />
+                </Grid> */}
+              </Grid>
+            </CardContent>
+            <CardContent>
+              <Grid
+                item
+                xs={12}
+                sx={{ pt: (theme) => `${theme.spacing(6.5)} !important` }}
+              >
+                <Button variant="contained" sx={{ mr: 4 }}>
+                  Save Changes
+                </Button>
+                {/* <Button
                     type="reset"
                     variant="tonal"
                     color="secondary"
                     onClick={() => setFormData(initialData)}
                   >
                     Reset
-                  </Button>
-                </Grid>
+                  </Button> */}
               </Grid>
             </CardContent>
           </form>

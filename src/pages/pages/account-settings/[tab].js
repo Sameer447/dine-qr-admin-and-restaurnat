@@ -1,5 +1,7 @@
+// @ts-nocheck
 // ** Third Party Imports
 import axios from "axios";
+import React from "react";
 
 // ** Demo Components Imports
 import AccountSettings from "src/views/pages/account-settings/AccountSettings";

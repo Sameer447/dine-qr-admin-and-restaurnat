@@ -36,29 +36,36 @@ const UserProfileHeader = ({ userData }) => {
       setData(response.data);
     });
   }, []);
+  console.log("userData", userData);
+
   const designationIcon = data?.designationIcon || "tabler:briefcase";
 
   return data !== null ? (
     <Card>
-      <CardMedia
-        component="img"
-        alt="profile-header"
-        image={data.coverImg}
-        sx={{
-          height: { xs: 150, md: 250 },
-        }}
-      />
+      {userData?.restaurantDetails?.banner ? (
+        <CardMedia
+          component="img"
+          alt="profile-header"
+          image={`/api/get-user-image?imageName=${userData?.restaurantDetails?.banner}`}
+          sx={{
+            height: { xs: 150, md: 250 },
+          }}
+        />
+      ) : null}
       <CardContent
         sx={{
           pt: 0,
-          mt: -8,
+          mt: 8,
           display: "flex",
           alignItems: "flex-end",
           flexWrap: { xs: "wrap", md: "nowrap" },
           justifyContent: { xs: "center", md: "flex-start" },
         }}
       >
-        <ProfilePicture src={data?.profileImg} alt="profile-picture" />
+        <ProfilePicture
+          src={`/api/get-user-image?imageName=${userData?.restaurantDetails?.logo}`}
+          alt="profile-picture"
+        />
         <Box
           sx={{
             width: "100%",
@@ -78,7 +85,7 @@ const UserProfileHeader = ({ userData }) => {
             }}
           >
             <Typography variant="h5" sx={{ mb: 2.5 }}>
-              {data.fullName}
+              {userData?.restaurantDetails?.restaurantName}
             </Typography>
             <Box
               sx={{

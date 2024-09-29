@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** Third Party Imports
 "use client";
 import React, { useEffect } from "react";
