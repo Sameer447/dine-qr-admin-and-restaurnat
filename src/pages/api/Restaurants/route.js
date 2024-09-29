@@ -1,11 +1,10 @@
 import User from "../../models/user";
 
-// Get all users with role "Restaurant"
 export default async function handler(req, res) {
   console.log("hit get restaurant users ??");
   if (req.method === "GET") {
     try {
-      const users = await User.find({ role: "Resturant" }).select("-password"); // Exclude password field from the response
+      const users = await User.find({ role: "Resturant" }).select("-password"); 
       res.status(200).json(users);
     } catch (error) {
       res.status(500).json({ message: error.message });

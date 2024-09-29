@@ -64,7 +64,7 @@ const renderClient = (row) => {
   if (row.logo) {
     return (
       <CustomAvatar
-        src={"http://localhost:3000/api/?data=" + row.logo}
+        src={`/api/get-user-image?imageName=${row ? row?.logo : ''}`}
         sx={{ mr: 2.5, width: 38, height: 38 }}
       />
     );
