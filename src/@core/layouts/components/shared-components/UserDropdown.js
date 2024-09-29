@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { useState, Fragment, useEffect } from "react";
 
@@ -19,6 +20,7 @@ import Icon from "src/@core/components/icon";
 
 // ** Context
 import { useAuth } from "src/hooks/useAuth";
+import React from "react";
 
 // ** Styled Components
 const BadgeContentSpan = styled("span")(({ theme }) => ({
@@ -53,11 +55,13 @@ const UserDropdown = (props) => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userData"));
+    console.log("user", user);
+
     if (user) {
-      if (user?.role === "admin") {
-        setUserRole(true);
-      } else if (user.role === "Resturant") {
+      if (user?.role === "superAdmin") {
         setUserRole(false);
+      } else if (user.role === "Resturant") {
+        setUserRole(true);
       }
       setUserData(user);
     }
