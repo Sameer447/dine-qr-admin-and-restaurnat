@@ -108,7 +108,7 @@ const UserDropdown = (props) => {
       >
         <Avatar
           alt="John Doe"
-          src="/images/avatars/1.png"
+          src={`/api/get-user-image?imageName=${userData && userData?.restaurantDetails ? userData?.restaurantDetails?.logo : '/images/avatars/1.png'}`}
           onClick={handleDropdownOpen}
           sx={{ width: 38, height: 38 }}
         />
@@ -139,7 +139,7 @@ const UserDropdown = (props) => {
             >
               <Avatar
                 alt="John Doe"
-                src="/images/avatars/1.png"
+                src={`/api/get-user-image?imageName=${userData && userData?.restaurantDetails ? userData?.restaurantDetails?.logo : '/images/avatars/1.png'}`}
                 sx={{ width: "2.5rem", height: "2.5rem" }}
               />
             </Badge>
