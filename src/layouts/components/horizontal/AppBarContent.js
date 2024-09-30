@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** MUI Imports
 import Box from "@mui/material/Box";
 
@@ -11,6 +12,7 @@ import ShortcutsDropdown from "src/@core/layouts/components/shared-components/Sh
 
 // ** Hook Import
 import { useAuth } from "src/hooks/useAuth";
+import React from "react";
 
 const notifications = [
   {
@@ -114,6 +116,7 @@ const AppBarContent = (props) => {
 
   // ** Hook
   const auth = useAuth();
+  console.log("auth", auth);
 
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>

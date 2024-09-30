@@ -5,7 +5,7 @@ var UserSchema = new mongoose.Schema(
   {
     id: {
       type: String,
-      default: uuidv4, // Set default value to a unique UUID
+      default: uuidv4,
     },
     email: {
       type: String,
@@ -16,6 +16,10 @@ var UserSchema = new mongoose.Schema(
       type: String,
     },
     isActivated: {
+      type: Boolean,
+      default: false,
+    },
+    isSetup: {
       type: Boolean,
       default: false,
     },
@@ -58,6 +62,65 @@ var UserSchema = new mongoose.Schema(
       },
       state: {
         type: String,
+      },
+    },
+    restaurantProfile: {
+      restaurantContactUs: {
+        heading: { type: String },
+        subHeading: { type: String },
+        description: { type: String },
+      },
+      restaurantSocialMedia: {
+        facebook: { type: String },
+        twitter: { type: String },
+        instagram: { type: String },
+        linkedin: { type: String },
+        portfolio: { type: String },
+      },
+      restaurantAboutUs: {
+        heading: { type: String },
+        subHeading: { type: String },
+        description: { type: String },
+        banner: { type: String },
+        logo: { type: String },
+        qualities: [
+          {
+            description: { type: String },
+          },
+          {
+            description: { type: String },
+          },
+          {
+            description: { type: String },
+          },
+        ],
+        features: {
+          description: { type: String },
+          features: [
+            {
+              description: { type: String },
+              logo: { type: String },
+            },
+            {
+              description: { type: String },
+              logo: { type: String },
+            },
+            {
+              description: { type: String },
+              logo: { type: String },
+            },
+          ],
+        },
+        workingHours: {
+          days: { type: String },
+          hours: { type: String },
+          banner: { type: String },
+        },
+        discount: {
+          description: { type: String },
+          banner: { type: String },
+          title: { type: String },
+        },
       },
     },
   },

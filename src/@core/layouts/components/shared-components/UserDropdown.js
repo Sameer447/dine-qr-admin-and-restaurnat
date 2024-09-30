@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { useState, Fragment, useEffect } from "react";
 
@@ -19,6 +20,7 @@ import Icon from "src/@core/components/icon";
 
 // ** Context
 import { useAuth } from "src/hooks/useAuth";
+import React from "react";
 
 // ** Styled Components
 const BadgeContentSpan = styled("span")(({ theme }) => ({
@@ -53,10 +55,12 @@ const UserDropdown = (props) => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userData"));
+    console.log("user", user);
+
     if (user) {
-      if (user?.role === "admin") {
+      if (user?.role === "superAdmin") {
         setUserRole(true);
-      } else if (user.role === "Resturant") {
+      } else if (user?.role === "Resturant") {
         setUserRole(false);
       }
       setUserData(user);
@@ -161,7 +165,7 @@ const UserDropdown = (props) => {
         {userRole && (
           <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
         )}
-        {userRole ? (
+        {!userRole ? (
           <MenuItemStyled
             sx={{ p: 0 }}
             onClick={() => handleDropdownClose("/pages/user-profile/profile")}
@@ -172,7 +176,7 @@ const UserDropdown = (props) => {
             </Box>
           </MenuItemStyled>
         ) : null}
-        {userRole ? (
+        {!userRole ? (
           <MenuItemStyled
             sx={{ p: 0 }}
             onClick={() =>
@@ -185,7 +189,7 @@ const UserDropdown = (props) => {
             </Box>
           </MenuItemStyled>
         ) : null}
-        {userRole ? (
+        {!userRole ? (
           <MenuItemStyled
             sx={{ p: 0 }}
             onClick={() =>
@@ -219,7 +223,7 @@ const UserDropdown = (props) => {
             FAQ
           </Box>
         </MenuItemStyled> */}
-        {userRole ? (
+        {!userRole ? (
           <MenuItemStyled
             sx={{ p: 0 }}
             onClick={() => handleDropdownClose("/pages/pricing")}
@@ -230,7 +234,7 @@ const UserDropdown = (props) => {
             </Box>
           </MenuItemStyled>
         ) : null}
-        {userRole && (
+        {!userRole && (
           <Divider sx={{ my: (theme) => `${theme.spacing(2)} !important` }} />
         )}
         <MenuItemStyled sx={{ p: 0 }} onClick={handleLogout}>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import User from "../../models/user";
 import bcrypt from "bcrypt";
 
@@ -5,32 +6,24 @@ export default async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(400).json({ message: "Method not allowed" });
   }
-
   const { email, password } = req.body;
-
   try {
     const user = await User.findOne({ email }).lean();
-
     if (!user) {
       return res.status(400).json({ status: 404, message: "User Not Found" });
     }
-
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
-
     if (!isPasswordCorrect) {
       return res
         .status(401)
         .json({ status: 400, message: "Incorrect Password" });
     }
-
     const { password: _, ...userData } = user;
-    return res
-      .status(200)
-      .json({
-        user: userData,
-        status: 200,
-        message: "User Logged In Successfully",
-      });
+    return res.status(200).json({
+      user: userData,
+      status: 200,
+      message: "User Logged In Successfully",
+    });
   } catch (error) {
     console.error("Error during login process:", error);
     return res

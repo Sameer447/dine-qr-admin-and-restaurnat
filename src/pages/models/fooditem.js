@@ -58,8 +58,21 @@ var FoodSchema = new mongoose.Schema({
     type: String,
     ref: User,
   },
+  addOns: [
+    {
+      name: {
+        type: String,
+        required: true,
+      },
+      price: {
+        type: Number,
+        required: true,
+      },
+    },
+  ],
 });
 
-const FoodItems = mongoose.models.fooditems || mongoose.model("fooditems", FoodSchema);
+const FoodItems =
+  mongoose.models.fooditems || mongoose.model("fooditems", FoodSchema);
 
 export default FoodItems;

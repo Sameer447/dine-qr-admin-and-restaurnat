@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { useState, useEffect } from "react";
 
@@ -127,7 +128,7 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
                     </Box>
                   }
                 />
-                <Tab
+                {/* <Tab
                   value="billing"
                   label={
                     <Box
@@ -141,7 +142,7 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
                       {!hideText && "Billing"}
                     </Box>
                   }
-                />
+                /> */}
                 {/*<Tab
                   value="notifications"
                   label={
