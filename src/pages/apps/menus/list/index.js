@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { useState, useEffect, useCallback } from "react";
 
@@ -146,212 +147,205 @@ const RowOptions = ({ id }) => {
   );
 };
 
- // {
-  //   flex: 0.25,
-  //   minWidth: 280,
-  //   field: "fullName",
-  //   headerName: "Menu Item Name",
-  //   renderCell: ({ row }) => {
-  //     const { fullName, email } = row;
+// {
+//   flex: 0.25,
+//   minWidth: 280,
+//   field: "fullName",
+//   headerName: "Menu Item Name",
+//   renderCell: ({ row }) => {
+//     const { fullName, email } = row;
 
-  //     return (
-  //       <Box sx={{ display: "flex", alignItems: "center" }}>
-  //         {renderClient(row)}
-  //         <Box
-  //           sx={{
-  //             display: "flex",
-  //             alignItems: "flex-start",
-  //             flexDirection: "column",
-  //           }}
-  //         >
-  //           <Typography
-  //             noWrap
-  //             component={Link}
-  //             href="/apps/user/view/account"
-  //             sx={{
-  //               fontWeight: 500,
-  //               textDecoration: "none",
-  //               color: "text.secondary",
-  //               "&:hover": { color: "primary.main" },
-  //             }}
-  //           >
-  //             {fullName}
-  //           </Typography>
-  //           <Typography noWrap variant="body2" sx={{ color: "text.disabled" }}>
-  //             {email}
-  //           </Typography>
-  //         </Box>
-  //       </Box>
-  //     );
-  //   },
-  // },
-  // {
-  //   flex: 0.15,
-  //   minWidth: 120,
-  //   headerName: "Category",
-  //   field: "Category",
-  //   renderCell: ({ row }) => {
-  //     return (
-  //       <Typography
-  //         noWrap
-  //         sx={{
-  //           fontWeight: 500,
-  //           color: "text.secondary",
-  //           textTransform: "capitalize",
-  //         }}
-  //       >
-  //         {row.currentPlan}
-  //       </Typography>
-  //     );
-  //   },
-  // },
-  // {
-  //   flex: 0.15,
-  //   minWidth: 190,
-  //   field: "Sub Category",
-  //   headerName: "Sub Category",
-  //   renderCell: ({ row }) => {
-  //     return (
-  //       <Typography noWrap sx={{ color: "text.secondary" }}>
-  //         {row.billing}
-  //       </Typography>
-  //     );
-  //   },
-  // },
-  // {
-  //   flex: 0.15,
-  //   minWidth: 190,
-  //   field: "Speciality Tags",
-  //   headerName: "Speciality Tags",
-  //   renderCell: ({ row }) => {
-  //     return (
-  //       <Typography noWrap sx={{ color: "text.secondary" }}>
-  //         {row.billing}
-  //       </Typography>
-  //     );
-  //   },
-  // },
-  // {
-  //   flex: 0.15,
-  //   minWidth: 190,
-  //   field: "Cuisine",
-  //   headerName: "Cuisine",
-  //   renderCell: ({ row }) => {
-  //     return (
-  //       <Typography noWrap sx={{ color: "text.secondary" }}>
-  //         {row.billing}
-  //       </Typography>
-  //     );
-  //   },
-  // },
+//     return (
+//       <Box sx={{ display: "flex", alignItems: "center" }}>
+//         {renderClient(row)}
+//         <Box
+//           sx={{
+//             display: "flex",
+//             alignItems: "flex-start",
+//             flexDirection: "column",
+//           }}
+//         >
+//           <Typography
+//             noWrap
+//             component={Link}
+//             href="/apps/user/view/account"
+//             sx={{
+//               fontWeight: 500,
+//               textDecoration: "none",
+//               color: "text.secondary",
+//               "&:hover": { color: "primary.main" },
+//             }}
+//           >
+//             {fullName}
+//           </Typography>
+//           <Typography noWrap variant="body2" sx={{ color: "text.disabled" }}>
+//             {email}
+//           </Typography>
+//         </Box>
+//       </Box>
+//     );
+//   },
+// },
+// {
+//   flex: 0.15,
+//   minWidth: 120,
+//   headerName: "Category",
+//   field: "Category",
+//   renderCell: ({ row }) => {
+//     return (
+//       <Typography
+//         noWrap
+//         sx={{
+//           fontWeight: 500,
+//           color: "text.secondary",
+//           textTransform: "capitalize",
+//         }}
+//       >
+//         {row.currentPlan}
+//       </Typography>
+//     );
+//   },
+// },
+// {
+//   flex: 0.15,
+//   minWidth: 190,
+//   field: "Sub Category",
+//   headerName: "Sub Category",
+//   renderCell: ({ row }) => {
+//     return (
+//       <Typography noWrap sx={{ color: "text.secondary" }}>
+//         {row.billing}
+//       </Typography>
+//     );
+//   },
+// },
+// {
+//   flex: 0.15,
+//   minWidth: 190,
+//   field: "Speciality Tags",
+//   headerName: "Speciality Tags",
+//   renderCell: ({ row }) => {
+//     return (
+//       <Typography noWrap sx={{ color: "text.secondary" }}>
+//         {row.billing}
+//       </Typography>
+//     );
+//   },
+// },
+// {
+//   flex: 0.15,
+//   minWidth: 190,
+//   field: "Cuisine",
+//   headerName: "Cuisine",
+//   renderCell: ({ row }) => {
+//     return (
+//       <Typography noWrap sx={{ color: "text.secondary" }}>
+//         {row.billing}
+//       </Typography>
+//     );
+//   },
+// },
 
-  // {
-  //   flex: 0.1,
-  //   minWidth: 110,
-  //   field: "status",
-  //   headerName: "Status",
-  //   renderCell: ({ row }) => {
-  //     return (
-  //       <CustomChip
-  //         rounded
-  //         skin="light"
-  //         size="small"
-  //         label={row.status}
-  //         color={userStatusObj[row.status]}
-  //         sx={{ textTransform: "capitalize" }}
-  //       />
-  //     );
-  //   },
-  // },
+// {
+//   flex: 0.1,
+//   minWidth: 110,
+//   field: "status",
+//   headerName: "Status",
+//   renderCell: ({ row }) => {
+//     return (
+//       <CustomChip
+//         rounded
+//         skin="light"
+//         size="small"
+//         label={row.status}
+//         color={userStatusObj[row.status]}
+//         sx={{ textTransform: "capitalize" }}
+//       />
+//     );
+//   },
+// },
 
 const columns = [
-    {
-      flex: 0.2,
-      minWidth: 280,
-      field: "food_name",
-      headerName: "Menu Item Name",
-      renderCell: ({ row }) => (
-        <Typography noWrap sx={{ fontWeight: 500 }}>
-          {row.food_name}
-        </Typography>
-      ),
-    },
-    {
-      flex: 0.15,
-      minWidth: 80,
-      field: "category",
-      headerName: "Category",
-      renderCell: ({ row }) => (
-        <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.category}
-        </Typography>
-      ),
-    },
-    {
-      flex: 0.15,
-      minWidth: 120,
-      field: "subCategory",
-      headerName: "Sub Category",
-      renderCell: ({ row }) => (
-        <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.subCategory}
-        </Typography>
-      ),
-    },
-    {
-      flex: 0.15,
-      minWidth: 120,
-      field: "calories",
-      headerName: "Calories",
-      renderCell: ({ row }) => (
-        <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.calories}
-        </Typography>
-      ),
-    },
-    {
-      flex: 0.15,
-      minWidth: 120,
-      field: "cuisine",
-      headerName: "Cuisine",
-      renderCell: ({ row }) => (
-        <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.cuisine}
-        </Typography>
-      ),
-    },
-    {
-      flex: 0.1,
-      minWidth: 100,
-      field: "price",
-      headerName: "Price",
-      renderCell: ({ row }) => (
-        <Typography noWrap>
-          ${row.price}
-        </Typography>
-      ),
-    },
-    {
-      flex: 0.1,
-      minWidth: 100,
-      field: "availability",
-      headerName: "Available",
-      renderCell: ({ row }) => (
-        <Typography noWrap>
-          {row.availability ? "Yes" : "No"}
-        </Typography>
-      ),
-    },
-    {
-      flex: 0.1,
-      minWidth: 100,
-      sortable: false,
-      field: "actions",
-      headerName: "Actions",
-      renderCell: ({ row }) => <RowOptions id={row._id} />,
-    },
-  ];
-  
+  {
+    flex: 0.2,
+    minWidth: 280,
+    field: "food_name",
+    headerName: "Menu Item Name",
+    renderCell: ({ row }) => (
+      <Typography noWrap sx={{ fontWeight: 500 }}>
+        {row.food_name}
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.15,
+    minWidth: 80,
+    field: "category",
+    headerName: "Category",
+    renderCell: ({ row }) => (
+      <Typography noWrap sx={{ color: "text.secondary" }}>
+        {row.category}
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.15,
+    minWidth: 120,
+    field: "subCategory",
+    headerName: "Sub Category",
+    renderCell: ({ row }) => (
+      <Typography noWrap sx={{ color: "text.secondary" }}>
+        {row.subCategory}
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.15,
+    minWidth: 120,
+    field: "calories",
+    headerName: "Calories",
+    renderCell: ({ row }) => (
+      <Typography noWrap sx={{ color: "text.secondary" }}>
+        {row.calories}
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.15,
+    minWidth: 120,
+    field: "cuisine",
+    headerName: "Cuisine",
+    renderCell: ({ row }) => (
+      <Typography noWrap sx={{ color: "text.secondary" }}>
+        {row.cuisine}
+      </Typography>
+    ),
+  },
+  {
+    flex: 0.1,
+    minWidth: 100,
+    field: "price",
+    headerName: "Price",
+    renderCell: ({ row }) => <Typography noWrap>${row.price}</Typography>,
+  },
+  {
+    flex: 0.1,
+    minWidth: 100,
+    field: "availability",
+    headerName: "Available",
+    renderCell: ({ row }) => (
+      <Typography noWrap>{row.availability ? "Yes" : "No"}</Typography>
+    ),
+  },
+  {
+    flex: 0.1,
+    minWidth: 100,
+    sortable: false,
+    field: "actions",
+    headerName: "Actions",
+    renderCell: ({ row }) => <RowOptions id={row._id} />,
+  },
+];
 
 const UserList = ({ apiData }) => {
   // ** State
@@ -484,7 +478,6 @@ const UserList = ({ apiData }) => {
             onPaginationModelChange={setPaginationModel}
             getRowId={(row) => row._id} // Specify _id as the unique identifier
           />
-
         </Card>
       </Grid>
 
