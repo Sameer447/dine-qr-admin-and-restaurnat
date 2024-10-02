@@ -64,63 +64,62 @@ var UserSchema = new mongoose.Schema(
         type: String,
       },
     },
-    restaurantProfile: {
-      restaurantContactUs: {
-        heading: { type: String },
-        subHeading: { type: String },
+    restaurantContactUs: {
+      heading: { type: String, default: "Contact Us" },
+      subHeading: { type: String, default: "Get in touch" },
+      description: { type: String, default: "We are here to help you" },
+    },
+    restaurantSocialMedia: {
+      facebook: { type: String, default: "" },
+      twitter: { type: String, default: "" },
+      instagram: { type: String, default: "" },
+      linkedin: { type: String, default: "" },
+      portfolio: { type: String, default: "" },
+    },
+    restaurantAboutUs: {
+      heading: { type: String },
+      subHeading: { type: String },
+      description: { type: String },
+      banner: { type: String },
+      logo: { type: String },
+      qualities: [
+        {
+          description: { type: String },
+        },
+        {
+          description: { type: String },
+        },
+        {
+          description: { type: String },
+        },
+      ],
+      features: {
         description: { type: String },
-      },
-      restaurantSocialMedia: {
-        facebook: { type: String },
-        twitter: { type: String },
-        instagram: { type: String },
-        linkedin: { type: String },
-        portfolio: { type: String },
-      },
-      restaurantAboutUs: {
-        heading: { type: String },
-        subHeading: { type: String },
-        description: { type: String },
-        banner: { type: String },
-        logo: { type: String },
-        qualities: [
+        features: [
           {
             description: { type: String },
+            logo: { type: String },
           },
           {
             description: { type: String },
+            logo: { type: String },
           },
           {
             description: { type: String },
+            logo: { type: String },
           },
         ],
-        features: {
-          description: { type: String },
-          features: [
-            {
-              description: { type: String },
-              logo: { type: String },
-            },
-            {
-              description: { type: String },
-              logo: { type: String },
-            },
-            {
-              description: { type: String },
-              logo: { type: String },
-            },
-          ],
-        },
-        workingHours: {
-          days: { type: String },
-          hours: { type: String },
-          banner: { type: String },
-        },
-        discount: {
-          description: { type: String },
-          banner: { type: String },
-          title: { type: String },
-        },
+      },
+      workingHours: {
+        days: { type: String },
+        startTime: { type: String },
+        offTime: { type: String },
+        banner: { type: String },
+      },
+      discount: {
+        description: { type: String },
+        banner: { type: String },
+        title: { type: String },
       },
     },
   },

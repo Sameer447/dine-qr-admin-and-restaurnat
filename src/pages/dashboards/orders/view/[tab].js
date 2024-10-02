@@ -1,36 +1,37 @@
+// @ts-nocheck
 // ** Third Party Imports
-import axios from 'axios'
+import axios from "axios";
 
 // ** Demo Components Imports
-import UserViewPage from 'src/views/apps/user/view/UserViewPage'
+import UserViewPage from "src/views/apps/orders/view/UserViewPage";
 
 const UserView = ({ tab, invoiceData }) => {
-  return <UserViewPage tab={tab} invoiceData={invoiceData} />
-}
+  return <UserViewPage tab={tab} invoiceData={invoiceData} />;
+};
 
 export const getStaticPaths = () => {
   return {
     paths: [
-      { params: { tab: 'account' } },
-      { params: { tab: 'security' } },
-      { params: { tab: 'billing-plan' } },
-      { params: { tab: 'notification' } },
-      { params: { tab: 'connection' } }
+      { params: { tab: "account" } },
+      { params: { tab: "security" } },
+      { params: { tab: "billing-plan" } },
+      { params: { tab: "notification" } },
+      { params: { tab: "connection" } },
     ],
-    fallback: false
-  }
-}
+    fallback: false,
+  };
+};
 
 export const getStaticProps = async ({ params }) => {
-  const res = await axios.get('/apps/invoice/invoices')
-  const invoiceData = res.data.allData
+  const res = await axios.get("/apps/invoice/invoices");
+  const invoiceData = res.data.allData;
 
   return {
     props: {
       invoiceData,
-      tab: params?.tab
-    }
-  }
-}
+      tab: params?.tab,
+    },
+  };
+};
 
-export default UserView
+export default UserView;

@@ -101,7 +101,8 @@ const initialData = {
     },
     workingHours: {
       days: "",
-      hours: "",
+      startTime: "",
+      offTime: "",
       banner: "",
     },
     discount: {
@@ -141,18 +142,21 @@ const TabAccount = () => {
   const [open, setOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const [userInput, setUserInput] = useState("yes");
-  const [formData, setFormData] = useState(initialData);
+  const [userData, setUserData] = useState(initialData);
   const [imgSrc, setImgSrc] = useState("/images/avatars/15.png");
   const [secondDialogOpen, setSecondDialogOpen] = useState(false);
   const [time, setTime] = useState(new Date());
+  const [offTime, setOffTime] = useState(new Date());
   const [dateTime, setDateTime] = useState(new Date());
 
   // ** Hooks
   const {
     control,
     handleSubmit,
+    setError,
+    setValue,
     formState: { errors },
-  } = useForm({ defaultValues: { checkbox: false } });
+  } = useForm({ defaultValues: initialData });
   const handleClose = () => setOpen(false);
   const handleSecondDialogClose = () => setSecondDialogOpen(false);
 
@@ -160,29 +164,16 @@ const TabAccount = () => {
     let mounted = true;
     if (mounted) {
       const user = JSON.parse(localStorage.getItem("userData"));
-      console.log(`user`, user);
-
+      setUserData(user);
       if (user) {
-        setFormData({
-          ...formData,
-          email: user.email,
-          number: user.phone,
-          restaurantDetails: {
-            ...formData.restaurantDetails,
-            logo: user.restaurantDetails.logo,
-            restaurantName: user.restaurantDetails.restaurantName,
-            restaurantOwner: user.restaurantDetails.restaurantOwner,
-            cnicNumber: user.restaurantDetails.cnicNumber,
-            tagline: user.restaurantDetails.tagline,
-          },
-          addressDetails: {
-            ...formData.addressDetails,
-            address: user.addressDetails.address,
-            state: user.addressDetails.state,
-            zipcode: user.addressDetails.zipcode,
-            mobile: user.addressDetails.mobile,
-          },
-        });
+        setValue("email", user?.email);
+        setValue("role", user?.role);
+        setValue("isActivated", user?.isActivated);
+        setValue("restaurantDetails", user?.restaurantDetails);
+        setValue("addressDetails", user?.addressDetails);
+        setValue("restaurantContactUs", user?.restaurantContactUs);
+        setValue("restaurantSocialMedia", user?.restaurantSocialMedia);
+        setValue("restaurantAboutUs", user?.restaurantAboutUs);
         setImgSrc(
           `/api/get-user-image?imageName=${user.restaurantDetails.logo}`,
         );
@@ -193,7 +184,123 @@ const TabAccount = () => {
     };
   }, []);
 
-  const onSubmit = () => setOpen(true);
+  const onSubmit = async (data) => {
+    console.log("data", data);
+
+    try {
+      // Create a new FormData object
+      const formData = new FormData();
+
+      // Append regular fields
+      formData.append("email", data.email);
+      formData.append("role", data.role);
+
+      // Append restaurantDetails fields
+      formData.append("logo", data.restaurantDetails.logo);
+      formData.append("banner", data.restaurantDetails.banner);
+      formData.append("restaurantName", data.restaurantDetails.restaurantName);
+      formData.append("cnicNumber", data.restaurantDetails.cnicNumber);
+      formData.append(
+        "restaurantOwner",
+        data.restaurantDetails.restaurantOwner,
+      );
+
+      // Append addressDetails fields
+      formData.append("address", data.addressDetails.address);
+      formData.append("state", data.addressDetails.state);
+      formData.append("zipcode", data.addressDetails.zipcode);
+      formData.append("mobile", data.addressDetails.mobile);
+      formData.append("city", data.addressDetails.city);
+      formData.append("landmark", data.addressDetails.landmark);
+
+      // Append restaurantContactUs fields
+      formData.append("contactUsHeading", data.restaurantContactUs.heading);
+      formData.append(
+        "contactUsSubHeading",
+        data.restaurantContactUs.subHeading,
+      );
+      formData.append(
+        "contactUsDescription",
+        data.restaurantContactUs.description,
+      );
+
+      // Append restaurantSocialMedia fields
+      formData.append("facebook", data.restaurantSocialMedia.facebook);
+      formData.append("twitter", data.restaurantSocialMedia.twitter);
+      formData.append("instagram", data.restaurantSocialMedia.instagram);
+      formData.append("linkedin", data.restaurantSocialMedia.linkedin);
+      formData.append("portfolio", data.restaurantSocialMedia.portfolio);
+
+      // Append restaurantAboutUs fields
+      formData.append("aboutUsHeading", data.restaurantAboutUs.heading);
+      formData.append("aboutUsSubHeading", data.restaurantAboutUs.subHeading);
+      formData.append("aboutUsDescription", data.restaurantAboutUs.description);
+
+      // Append "About Us" qualities and features as JSON strings
+      formData.append(
+        "qualities",
+        JSON.stringify(data.restaurantAboutUs.qualities),
+      );
+      formData.append(
+        "features",
+        JSON.stringify(data.restaurantAboutUs.features.features),
+      );
+      formData.append(
+        "featuresDescription",
+        data.restaurantAboutUs.features.description,
+      );
+
+      // Append working hours
+      formData.append("workingDays", data.restaurantAboutUs.workingHours.days);
+      formData.append(
+        "startTime",
+        data.restaurantAboutUs.workingHours.startTime,
+      );
+      formData.append("offTime", data.restaurantAboutUs.workingHours.offTime);
+      // Append discount details
+      formData.append(
+        "discountDescription",
+        data.restaurantAboutUs.discount.description,
+      );
+      formData.append("discountTitle", data.restaurantAboutUs.discount.title);
+
+      // Append images (ensure file inputs are handled)
+      if (data.restaurantDetails.logo)
+        formData.append("logo", data.restaurantDetails.logo[0]);
+      if (data.restaurantDetails.banner)
+        formData.append("banner", data.restaurantDetails.banner[0]);
+      if (data.restaurantAboutUs.logo)
+        formData.append("aboutUsLogo", data.restaurantAboutUs.logo[0]);
+      if (data.restaurantAboutUs.banner)
+        formData.append("aboutUsBanner", data.restaurantAboutUs.banner[0]);
+      if (data.restaurantAboutUs.workingHours.banner)
+        formData.append(
+          "workingBanner",
+          data.restaurantAboutUs.workingHours.banner[0],
+        );
+      if (data.restaurantAboutUs.discount.banner)
+        formData.append(
+          "discountBanner",
+          data.restaurantAboutUs.discount.banner[0],
+        );
+
+      // Make the API call
+      const response = await fetch(`/api/RestaurantProfile/${userData._id}`, {
+        method: "PUT",
+        body: formData, // Send the FormData
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Restaurant updated successfully:", result);
+      } else {
+        console.error("Error updating restaurant:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error in submission:", error);
+    }
+  };
+
   const handleConfirmation = (value) => {
     handleClose();
     setUserInput(value);
@@ -217,16 +324,16 @@ const TabAccount = () => {
     setImgSrc("/images/avatars/15.png");
   };
 
-  const handleFormChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-  };
+  // const handleFormChange = (field, value) => {
+  //   setFormData({ ...formData, [field]: value });
+  // };
 
   return (
     <Grid container spacing={6}>
       {/* Account Details Card */}
       <Grid item xs={12}>
         <Card>
-          <form>
+          <form onSubmit={handleSubmit(onSubmit)}>
             <CardHeader title="Profile Basic Informations" />
             <CardContent sx={{ pt: 0 }}>
               <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -268,10 +375,7 @@ const TabAccount = () => {
                     name="restaurantDetails.banner"
                     control={control}
                     rules={{ required: true }}
-                    render={({
-                      field: { value, onChange },
-                      fieldState: { error },
-                    }) => (
+                    render={({ field: { value, onChange } }) => (
                       <CustomTextField
                         fullWidth
                         type="file"
@@ -279,8 +383,12 @@ const TabAccount = () => {
                         placeholder="banner"
                         value={value}
                         onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
+                        error={Boolean(errors.restaurantDetails?.banner)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantDetails?.banner && {
+                          helperText: "This field is required",
+                        })}
                       />
                     )}
                   />
@@ -290,18 +398,21 @@ const TabAccount = () => {
                     name="restaurantDetails.restaurantName"
                     control={control}
                     rules={{ required: true }}
-                    render={({
-                      field: { value, onChange },
-                      fieldState: { error },
-                    }) => (
+                    render={({ field: { value, onChange } }) => (
                       <CustomTextField
                         fullWidth
                         label="Restaurant Full Name"
                         placeholder="John"
                         value={value}
                         onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
+                        error={Boolean(
+                          errors.restaurantDetails?.restaurantName,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantDetails?.restaurantName && {
+                          helperText: "This field is required",
+                        })}
                       />
                     )}
                   />
@@ -311,18 +422,21 @@ const TabAccount = () => {
                     name="restaurantDetails.restaurantOwner"
                     control={control}
                     rules={{ required: true }}
-                    render={({
-                      field: { value, onChange },
-                      fieldState: { error },
-                    }) => (
+                    render={({ field: { value, onChange } }) => (
                       <CustomTextField
                         fullWidth
                         label="Restaurant Owner"
                         placeholder="Doe"
                         value={value}
                         onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
+                        error={Boolean(
+                          errors.restaurantDetails?.restaurantOwner,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantDetails?.restaurantOwner && {
+                          helperText: "This field is required",
+                        })}
                       />
                     )}
                   />
@@ -332,18 +446,19 @@ const TabAccount = () => {
                     name="restaurantDetails.cnicNumber"
                     control={control}
                     rules={{ required: true }}
-                    render={({
-                      field: { value, onChange },
-                      fieldState: { error },
-                    }) => (
+                    render={({ field: { value, onChange } }) => (
                       <CustomTextField
                         fullWidth
                         label="CNIC Number"
                         placeholder="12345-1234567-1"
                         value={value}
                         onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
+                        error={Boolean(errors.restaurantDetails?.cnicNumber)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantDetails?.cnicNumber && {
+                          helperText: "This field is required",
+                        })}
                       />
                     )}
                   />
@@ -353,200 +468,145 @@ const TabAccount = () => {
                     name="restaurantDetails.tagline"
                     control={control}
                     rules={{ required: true }}
-                    render={({
-                      field: { value, onChange },
-                      fieldState: { error },
-                    }) => (
+                    render={({ field: { value, onChange } }) => (
                       <CustomTextField
                         fullWidth
                         label="Tagline"
                         placeholder="Tagline"
                         value={value}
                         onChange={onChange}
-                        error={!!error}
-                        helperText={error ? error.message : null}
+                        error={Boolean(errors.restaurantDetails?.tagline)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantDetails?.tagline && {
+                          helperText: "This field is required",
+                        })}
                       />
                     )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    type="email"
-                    label="Email"
-                    disabled
-                    value={formData.email}
-                    placeholder="john.doe@example.com"
-                    onChange={(e) => handleFormChange("email", e.target.value)}
+                  <Controller
+                    name="email"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        type="email"
+                        label="Email"
+                        disabled
+                        value={value}
+                        placeholder="john.doe@example.com"
+                        onChange={onChange}
+                        error={Boolean(errors.email)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.email && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    type="number"
-                    label="Phone Number"
-                    disabled
-                    value={formData.addressDetails.mobile}
-                    placeholder="317 961 0447"
-                    onChange={(e) => handleFormChange("number", e.target.value)}
-                    InputProps={{
-                      startAdornment: (
-                        <InputAdornment position="start">
-                          PK (+92)
-                        </InputAdornment>
-                      ),
-                    }}
+                  <Controller
+                    name="addressDetails.mobile"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        type="mobile"
+                        label="Phone Number"
+                        disabled
+                        value={value}
+                        onChange={onChange}
+                        placeholder="317 961 0447"
+                        InputProps={{
+                          startAdornment: (
+                            <InputAdornment position="start">
+                              PK (+92)
+                            </InputAdornment>
+                          ),
+                        }}
+                        error={Boolean(errors.addressDetails?.mobile)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.addressDetails?.mobile && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Address"
-                    placeholder="Address"
-                    value={formData.addressDetails.address}
-                    onChange={(e) =>
-                      handleFormChange("address", e.target.value)
-                    }
+                  <Controller
+                    name="addressDetails.address"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Address"
+                        placeholder="Address"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.addressDetails?.address)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.addressDetails?.address && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="State"
-                    placeholder="Punjab"
-                    value={formData.addressDetails.state}
-                    onChange={(e) => handleFormChange("state", e.target.value)}
+                  <Controller
+                    name="addressDetails.state"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="State"
+                        placeholder="Punjab"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.addressDetails?.state)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.addressDetails?.state && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    type="number"
-                    label="Zip Code"
-                    placeholder="231465"
-                    value={formData.addressDetails.zipcode}
-                    onChange={(e) =>
-                      handleFormChange("zipcode", e.target.value)
-                    }
+                  <Controller
+                    name="addressDetails.zipcode"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        type="number"
+                        label="Zip Code"
+                        placeholder="231465"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.addressDetails?.zipcode)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.addressDetails?.zipcode && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
-                {/* <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Country"
-                    SelectProps={{
-                      value: formData.country,
-                      onChange: (e) =>
-                        handleFormChange("country", e.target.value),
-                    }}
-                  >
-                    <MenuItem value="australia">Australia</MenuItem>
-                    <MenuItem value="canada">Canada</MenuItem>
-                    <MenuItem value="france">France</MenuItem>
-                    <MenuItem value="united-kingdom">United Kingdom</MenuItem>
-                    <MenuItem value="united-states">United States</MenuItem>
-                  </CustomTextField>
-                </Grid> */}
-                {/* <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Language"
-                    SelectProps={{
-                      value: formData.language,
-                      onChange: (e) =>
-                        handleFormChange("language", e.target.value),
-                    }}
-                  >
-                    <MenuItem value="arabic">Arabic</MenuItem>
-                    <MenuItem value="english">English</MenuItem>
-                    <MenuItem value="french">French</MenuItem>
-                    <MenuItem value="german">German</MenuItem>
-                    <MenuItem value="portuguese">Portuguese</MenuItem>
-                  </CustomTextField>
-                </Grid> */}
-                {/* <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Timezone"
-                    SelectProps={{
-                      value: formData.timezone,
-                      onChange: (e) =>
-                        handleFormChange("timezone", e.target.value),
-                    }}
-                  >
-                    <MenuItem value="gmt-12">
-                      (GMT-12:00) International Date Line West
-                    </MenuItem>
-                    <MenuItem value="gmt-11">
-                      (GMT-11:00) Midway Island, Samoa
-                    </MenuItem>
-                    <MenuItem value="gmt-10">(GMT-10:00) Hawaii</MenuItem>
-                    <MenuItem value="gmt-09">(GMT-09:00) Alaska</MenuItem>
-                    <MenuItem value="gmt-08">
-                      (GMT-08:00) Pacific Time (US & Canada)
-                    </MenuItem>
-                    <MenuItem value="gmt-08-baja">
-                      (GMT-08:00) Tijuana, Baja California
-                    </MenuItem>
-                    <MenuItem value="gmt-07">
-                      (GMT-07:00) Chihuahua, La Paz, Mazatlan
-                    </MenuItem>
-                    <MenuItem value="gmt-07-mt">
-                      (GMT-07:00) Mountain Time (US & Canada)
-                    </MenuItem>
-                    <MenuItem value="gmt-06">
-                      (GMT-06:00) Central America
-                    </MenuItem>
-                    <MenuItem value="gmt-06-ct">
-                      (GMT-06:00) Central Time (US & Canada)
-                    </MenuItem>
-                    <MenuItem value="gmt-06-mc">
-                      (GMT-06:00) Guadalajara, Mexico City, Monterrey
-                    </MenuItem>
-                    <MenuItem value="gmt-06-sk">
-                      (GMT-06:00) Saskatchewan
-                    </MenuItem>
-                    <MenuItem value="gmt-05">
-                      (GMT-05:00) Bogota, Lima, Quito, Rio Branco
-                    </MenuItem>
-                    <MenuItem value="gmt-05-et">
-                      (GMT-05:00) Eastern Time (US & Canada)
-                    </MenuItem>
-                    <MenuItem value="gmt-05-ind">
-                      (GMT-05:00) Indiana (East)
-                    </MenuItem>
-                    <MenuItem value="gmt-04">
-                      (GMT-04:00) Atlantic Time (Canada)
-                    </MenuItem>
-                    <MenuItem value="gmt-04-clp">
-                      (GMT-04:00) Caracas, La Paz
-                    </MenuItem>
-                  </CustomTextField>
-                </Grid> */}
-                {/* <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    select
-                    fullWidth
-                    defaultValue=""
-                    label="Currency"
-                    SelectProps={{
-                      value: formData.currency,
-                      onChange: (e) =>
-                        handleFormChange("currency", e.target.value),
-                    }}
-                  >
-                    <MenuItem value="usd">USD</MenuItem>
-                    <MenuItem value="eur">EUR</MenuItem>
-                    <MenuItem value="pound">Pound</MenuItem>
-                    <MenuItem value="bitcoin">Bitcoin</MenuItem>
-                  </CustomTextField>
-                </Grid> */}
               </Grid>
             </CardContent>
             <Divider />
@@ -555,38 +615,71 @@ const TabAccount = () => {
             <CardContent>
               <Grid container spacing={5}>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Heading"
-                    placeholder="Get in Touch with Us or We’d Love to Hear from You! like that"
-                    value={formData.restaurantContactUs.heading}
-                    onChange={(e) =>
-                      handleFormChange("heading", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantContactUs.heading"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Heading"
+                        placeholder="Get in Touch with Us or We’d Love to Hear from You! like that"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantContactUs?.heading)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantContactUs?.heading && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Tagline"
-                    placeholder="Reach out for any inquiries or feedback"
-                    value={formData.restaurantContactUs.subHeading}
-                    onChange={(e) =>
-                      handleFormChange("subHeading", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantContactUs.subHeading"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Tagline"
+                        placeholder="Reach out for any inquiries or feedback"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantContactUs?.subHeading)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantContactUs?.subHeading && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="Description"
-                    placeholder="Briefly describe what your restaurant offers or how customers can contact you"
-                    value={formData.restaurantContactUs.description}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantContactUs.description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="Description"
+                        placeholder="Briefly describe what your restaurant offers or how customers can contact you"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantContactUs?.description)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantContactUs?.description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
               </Grid>
@@ -597,314 +690,678 @@ const TabAccount = () => {
             <CardContent>
               <Grid container spacing={5}>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Tagline"
-                    placeholder="Enter your restaurant's tagline (e.g., 'Serving deliciousness since 2005')"
-                    value={formData.restaurantAboutUs.heading}
-                    onChange={(e) =>
-                      handleFormChange("heading", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.heading"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Tagline"
+                        placeholder="Enter your restaurant's tagline (e.g., 'Serving deliciousness since 2005')"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantAboutUs?.heading)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantAboutUs?.heading && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Sub Heading"
-                    placeholder="Our Story"
-                    value={formData.restaurantAboutUs.subHeading}
-                    onChange={(e) =>
-                      handleFormChange("subHeading", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.subHeading"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Sub Heading"
+                        placeholder="Our Story"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantAboutUs?.subHeading)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantAboutUs?.subHeading && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="History/Background"
-                    placeholder="Tell us the story of how your restaurant began."
-                    value={formData.restaurantAboutUs.description}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="History/Background"
+                        placeholder="Tell us the story of how your restaurant began."
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantAboutUs?.description)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantAboutUs?.description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Qualities" />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Quality 1"
-                    placeholder="List your restaurant's top qualities in one line"
-                    value={formData.restaurantAboutUs.qualities[0].description}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.qualities[0].description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Quality 1"
+                        placeholder="List your restaurant's top qualities in one line"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.qualities[0]?.description,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.qualities[0]
+                          .description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Quality 2"
-                    placeholder="List your restaurant's top qualities in one line"
-                    value={formData.restaurantAboutUs.qualities[1].description}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.qualities[1].description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Quality 2"
+                        placeholder="List your restaurant's top qualities in one line"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.qualities[1]?.description,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.qualities[1]
+                          ?.description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Quality 3"
-                    placeholder="List your restaurant's top qualities in one line"
-                    value={formData.restaurantAboutUs.qualities[2].description}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.qualities[2].description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Quality 3"
+                        placeholder="List your restaurant's top qualities in one line"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors.restaurantAboutUs?.qualities[2].description,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantAboutUs?.qualities[2]
+                          .description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="About us logo"
-                    type="file"
-                    placeholder="Upload your restaurant's about us logo"
-                    value={formData.restaurantAboutUs.logo}
-                    onChange={(e) => handleFormChange("logo", e.target.value)}
+                  <Controller
+                    name="restaurantAboutUs.logo"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="About us logo"
+                        type="file"
+                        placeholder="Upload your restaurant's about us logo"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors?.restaurantAboutUs?.logo)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.logo && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="About us side banner"
-                    type="file"
-                    placeholder="Upload your restaurant's about us side banner"
-                    value={formData.restaurantAboutUs.banner}
-                    onChange={(e) => handleFormChange("logo", e.target.value)}
+                  <Controller
+                    name="restaurantAboutUs.banner"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="About us side banner"
+                        type="file"
+                        placeholder="Upload your restaurant's about us side banner"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors?.restaurantAboutUs?.banner)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.banner && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Features" />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Restaurant's Core Value 1"
-                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
-                    value={
-                      formData.restaurantAboutUs.features.features[0]
-                        .description
-                    }
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.features.features[0].description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Restaurant's Core Value 1"
+                        placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.features?.features[0]
+                            ?.description,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.features?.features[0]
+                          ?.description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Restaurant's Core Value 1 Logo"
-                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
-                    type="file"
-                    value={formData.restaurantAboutUs.features.features[0].logo}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.features.features[0].logo"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Restaurant's Core Value 1 Logo"
+                        type="file"
+                        placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.features?.features[0]
+                            ?.logo,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.features?.features[0]
+                          ?.logo && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Restaurant's Core Value 2"
-                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
-                    value={
-                      formData.restaurantAboutUs.features.features[1]
-                        .description
-                    }
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.features.features[1].description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Restaurant's Core Value 2"
+                        placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.features?.features[1]
+                            ?.description,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.features?.features[1]
+                          ?.description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Restaurant's Core Value 2 Logo"
-                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
-                    type="file"
-                    value={formData.restaurantAboutUs.features.features[1].logo}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.features.features[1].logo"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Restaurant's Core Value 2 Logo"
+                        type="file"
+                        placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.features?.features[1]
+                            ?.logo,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.features?.features[1]
+                          ?.logo && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Restaurant's Core Value 3"
-                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
-                    value={
-                      formData.restaurantAboutUs.features.features[2]
-                        .description
-                    }
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.features.features[2].description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Restaurant's Core Value 3"
+                        placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.features?.features[2]
+                            ?.description,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.features?.features[2]
+                          ?.description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Restaurant's Core Value 3 Logo"
-                    placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
-                    type="file"
-                    value={formData.restaurantAboutUs.features.features[2].logo}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.features.features[2].logo"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Restaurant's Core Value 3 Logo"
+                        type="file"
+                        placeholder="Share your restaurant's core values (e.g., 'Sustainability, Freshness, Innovation')."
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.features?.features[2]
+                            ?.logo,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.features?.features[2]
+                          ?.logo && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="Description Max (100 characters)"
-                    placeholder="What principles guide the restaurant’s operations"
-                    value={formData.restaurantAboutUs.features.description}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.features.description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="Description Max (100 characters)"
+                        placeholder="What principles guide the restaurant’s operations"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.features?.description,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.features
+                          ?.description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Discounts" />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Discount Title"
-                    placeholder="Enter the title of the discount"
-                    value={formData.restaurantAboutUs.discount.title}
-                    onChange={(e) => handleFormChange("title", e.target.value)}
+                  <Controller
+                    name="restaurantAboutUs.discount.title"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Discount Title"
+                        placeholder="Enter the title of the discount"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.discount?.title,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.discount?.title && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Discount Banner"
-                    type="file"
-                    placeholder="Upload the discount banner"
-                    value={formData.restaurantAboutUs.discount.banner}
-                    onChange={(e) => handleFormChange("banner", e.target.value)}
+                  <Controller
+                    name="restaurantAboutUs.discount.banner"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Discount Banner"
+                        type="file"
+                        placeholder="Upload the discount banner"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.discount?.banner,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.discount?.banner && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
-                  <CustomTextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    label="Discount Description"
-                    placeholder="Enter the description of the discount"
-                    value={formData.restaurantAboutUs.discount.description}
-                    onChange={(e) =>
-                      handleFormChange("description", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantAboutUs.discount.description"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        multiline
+                        rows={4}
+                        label="Discount Description"
+                        placeholder="Enter the description of the discount"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors?.restaurantAboutUs?.discount?.description,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors?.restaurantAboutUs?.discount
+                          ?.description && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Working Hours" />
                 </Grid>
-                <Grid item xs={12} sm={6}>
-                  <DatePicker
-                    showTimeSelect
-                    selected={time}
-                    timeIntervals={30}
-                    showTimeSelectOnly
-                    dateFormat="h:mm aa"
-                    id="time-only-picker"
-                    popperPlacement={"top-start"}
-                    onChange={(date) => setTime(date)}
-                    customInput={
-                      <CustomInput label={"Select Restaurant On Time"} />
-                    }
+                <Grid item xs={6} sm={3}>
+                  <Controller
+                    name="restaurantAboutUs.workingHours.startTime"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <DatePicker
+                        showTimeSelect
+                        selected={time}
+                        timeIntervals={30}
+                        showTimeSelectOnly
+                        dateFormat="h:mm aa"
+                        id="time-only-picker"
+                        popperPlacement={"top-start"}
+                        onChange={(date) => {
+                          setTime(date);
+                          onChange(date);
+                        }}
+                        customInput={
+                          <CustomInput label={"Select Restaurant On Time"} />
+                        }
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={6} sm={3}>
+                  <Controller
+                    name="restaurantAboutUs.workingHours.offTime"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <DatePicker
+                        showTimeSelect
+                        selected={offTime}
+                        timeIntervals={30}
+                        showTimeSelectOnly
+                        dateFormat="h:mm aa"
+                        id="time-only-picker"
+                        popperPlacement={"top-start"}
+                        onChange={(date) => {
+                          setOffTime(date);
+                          onChange(date);
+                        }}
+                        customInput={
+                          <CustomInput label={"Select Restaurant Off Time"} />
+                        }
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <DatePicker
-                    showTimeSelect
-                    selected={time}
-                    timeIntervals={30}
-                    showTimeSelectOnly
-                    dateFormat="h:mm aa"
-                    id="time-only-picker"
-                    popperPlacement={"top-start"}
-                    onChange={(date) => setTime(date)}
-                    customInput={
-                      <CustomInput label={"Select Restaurant Off Time"} />
-                    }
+                  <Controller
+                    name="restaurantAboutUs.workingHours.days"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Working Days"
+                        placeholder="Monday - Sunday"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors.restaurantAboutUs?.workingHours.days,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantAboutUs?.workingHours.days && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
+                  />
+                </Grid>
+                <Grid item xs={12} sm={12}>
+                  <Controller
+                    name="restaurantAboutUs.workingHours.banner"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Working Hours Banner"
+                        type="file"
+                        placeholder="Upload the working hours banner"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(
+                          errors.restaurantAboutUs?.workingHours.banner,
+                        )}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantAboutUs?.workingHours.banner && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Social Links" />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Facebook Link"
-                    placeholder="https://www.facebook.com/your-restaurant"
-                    value={formData.restaurantSocialMedia.facebook}
-                    onChange={(e) =>
-                      handleFormChange("facebook", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantSocialMedia.facebook"
+                    control={control}
+                    rules={{ required: false }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Facebook Link"
+                        placeholder="https://www.facebook.com/your-restaurant"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantSocialMedia?.facebook)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantSocialMedia?.facebook && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Twitter Link"
-                    placeholder="https://www.twitter.com/your-restaurant"
-                    value={formData.restaurantSocialMedia.twitter}
-                    onChange={(e) =>
-                      handleFormChange("twitter", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantSocialMedia.twitter"
+                    control={control}
+                    rules={{ required: false }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Twitter Link"
+                        placeholder="https://www.twitter.com/your-restaurant"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantSocialMedia?.twitter)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantSocialMedia?.twitter && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Instagram Link"
-                    placeholder="https://www.instagram.com/your-restaurant"
-                    value={formData.restaurantSocialMedia.instagram}
-                    onChange={(e) =>
-                      handleFormChange("instagram", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantSocialMedia.instagram"
+                    control={control}
+                    rules={{ required: false }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Instagram Link"
+                        placeholder="https://www.instagram.com/your-restaurant"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantSocialMedia?.instagram)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantSocialMedia?.instagram && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="LinkedIn Link"
-                    placeholder="https://www.linkedin.com/your-restaurant"
-                    value={formData.restaurantSocialMedia.linkedin}
-                    onChange={(e) =>
-                      handleFormChange("linkedin", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantSocialMedia.linkedin"
+                    control={control}
+                    rules={{ required: false }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="LinkedIn Link"
+                        placeholder="https://www.linkedin.com/your-restaurant"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantSocialMedia?.linkedin)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantSocialMedia?.linkedin && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <CustomTextField
-                    fullWidth
-                    label="Portfolio Link"
-                    placeholder="https://www.portfolio.com/your-restaurant"
-                    value={formData.restaurantSocialMedia.portfolio}
-                    onChange={(e) =>
-                      handleFormChange("portfolio", e.target.value)
-                    }
+                  <Controller
+                    name="restaurantSocialMedia.portfolio"
+                    control={control}
+                    rules={{ required: false }}
+                    render={({ field: { value, onChange } }) => (
+                      <CustomTextField
+                        fullWidth
+                        label="Portfolio Link"
+                        placeholder="https://www.portfolio.com/your-restaurant"
+                        value={value}
+                        onChange={onChange}
+                        error={Boolean(errors.restaurantSocialMedia?.portfolio)}
+                        id="validation-basic-select"
+                        aria-describedby="validation-basic-select"
+                        {...(errors.restaurantSocialMedia?.portfolio && {
+                          helperText: "This field is required",
+                        })}
+                      />
+                    )}
                   />
                 </Grid>
               </Grid>
@@ -915,7 +1372,7 @@ const TabAccount = () => {
                 xs={12}
                 sx={{ pt: (theme) => `${theme.spacing(6.5)} !important` }}
               >
-                <Button variant="contained" sx={{ mr: 4 }}>
+                <Button type="submit" variant="contained" sx={{ mr: 4 }}>
                   Save Changes
                 </Button>
                 {/* <Button
@@ -933,11 +1390,11 @@ const TabAccount = () => {
       </Grid>
 
       {/* Delete Account Card */}
-      <Grid item xs={12}>
+      {/* <Grid item xs={12}>
         <Card>
           <CardHeader title="Delete Account" />
           <CardContent>
-            <form onSubmit={handleSubmit(onSubmit)}>
+            <form>
               <Box sx={{ mb: 4 }}>
                 <FormControl>
                   <Controller
@@ -992,7 +1449,7 @@ const TabAccount = () => {
             </form>
           </CardContent>
         </Card>
-      </Grid>
+      </Grid> */}
 
       {/* Deactivate Account Dialogs */}
       <Dialog fullWidth maxWidth="xs" open={open} onClose={handleClose}>

@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { useState, useEffect, useCallback } from "react";
 
@@ -39,8 +40,8 @@ import { fetchData, deleteUser } from "src/store/apps/user";
 import axios from "axios";
 
 // ** Custom Table Components Imports
-import TableHeader from "src/views/apps/user/list/TableHeader";
-import AddUserDrawer from "src/views/apps/user/list/AddUserDrawer";
+import TableHeader from "src/views/apps/orders/list/TableHeader";
+import AddUserDrawer from "src/views/apps/orders/list/AddUserDrawer";
 
 // ** renders client column
 const userRoleObj = {
@@ -52,9 +53,10 @@ const userRoleObj = {
 };
 
 const userStatusObj = {
-  active: "success",
+  cancel: "error",
+  active: "secondary",
   pending: "warning",
-  inactive: "secondary",
+  complete: "success",
 };
 
 // ** renders client column
