@@ -70,6 +70,10 @@ var FoodSchema = new mongoose.Schema({
       },
     },
   ],
+  quantity: {
+    type: Number,
+    default: 1,
+  },
 });
 
 const FoodItems =

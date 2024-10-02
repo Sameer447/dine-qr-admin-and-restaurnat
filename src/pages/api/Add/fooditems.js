@@ -140,6 +140,7 @@ export default async function handler(req, res) {
       ],
       restaurant_id: restaurant_id[0],
       addOns: parsedAddOns,
+      quantity: 1
     });
 
     return res

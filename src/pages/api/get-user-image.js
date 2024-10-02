@@ -4,7 +4,6 @@ import fs from 'fs';
 export default function handler(req, res) {
     const { imageName } = req.query;
 
-
     if (!imageName) {
         return res.status(400).json({ error: 'Image name is required' });
     }
