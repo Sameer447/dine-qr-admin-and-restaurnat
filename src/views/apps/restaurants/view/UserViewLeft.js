@@ -109,9 +109,11 @@ const UserViewLeft = ({ userData }) => {
                 flexDirection: "column",
               }}
             >
-              {data.avatar ? (
+              {restaurantDetails.logo ? (
                 <CustomAvatar
-                  src={data.avatar}
+                  src={
+                    "/api/get-user-image?imageName=" + restaurantDetails.logo
+                  }
                   variant="rounded"
                   alt={restaurantDetails.restaurantName}
                   sx={{ width: 100, height: 100, mb: 4 }}
