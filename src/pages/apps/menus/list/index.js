@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 
 // ** Next Imports
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -84,9 +85,10 @@ const renderClient = (row) => {
   }
 };
 
-const RowOptions = ({ id }) => {
+const RowOptions = ({ id, data }) => {
   // ** Hooks
   const dispatch = useDispatch();
+  const router = useRouter();
 
   // ** State
   const [anchorEl, setAnchorEl] = useState(null);
@@ -98,6 +100,14 @@ const RowOptions = ({ id }) => {
 
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
+  };
+
+  const hadleViewItem = () => {
+    router.push({
+      pathname: `/apps/menus/view/add-menu-item`,
+      query: { id: id, data: JSON.stringify(data) },
+    });
+    handleRowOptionsClose();
   };
 
   const handleDelete = () => {
@@ -126,10 +136,10 @@ const RowOptions = ({ id }) => {
         PaperProps={{ style: { minWidth: "8rem" } }}
       >
         <MenuItem
-          component={Link}
+          // component={Link}
           sx={{ "& svg": { mr: 2 } }}
-          href="/apps/user/view/account"
-          onClick={handleRowOptionsClose}
+          // href="/apps/user/view/account"
+          onClick={hadleViewItem}
         >
           <Icon icon="tabler:eye" fontSize={20} />
           View
@@ -343,7 +353,7 @@ const columns = [
     sortable: false,
     field: "actions",
     headerName: "Actions",
-    renderCell: ({ row }) => <RowOptions id={row._id} />,
+    renderCell: ({ row }) => <RowOptions id={row._id} data={row} />,
   },
 ];
 

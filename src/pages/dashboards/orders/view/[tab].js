@@ -1,22 +1,24 @@
 // @ts-nocheck
 // ** Third Party Imports
 import axios from "axios";
+import { useRouter } from "next/router";
 
 // ** Demo Components Imports
 import UserViewPage from "src/views/apps/orders/view/UserViewPage";
 
 const UserView = ({ tab, invoiceData }) => {
-  return <UserViewPage tab={tab} invoiceData={invoiceData} />;
+  const router = useRouter();
+  return <UserViewPage tab={tab} cartData={JSON.parse(router.query.data)} />;
 };
 
 export const getStaticPaths = () => {
   return {
     paths: [
       { params: { tab: "account" } },
-      { params: { tab: "security" } },
-      { params: { tab: "billing-plan" } },
-      { params: { tab: "notification" } },
-      { params: { tab: "connection" } },
+      // { params: { tab: "security" } },
+      // { params: { tab: "billing-plan" } },
+      // { params: { tab: "notification" } },
+      // { params: { tab: "connection" } },
     ],
     fallback: false,
   };

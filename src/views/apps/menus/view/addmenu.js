@@ -37,6 +37,7 @@ import { categoris } from "src/@fake-db/categories";
 import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
+import { useRouter } from "next/router";
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: "none",
@@ -44,7 +45,7 @@ const LinkStyled = styled(Link)(({ theme }) => ({
 }));
 
 const initialState = {
-  category: categoris[0].value,
+  category: "",
   subCategory: "",
   specialityTags: [],
   cuisine: "",
@@ -60,12 +61,7 @@ const initialState = {
   customiseable: false,
   customiseableOptions: [],
   calories: 0,
-  addOns: [
-    {
-      name: "",
-      price: 0,
-    },
-  ],
+  addOns: [{ name: "", price: 0 }],
 };
 
 function reducer(state, action) {
@@ -96,11 +92,12 @@ const CustomInput = forwardRef(({ ...props }, ref) => {
   );
 });
 
-const AddMenuItemForm = ({ restaurantData }) => {
+const AddMenuItemForm = ({ restaurantData, menuData }) => {
   // ** States
   const [state, dispatch] = useReducer(reducer, initialState);
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
+  console.log("here ====>", menuData);
 
   // ** Hooks
   const {
@@ -110,6 +107,48 @@ const AddMenuItemForm = ({ restaurantData }) => {
     reset,
     formState: { errors },
   } = useForm({ defaultValues: initialState });
+
+  useEffect(() => {
+    if (menuData) {
+      const {
+        category,
+        subCategory,
+        specialityTags,
+        cuisine,
+        primaryIngredients,
+        menuItemName,
+        description,
+        itemImage,
+        allergens,
+        preparationTime,
+        price,
+        avialableSizes,
+        availability,
+        customiseable,
+        customiseableOptions,
+        calories,
+        addOns,
+      } = menuData;
+      setValue("category", category);
+      setValue("subCategory", subCategory);
+      setValue("specialityTags", specialityTags);
+      setValue("cuisine", cuisine);
+      setValue("primaryIngredients", primaryIngredients);
+      setValue("menuItemName", menuItemName);
+      setValue("description", description);
+      setValue("itemImage", itemImage);
+      setValue("allergens", allergens);
+      setValue("preparationTime", preparationTime);
+      setValue("price", price);
+      setValue("avialableSizes", avialableSizes);
+      setValue("availability", availability);
+      setValue("customiseable", customiseable);
+      setValue("customiseableOptions", customiseableOptions);
+      setValue("calories", calories);
+      setValue("addOns", addOns);
+      setImage(itemImage);
+    }
+  }, []);
 
   const onSubmit = async (data) => {
     console.log("data", data);

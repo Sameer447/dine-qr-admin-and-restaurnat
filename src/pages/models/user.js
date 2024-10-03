@@ -30,6 +30,10 @@ var UserSchema = new mongoose.Schema(
       logo: {
         type: String,
       },
+      banner: {
+        type: String,
+        required: false,
+      },
       tagline: {
         type: String,
       },

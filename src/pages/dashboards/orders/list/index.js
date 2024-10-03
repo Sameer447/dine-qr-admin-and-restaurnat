@@ -34,7 +34,7 @@ import CardStatsHorizontalWithDetails from "src/@core/components/card-statistics
 import { getInitials } from "src/@core/utils/get-initials";
 
 // ** Actions Imports
-import { fetchData, deleteUser } from "src/store/apps/user";
+import { fetchOrdersData, deleteOrder } from "src/store/apps/orders";
 
 // ** Third Party Components
 import axios from "axios";
@@ -42,6 +42,7 @@ import axios from "axios";
 // ** Custom Table Components Imports
 import TableHeader from "src/views/apps/orders/list/TableHeader";
 import AddUserDrawer from "src/views/apps/orders/list/AddUserDrawer";
+import { useRouter } from "next/router";
 
 // ** renders client column
 const userRoleObj = {
@@ -84,9 +85,10 @@ const renderClient = (row) => {
   }
 };
 
-const RowOptions = ({ id }) => {
+const RowOptions = ({ id, data }) => {
   // ** Hooks
   const dispatch = useDispatch();
+  const router = useRouter();
 
   // ** State
   const [anchorEl, setAnchorEl] = useState(null);
@@ -97,11 +99,16 @@ const RowOptions = ({ id }) => {
   };
 
   const handleRowOptionsClose = () => {
+    // navigation.push(`/apps/orders/view/account`, data);
+    router.push({
+      pathname: "/dashboards/orders/view/account",
+      query: { data: JSON.stringify(data) },
+    });
     setAnchorEl(null);
   };
 
   const handleDelete = () => {
-    dispatch(deleteUser(id));
+    dispatch(deleteOrder(id));
     handleRowOptionsClose();
   };
 
@@ -126,22 +133,22 @@ const RowOptions = ({ id }) => {
         PaperProps={{ style: { minWidth: "8rem" } }}
       >
         <MenuItem
-          component={Link}
+          // component={Link}
           sx={{ "& svg": { mr: 2 } }}
-          href="/apps/user/view/account"
+          // href="/dashboards/orders/view/account"
           onClick={handleRowOptionsClose}
         >
           <Icon icon="tabler:eye" fontSize={20} />
           View
         </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ "& svg": { mr: 2 } }}>
+        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="tabler:edit" fontSize={20} />
           Edit
         </MenuItem>
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="tabler:trash" fontSize={20} />
           Delete
-        </MenuItem>
+        </MenuItem> */}
       </Menu>
     </>
   );
@@ -149,16 +156,16 @@ const RowOptions = ({ id }) => {
 
 const columns = [
   {
-    flex: 0.25,
-    minWidth: 280,
+    flex: 0.15,
+    minWidth: 250,
     field: "fullName",
     headerName: "User",
     renderCell: ({ row }) => {
-      const { fullName, email } = row;
+      const { user_name, user_email } = row;
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {renderClient(row)}
+          {/* {renderClient(row)} */}
           <Box
             sx={{
               display: "flex",
@@ -177,43 +184,54 @@ const columns = [
                 "&:hover": { color: "primary.main" },
               }}
             >
-              {fullName}
+              {user_name || "Sameer Shoukat"}
             </Typography>
             <Typography noWrap variant="body2" sx={{ color: "text.disabled" }}>
-              {email}
+              {user_email || "sameer@test.com"}
             </Typography>
           </Box>
         </Box>
       );
     },
   },
-  // {
-  //   flex: 0.15,
-  //   field: "role",
-  //   minWidth: 170,
-  //   headerName: "Role",
-  //   renderCell: ({ row }) => {
-  //     return (
-  //       <Box sx={{ display: "flex", alignItems: "center" }}>
-  //         <CustomAvatar
-  //           skin="light"
-  //           sx={{ mr: 4, width: 30, height: 30 }}
-  //           color={userRoleObj[row.role].color || "primary"}
-  //         >
-  //           <Icon icon={userRoleObj[row.role].icon} />
-  //         </CustomAvatar>
-  //         <Typography
-  //           noWrap
-  //           sx={{ color: "text.secondary", textTransform: "capitalize" }}
-  //         >
-  //           {row.role}
-  //         </Typography>
-  //       </Box>
-  //     );
-  //   },
-  // },
   {
     flex: 0.15,
+    field: "role",
+    maxWidth: 100,
+    headerName: "Table",
+    renderCell: ({ row }) => {
+      return (
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+          }}
+        >
+          {/* <CustomAvatar
+            skin="light"
+            sx={{ mr: 4, width: 30, height: 30 }}
+            color={userRoleObj[row.role].color || "primary"}
+          >
+            <Icon icon={userRoleObj[row.role].icon} />
+          </CustomAvatar> */}
+          <Typography
+            noWrap
+            sx={{
+              color: "text.secondary",
+              textTransform: "capitalize",
+              textAlign: "center",
+            }}
+          >
+            {row.table_number}
+          </Typography>
+        </Box>
+      );
+    },
+  },
+  {
+    flex: 0.25,
     minWidth: 120,
     headerName: "Order",
     field: "currentPlan",
@@ -227,7 +245,25 @@ const columns = [
             textTransform: "capitalize",
           }}
         >
-          {row.currentPlan}
+          {row?.cart_items && row?.cart_items.length > 0 ? (
+            <>
+              <div>
+                <span>{row?.cart_items.length} Items </span>
+              </div>
+              {/* display cart food names */}
+              <div>
+                {row?.cart_items.map((item, index) => (
+                  <span key={item._id}>
+                    {`${item.food_name} ${
+                      index < row?.cart_items.length - 1 ? ", " : ""
+                    }`}
+                  </span>
+                ))}
+              </div>
+            </>
+          ) : (
+            <span>No Items</span>
+          )}
         </Typography>
       );
     },
@@ -240,7 +276,8 @@ const columns = [
     renderCell: ({ row }) => {
       return (
         <Typography noWrap sx={{ color: "text.secondary" }}>
-          {row.billing}
+          {row.cart_items &&
+            row.cart_items.reduce((acc, item) => acc + item.total_price, 0)}
         </Typography>
       );
     },
@@ -269,7 +306,7 @@ const columns = [
     sortable: false,
     field: "actions",
     headerName: "Actions",
-    renderCell: ({ row }) => <RowOptions id={row.id} />,
+    renderCell: ({ row }) => <RowOptions id={row._id} data={row} />,
   },
 ];
 
@@ -287,17 +324,11 @@ const UserList = ({ apiData }) => {
 
   // ** Hooks
   const dispatch = useDispatch();
-  const store = useSelector((state) => state.user);
+  const store = useSelector((state) => state.orders);
+
   useEffect(() => {
-    dispatch(
-      fetchData({
-        role,
-        status,
-        q: value,
-        currentPlan: plan,
-      }),
-    );
-  }, [dispatch, plan, role, status, value]);
+    dispatch(fetchOrdersData());
+  }, []);
 
   const handleFilter = useCallback((val) => {
     setValue(val);
@@ -401,12 +432,13 @@ const UserList = ({ apiData }) => {
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={store.data}
+            rows={store.orders}
             columns={columns}
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
             paginationModel={paginationModel}
             onPaginationModelChange={setPaginationModel}
+            getRowId={(row) => row._id}
           />
         </Card>
       </Grid>

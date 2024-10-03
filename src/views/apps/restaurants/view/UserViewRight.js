@@ -19,9 +19,9 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Icon from "src/@core/components/icon";
 
 // ** Demo Components Imports
-import UserViewBilling from "src/views/apps/user/view/UserViewBilling";
-import UserViewAccount from "src/views/apps/user/view/UserViewAccount";
-import UserViewSecurity from "src/views/apps/user/view/UserViewSecurity";
+import UserViewBilling from "src/views/apps/restaurants/view/UserViewBilling";
+import UserViewAccount from "src/views/apps/restaurants/view/UserViewAccount";
+import UserViewSecurity from "src/views/apps/restaurants/view/UserViewSecurity";
 import UserViewConnection from "src/views/apps/user/view/UserViewConnection";
 import UserViewNotification from "src/views/apps/user/view/UserViewNotification";
 
@@ -89,7 +89,7 @@ const UserViewRight = ({ tab, invoiceData }) => {
 
   return (
     <TabContext value={activeTab}>
-      <TabList
+      {/* <TabList
         variant="scrollable"
         scrollButtons="auto"
         onChange={handleChange}
@@ -101,17 +101,17 @@ const UserViewRight = ({ tab, invoiceData }) => {
           label="Account"
           icon={<Icon fontSize="1.125rem" icon="tabler:user-check" />}
         />
-        {/* <Tab
+        <Tab
           value="security"
           label="Security"
           icon={<Icon fontSize="1.125rem" icon="tabler:lock" />}
-        /> */}
+        />
         <Tab
           value="billing-plan"
           label="Billing & Plan"
           icon={<Icon fontSize="1.125rem" icon="tabler:currency-dollar" />}
         />
-        {/* <Tab
+        <Tab
           value="notification"
           label="Notification"
           icon={<Icon fontSize="1.125rem" icon="tabler:bell" />}
@@ -120,8 +120,8 @@ const UserViewRight = ({ tab, invoiceData }) => {
           value="connection"
           label="Connection"
           icon={<Icon fontSize="1.125rem" icon="tabler:link" />}
-        /> */}
-      </TabList>
+        />
+      </TabList> */}
       <Box sx={{ mt: 4 }}>
         {isLoading ? (
           <Box

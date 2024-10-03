@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** React Imports
 import { forwardRef, useReducer, useState } from "react";
 
@@ -33,6 +34,7 @@ import PageHeader from "src/@core/components/page-header";
 // ** Icon Imports
 import { categoris } from "src/@fake-db/categories";
 import DatePickerWrapper from "src/@core/styles/libs/react-datepicker";
+import React from "react";
 
 const LinkStyled = styled(Link)(({ theme }) => ({
   textDecoration: "none",
@@ -75,10 +77,11 @@ const CustomInput = forwardRef(({ ...props }, ref) => {
   );
 });
 
-const MenuForm = ({restaurantData}) => {
+const MenuForm = ({ restaurantData }) => {
   // ** States
   const [state, dispatch] = useReducer(reducer, initialState);
   const [image, setImage] = useState(null);
+  console.log("here", here);
 
   // ** Hooks
   const {
@@ -94,13 +97,15 @@ const MenuForm = ({restaurantData}) => {
           title={
             <Typography variant="h4">
               <LinkStyled href="link-to-restaurant" target="_blank">
-                {restaurantData?.restaurantDetails?.restaurantName || "Restaurant Name"}
+                {restaurantData?.restaurantDetails?.restaurantName ||
+                  "Restaurant Name"}
               </LinkStyled>
             </Typography>
           }
           subtitle={
             <Typography sx={{ color: "text.secondary" }}>
-              {restaurantData?.restaurantDetails?.tagline || "A catchy line that summarizes the restaurant's appeal."}
+              {restaurantData?.restaurantDetails?.tagline ||
+                "A catchy line that summarizes the restaurant's appeal."}
             </Typography>
           }
         />

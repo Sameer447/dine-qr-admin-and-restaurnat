@@ -5,6 +5,7 @@ import { useState, useEffect, useCallback } from "react";
 
 // ** Next Imports
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 // ** MUI Imports
 import Box from "@mui/material/Box";
@@ -64,7 +65,7 @@ const renderClient = (row) => {
   if (row.logo) {
     return (
       <CustomAvatar
-        src={`/api/get-user-image?imageName=${row ? row?.logo : ''}`}
+        src={`/api/get-user-image?imageName=${row ? row?.logo : ""}`}
         sx={{ mr: 2.5, width: 38, height: 38 }}
       />
     );
@@ -90,6 +91,7 @@ const renderClient = (row) => {
 const RowOptions = ({ id }) => {
   // ** Hooks
   const dispatch = useDispatch();
+  const router = useRouter();
 
   // ** State
   const [anchorEl, setAnchorEl] = useState(null);
@@ -101,6 +103,14 @@ const RowOptions = ({ id }) => {
 
   const handleRowOptionsClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleViewRestaurant = () => {
+    router.push({
+      pathname: `/dashboards/restaurants/view/account`,
+      query: { id },
+    });
+    handleRowOptionsClose();
   };
 
   const handleDelete = () => {
@@ -129,18 +139,18 @@ const RowOptions = ({ id }) => {
         PaperProps={{ style: { minWidth: "8rem" } }}
       >
         <MenuItem
-          component={Link}
+          // component={Link}
           sx={{ "& svg": { mr: 2 } }}
-          href="/apps/user/view/account"
-          onClick={handleRowOptionsClose}
+          // href="/dashboards/restaurants/view/account"
+          onClick={handleViewRestaurant}
         >
           <Icon icon="tabler:eye" fontSize={20} />
           View
         </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ "& svg": { mr: 2 } }}>
+        {/* <MenuItem onClick={handleRowOptionsClose} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="tabler:edit" fontSize={20} />
           Edit
-        </MenuItem>
+        </MenuItem> */}
         <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="tabler:trash" fontSize={20} />
           Delete

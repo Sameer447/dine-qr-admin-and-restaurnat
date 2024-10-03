@@ -9,9 +9,10 @@ import UserViewPage from "src/views/apps/restaurants/view/UserViewPage";
 
 const UserView = ({ tab, invoiceData }) => {
   const router = useRouter();
+  const { id } = router.query;
   const [userData, setUserData] = useState(null);
   useEffect(() => {
-    axios.get("/api/UserById/route?id=" + router.query.id).then((res) => {
+    axios.get("/api/UserById/route?id=" + id).then((res) => {
       setUserData(res.data);
     });
   }, [router.query.id]);

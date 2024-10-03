@@ -23,20 +23,20 @@ const navigation = (role) => {
     //   icon: "tabler:messages",
     //   path: "/apps/chat",
     // },
-    !role && {
-      title: "Invoice",
-      icon: "tabler:file-dollar",
-      children: [
-        {
-          title: "List",
-          path: "/apps/invoice/list",
-        },
-        {
-          title: "Preview",
-          path: "/apps/invoice/preview",
-        },
-      ],
-    },
+    // !role && {
+    //   title: "Invoice",
+    //   icon: "tabler:file-dollar",
+    //   children: [
+    //     {
+    //       title: "List",
+    //       path: "/apps/invoice/list",
+    //     },
+    //     {
+    //       title: "Preview",
+    //       path: "/apps/invoice/preview",
+    //     },
+    //   ],
+    // },
     !role && {
       title: "Menus",
       icon: "tabler:home",

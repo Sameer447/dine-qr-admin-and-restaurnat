@@ -66,11 +66,10 @@ export default async function handler(req, res) {
         uploadFile(files.logo, uploadDir) || user.restaurantDetails.logo;
       const restaurantBanner =
         uploadFile(files.banner, uploadDir) || user?.restaurantDetails?.banner;
-      const aboutUsLogo =
-        uploadFile(files.aboutUsLogo, uploadDir) || user.restaurantAboutUs.logo;
-      const aboutUsBanner =
-        uploadFile(files.aboutUsBanner, uploadDir) ||
-        user.restaurantAboutUs.banner;
+
+      // Log the file paths
+      console.log("Uploaded restaurantLogo:", restaurantLogo);
+      console.log("Uploaded restaurantBanner:", restaurantBanner);
 
       // Convert array values to strings
       const getStringValue = (value) =>
@@ -85,6 +84,8 @@ export default async function handler(req, res) {
       user.restaurantDetails = {
         logo: restaurantLogo,
         banner: restaurantBanner,
+        tagline:
+          getStringValue(fields.tagline) || user.restaurantDetails.tagline,
         restaurantName:
           getStringValue(fields.restaurantName) ||
           user.restaurantDetails.restaurantName,
@@ -95,6 +96,9 @@ export default async function handler(req, res) {
           getStringValue(fields.restaurantOwner) ||
           user.restaurantDetails.restaurantOwner,
       };
+
+      // Log the updated restaurantDetails
+      console.log("Updated restaurantDetails:", user.restaurantDetails);
 
       // Update address details
       user.addressDetails = {
@@ -149,8 +153,12 @@ export default async function handler(req, res) {
         description:
           getStringValue(fields.aboutUsDescription) ||
           user.restaurantAboutUs.description,
-        logo: aboutUsLogo,
-        banner: aboutUsBanner,
+        logo:
+          uploadFile(files.aboutUsLogo, uploadDir) ||
+          user.restaurantAboutUs.logo,
+        banner:
+          uploadFile(files.aboutUsBanner, uploadDir) ||
+          user.restaurantAboutUs.banner,
         qualities: fields.qualities
           ? JSON.parse(fields.qualities)
           : user.restaurantAboutUs.qualities || [],
