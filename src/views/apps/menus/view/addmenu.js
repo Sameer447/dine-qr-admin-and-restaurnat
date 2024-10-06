@@ -213,23 +213,33 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
 
   const handleAddOnChange = (index, field, value) => {
     const updatedAddOns = [...state.addOns];
+
     updatedAddOns[index][field] = value;
+
     dispatch({ type: "addOns", payload: updatedAddOns });
+
     setValue("addOns", updatedAddOns);
   };
+
   const addAddOn = () => {
     const updatedAddOns = [...state.addOns, { name: "", price: 0 }];
+
     console.log("updatedAddOns", updatedAddOns);
 
     dispatch({ type: "addOns", payload: updatedAddOns });
+
     setValue("addOns", updatedAddOns);
   };
 
   const removeAddOn = (index) => {
     const updatedAddOns = state.addOns.filter((_, i) => i !== index);
+
     dispatch({ type: "addOns", payload: updatedAddOns });
     setValue("addOns", updatedAddOns);
   };
+
+
+
   return (
     <DatePickerWrapper>
       <Grid container spacing={6} className="match-height">
@@ -540,11 +550,11 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
                             },
                           }}
                           id="validation-basic-select"
-                          error={Boolean(errors.avialableSizes)}
+                          // error={Boolean(errors.avialableSizes)}
                           aria-describedby="validation-basic-select"
-                          {...(errors.avialableSizes && {
-                            helperText: "This field is required",
-                          })}
+                          // {...(errors.avialableSizes && {
+                          //   helperText: "This field is required",
+                          // })}
                         >
                           <MenuItem value={"Small"}>Small</MenuItem>
                           <MenuItem value={"Medium"}>Medium</MenuItem>
@@ -593,12 +603,7 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
                   <Grid item xs={12}>
                     <FormLabel>Add Ons</FormLabel>
                     {state.addOns.map((addOn, index) => (
-                      <Grid
-                        container
-                        spacing={2}
-                        key={index}
-                        sx={{ marginTop: 1 }}
-                      >
+                      <Grid container spacing={2} key={index} sx={{ marginTop: 1 }}>
                         <Grid item xs={5}>
                           <CustomTextField
                             fullWidth
@@ -615,12 +620,9 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
                             label="Add On Price"
                             value={addOn.price}
                             onChange={(e) =>
-                              handleAddOnChange(
-                                index,
-                                "price",
-                                parseFloat(e.target.value),
-                              )
+                              handleAddOnChange(index, "price", e.target.value) // Keep as string
                             }
+                            type="number" // Ensure this is a number input
                           />
                         </Grid>
                         <Grid
