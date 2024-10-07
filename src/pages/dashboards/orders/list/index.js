@@ -379,8 +379,8 @@ const UserList = ({ apiData }) => {
       </Grid> */}
       <Grid item xs={12}>
         <Card>
-          <CardHeader title="Search Filters" />
-          <CardContent>
+          <CardHeader title="Orders" />
+          {/* <CardContent>
             <Grid container spacing={6}>
               <Grid item sm={4} xs={12}>
                 <CustomTextField
@@ -437,7 +437,7 @@ const UserList = ({ apiData }) => {
                 </CustomTextField>
               </Grid>
             </Grid>
-          </CardContent>
+          </CardContent> */}
           <Divider sx={{ m: "0 !important" }} />
           {/* <TableHeader
             value={value}

@@ -276,46 +276,61 @@ const TabAccount = () => {
       formData.append("discountTitle", data.restaurantAboutUs.discount.title);
 
       // Handle file uploads
-      if (data.restaurantDetails.logo && data.restaurantDetails.logo[0]) {
-        formData.append("logo", data.restaurantDetails.logo[0]); // File object
-      }
+      // if (data.restaurantDetails.logo && data.restaurantDetails.logo[0]) {
+      //   formData.append("logo", data.restaurantDetails.logo[0]); // File object
+      // }
 
-      if (data.restaurantDetails.banner && data.restaurantDetails.banner[0]) {
-        formData.append("banner", data.restaurantDetails.banner[0]); // File object
-      }
+      // if (data.restaurantDetails.banner && data.restaurantDetails.banner[0]) {
+      //   formData.append("banner", data.restaurantDetails.banner[0]); // File object
+      // }
 
-      if (data.restaurantAboutUs.logo && data.restaurantAboutUs.logo[0]) {
-        formData.append("aboutUsLogo", data.restaurantAboutUs.logo[0]); // File object
-      }
+      // if (data.restaurantAboutUs.logo && data.restaurantAboutUs.logo[0]) {
+      //   formData.append("aboutUsLogo", data.restaurantAboutUs.logo[0]); // File object
+      // }
 
-      if (data.restaurantAboutUs.banner && data.restaurantAboutUs.banner[0]) {
-        formData.append("aboutUsBanner", data.restaurantAboutUs.banner[0]); // File object
-      }
+      // if (data.restaurantAboutUs.banner && data.restaurantAboutUs.banner[0]) {
+      //   formData.append("aboutUsBanner", data.restaurantAboutUs.banner[0]); // File object
+      // }
 
-      if (data.restaurantAboutUs.workingHours.banner && data.restaurantAboutUs.workingHours.banner[0]) {
-        formData.append("workingBanner", data.restaurantAboutUs.workingHours.banner[0]); // File object
-      }
+      // if (data.restaurantAboutUs.workingHours.banner && data.restaurantAboutUs.workingHours.banner[0]) {
+      //   formData.append("workingBanner", data.restaurantAboutUs.workingHours.banner[0]); // File object
+      // }
 
-      if (data.restaurantAboutUs.discount.banner && data.restaurantAboutUs.discount.banner[0]) {
-        formData.append("discountBanner", data.restaurantAboutUs.discount.banner[0]); // File object
-      }
+      // if (data.restaurantAboutUs.discount.banner && data.restaurantAboutUs.discount.banner[0]) {
+      //   formData.append("discountBanner", data.restaurantAboutUs.discount.banner[0]); // File object
+      // }
+
+
+      // Handle file uploads (logo, banner, etc.)
+      const appendFile = (key, file) => {
+        if (file) {
+          formData.append(key, file);
+        }
+      };
+
+      appendFile("logo", data.restaurantDetails.logo);
+      appendFile("banner", data.restaurantDetails.banner);
+      appendFile("aboutUsLogo", data.restaurantAboutUs.logo);
+      appendFile("aboutUsBanner", data.restaurantAboutUs.banner);
+      appendFile("workingBanner", data.restaurantAboutUs.workingHours.banner);
+      appendFile("discountBanner", data.restaurantAboutUs.discount.banner);
 
       // You can now submit the formData to your API using Axios or fetch
 
       console.log([...formData.entries()]); // To check if all data is appended correctly
 
       // Make the API call
-      // const response = await fetch(`/api/RestaurantProfile/${userData._id}`, {
-      //   method: "PUT",
-      //   body: formData, // Send the FormData
-      // });
+      const response = await fetch(`/api/RestaurantProfile/${userData._id}`, {
+        method: "PUT",
+        body: formData, // Send the FormData
+      });
 
-      // if (response.ok) {
-      //   const result = await response.json();
-      //   console.log("Restaurant updated successfully:", result);
-      // } else {
-      //   console.error("Error updating restaurant:", response.statusText);
-      // }
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Restaurant updated successfully:", result);
+      } else {
+        console.error("Error updating restaurant:", response.statusText);
+      }
     } catch (error) {
       console.error("Error in submission:", error);
     }
@@ -405,22 +420,32 @@ const TabAccount = () => {
               <Box sx={{ display: "flex", alignItems: "center" }}>
                 <ImgStyled src={imgSrc} alt="Profile Pic" />
                 <div>
-                  <ButtonStyled
-                    component="label"
-                    variant="contained"
-                    htmlFor="account-settings-upload-image"
-                  >
-                    Upload New Logo
-                    <input
-                      hidden
-                      type="file"
-                      accept="image/png, image/jpeg"
-                      onChange={(event) => {
-                        handleInputImageChange(event);
-                      }}
-                      id="account-settings-upload-image"
-                    />
-                  </ButtonStyled>
+                  <Controller
+                    name="restaurantDetails.logo"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field: { value, onChange } }) => (
+                      <ButtonStyled
+                        component="label"
+                        variant="contained"
+                        htmlFor="account-settings-upload-image"
+                      >
+                        Upload New Logo
+                        <input
+                          hidden
+                          type="file"
+                          accept="image/png, image/jpeg"
+                          onChange={(e) => {
+                            const file = e.target.files[0]; // Capture the file object
+                            console.log("logo file:", file); // Log the file object for debugging
+                            onChange(file);
+                            handleInputImageChange(e);
+                          }}
+                          id="account-settings-upload-image"
+                        />
+                      </ButtonStyled>
+                    )}
+                  />
                   <Typography sx={{ mt: 4, color: "text.disabled" }}>
                     Allowed PNG or JPEG. Max size of 800K.
                   </Typography>

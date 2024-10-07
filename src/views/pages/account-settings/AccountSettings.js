@@ -80,10 +80,10 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
 
   const tabContentList = {
     account: <TabAccount />,
-    security: <TabSecurity />,
+    // security: <TabSecurity />,
     // connections: <TabConnections />,
     // notifications: <TabNotifications />,
-    billing: <TabBilling apiPricingPlanData={apiPricingPlanData} />,
+    // billing: <TabBilling apiPricingPlanData={apiPricingPlanData} />,
   };
 
   return (
@@ -113,7 +113,7 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
                     </Box>
                   }
                 />
-                <Tab
+                {/* <Tab
                   value="security"
                   label={
                     <Box
@@ -127,7 +127,7 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
                       {!hideText && "Security"}
                     </Box>
                   }
-                />
+                /> */}
                 {/* <Tab
                   value="billing"
                   label={
