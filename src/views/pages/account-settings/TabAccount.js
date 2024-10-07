@@ -35,6 +35,7 @@ import { useForm, Controller } from "react-hook-form";
 import Icon from "src/@core/components/icon";
 import PickersTime from "../../forms/form-elements/pickers/PickersTime";
 import { set } from "nprogress";
+import { id } from "date-fns/locale";
 
 const initialData = {
   email: "",
@@ -150,8 +151,15 @@ const TabAccount = () => {
   const [time, setTime] = useState(new Date());
   const [offTime, setOffTime] = useState(new Date());
   const [dateTime, setDateTime] = useState(new Date());
-  const [qualities, setQualities] = useState([]);
-  const [features, setFeatures] = useState([]);
+  const [qualities, setQualities] = useState([{
+    id: 1,
+    description: "",
+  }]);
+  const [features, setFeatures] = useState([{
+    id: 1,
+    description: "",
+    logo: "",
+  }]);
 
   // ** Hooks
   const {
@@ -209,9 +217,7 @@ const TabAccount = () => {
 
   const onSubmit = async (data) => {
     console.log("data", data);
-
     try {
-      // Create a new FormData object
       const formData = new FormData();
 
       // Append regular fields
@@ -219,14 +225,9 @@ const TabAccount = () => {
       formData.append("role", data.role);
 
       // Append restaurantDetails fields
-      formData.append("logo", data.restaurantDetails.logo);
-      formData.append("banner", data.restaurantDetails.banner);
       formData.append("restaurantName", data.restaurantDetails.restaurantName);
       formData.append("cnicNumber", data.restaurantDetails.cnicNumber);
-      formData.append(
-        "restaurantOwner",
-        data.restaurantDetails.restaurantOwner,
-      );
+      formData.append("restaurantOwner", data.restaurantDetails.restaurantOwner);
 
       // Append addressDetails fields
       formData.append("address", data.addressDetails.address);
@@ -238,14 +239,8 @@ const TabAccount = () => {
 
       // Append restaurantContactUs fields
       formData.append("contactUsHeading", data.restaurantContactUs.heading);
-      formData.append(
-        "contactUsSubHeading",
-        data.restaurantContactUs.subHeading,
-      );
-      formData.append(
-        "contactUsDescription",
-        data.restaurantContactUs.description,
-      );
+      formData.append("contactUsSubHeading", data.restaurantContactUs.subHeading);
+      formData.append("contactUsDescription", data.restaurantContactUs.description);
 
       // Append restaurantSocialMedia fields
       formData.append("facebook", data.restaurantSocialMedia.facebook);
@@ -259,66 +254,66 @@ const TabAccount = () => {
       formData.append("aboutUsSubHeading", data.restaurantAboutUs.subHeading);
       formData.append("aboutUsDescription", data.restaurantAboutUs.description);
 
-      // Append "About Us" qualities and features as JSON strings
-      formData.append(
-        "qualities",
-        JSON.stringify(data.restaurantAboutUs.qualities),
-      );
-      formData.append(
-        "features",
-        JSON.stringify(data.restaurantAboutUs.features.features),
-      );
-      formData.append(
-        "featuresDescription",
-        data.restaurantAboutUs.features.description,
-      );
+      // Append complex fields
+      if (data.restaurantAboutUs.qualities) {
+        formData.append("qualities", JSON.stringify(data.restaurantAboutUs.qualities));
+      }
+      if (data.restaurantAboutUs.features && data.restaurantAboutUs.features.features) {
+        formData.append("features", JSON.stringify(data.restaurantAboutUs.features.features));
+      }
+
+      formData.append("featuresDescription", data.restaurantAboutUs.features.description);
 
       // Append working hours
       formData.append("workingDays", data.restaurantAboutUs.workingHours.days);
-      formData.append(
-        "startTime",
-        data.restaurantAboutUs.workingHours.startTime,
-      );
+      formData.append("startTime", data.restaurantAboutUs.workingHours.startTime);
       formData.append("offTime", data.restaurantAboutUs.workingHours.offTime);
+
       // Append discount details
-      formData.append(
-        "discountDescription",
-        data.restaurantAboutUs.discount.description,
-      );
+      formData.append("discountDescription", data.restaurantAboutUs.discount.description);
       formData.append("discountTitle", data.restaurantAboutUs.discount.title);
 
-      // Append images (ensure file inputs are handled)
-      if (data.restaurantDetails.logo)
-        formData.append("logo", data.restaurantDetails.logo[0]);
-      if (data.restaurantDetails.banner)
-        formData.append("banner", data.restaurantDetails.banner[0]);
-      if (data.restaurantAboutUs.logo)
-        formData.append("aboutUsLogo", data.restaurantAboutUs.logo[0]);
-      if (data.restaurantAboutUs.banner)
-        formData.append("aboutUsBanner", data.restaurantAboutUs.banner[0]);
-      if (data.restaurantAboutUs.workingHours.banner)
-        formData.append(
-          "workingBanner",
-          data.restaurantAboutUs.workingHours.banner[0],
-        );
-      if (data.restaurantAboutUs.discount.banner)
-        formData.append(
-          "discountBanner",
-          data.restaurantAboutUs.discount.banner[0],
-        );
+      // Handle file uploads
+      if (data.restaurantDetails.logo && data.restaurantDetails.logo[0]) {
+        formData.append("logo", data.restaurantDetails.logo[0]); // File object
+      }
+
+      if (data.restaurantDetails.banner && data.restaurantDetails.banner[0]) {
+        formData.append("banner", data.restaurantDetails.banner[0]); // File object
+      }
+
+      if (data.restaurantAboutUs.logo && data.restaurantAboutUs.logo[0]) {
+        formData.append("aboutUsLogo", data.restaurantAboutUs.logo[0]); // File object
+      }
+
+      if (data.restaurantAboutUs.banner && data.restaurantAboutUs.banner[0]) {
+        formData.append("aboutUsBanner", data.restaurantAboutUs.banner[0]); // File object
+      }
+
+      if (data.restaurantAboutUs.workingHours.banner && data.restaurantAboutUs.workingHours.banner[0]) {
+        formData.append("workingBanner", data.restaurantAboutUs.workingHours.banner[0]); // File object
+      }
+
+      if (data.restaurantAboutUs.discount.banner && data.restaurantAboutUs.discount.banner[0]) {
+        formData.append("discountBanner", data.restaurantAboutUs.discount.banner[0]); // File object
+      }
+
+      // You can now submit the formData to your API using Axios or fetch
+
+      console.log([...formData.entries()]); // To check if all data is appended correctly
 
       // Make the API call
-      const response = await fetch(`/api/RestaurantProfile/${userData._id}`, {
-        method: "PUT",
-        body: formData, // Send the FormData
-      });
+      // const response = await fetch(`/api/RestaurantProfile/${userData._id}`, {
+      //   method: "PUT",
+      //   body: formData, // Send the FormData
+      // });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Restaurant updated successfully:", result);
-      } else {
-        console.error("Error updating restaurant:", response.statusText);
-      }
+      // if (response.ok) {
+      //   const result = await response.json();
+      //   console.log("Restaurant updated successfully:", result);
+      // } else {
+      //   console.error("Error updating restaurant:", response.statusText);
+      // }
     } catch (error) {
       console.error("Error in submission:", error);
     }
@@ -330,17 +325,25 @@ const TabAccount = () => {
     setSecondDialogOpen(true);
   };
 
-  const handleInputImageChange = (file) => {
-    const reader = new FileReader();
-    const { files } = file.target;
-    if (files && files.length !== 0) {
-      reader.onload = () => setImgSrc(reader.result);
-      reader.readAsDataURL(files[0]);
-      if (reader.result !== null) {
-        setInputValue(reader.result);
-      }
+  const handleInputImageChange = (event) => {
+    const { files } = event.target;
+    if (files && files.length > 0) {
+      const file = files[0]; // Get the first file
+      const reader = new FileReader();
+
+      // Log the file object to verify it's being received
+      console.log("File object:", file);
+
+      // Read the file as a DataURL for displaying the image preview
+      reader.onload = () => {
+        setImgSrc(reader.result); // Set the image preview
+        setInputValue(file); // Set the actual file to state for form submission
+      };
+
+      reader.readAsDataURL(file);
     }
   };
+
 
   const handleInputImageReset = () => {
     setInputValue("");
@@ -438,29 +441,30 @@ const TabAccount = () => {
             <Divider />
             <CardContent>
               <Grid container spacing={5}>
-                <Grid item xs={12} sm={12}>
+                <Grid item xs={12} sm={6}>
                   <Controller
                     name="restaurantDetails.banner"
                     control={control}
                     rules={{ required: true }}
-                    render={({ field: { value, onChange } }) => (
+                    render={({ field: { onChange, ...rest } }) => (
                       <CustomTextField
                         fullWidth
                         type="file"
-                        label="Upload High Quality Restaurant Banner"
+                        label="Upload High-Quality Restaurant Banner"
                         placeholder="banner"
-                        value={value}
-                        onChange={onChange}
+                        onChange={(e) => {
+                          const file = e.target.files[0]; // Capture the file object
+                          console.log("Banner file:", file); // Log the file object for debugging
+                          onChange(file); // Pass the file object to React Hook Form
+                        }}
                         error={Boolean(errors.restaurantDetails?.banner)}
-                        id="validation-basic-select"
-                        aria-describedby="validation-basic-select"
-                        {...(errors.restaurantDetails?.banner && {
-                          helperText: "This field is required",
-                        })}
+                        helperText={errors.restaurantDetails?.banner ? "This field is required" : ""}
+                        {...rest}
                       />
                     )}
                   />
                 </Grid>
+
                 <Grid item xs={12} sm={6}>
                   <Controller
                     name="restaurantDetails.restaurantName"
@@ -828,7 +832,7 @@ const TabAccount = () => {
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Qualities" />
                 </Grid>
-                {qualities.map((quality, index) => (
+                {qualities?.map((quality, index) => (
                   <GridRow
                     key={index}
                     item
@@ -923,7 +927,7 @@ const TabAccount = () => {
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Features" />
                 </Grid>
-                {features.map((feature, index) => (
+                {features?.map((feature, index) => (
                   <Grid
                     container
                     key={index}

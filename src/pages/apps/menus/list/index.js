@@ -43,7 +43,8 @@ import axios from "axios";
 // ** Custom Table Components Imports
 import TableHeader from "src/views/apps/user/list/TableHeader";
 import AddUserDrawer from "src/views/apps/user/list/AddUserDrawer";
-import { fetchMenuItems } from "../../../../store/apps/restaurants";
+import { deleteMenuItems, fetchMenuItems } from "../../../../store/apps/restaurants";
+import { CircularProgress } from "@mui/material";
 
 // ** renders client column
 const userRoleObj = {
@@ -60,11 +61,19 @@ const userStatusObj = {
   inactive: "secondary",
 };
 
-// ** renders client column
+
 const renderClient = (row) => {
-  if (row.avatar.length) {
+  if (row.images && row.images.length) {
     return (
-      <CustomAvatar src={row.avatar} sx={{ mr: 2.5, width: 38, height: 38 }} />
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        {row.images.map((image, index) => (
+          <CustomAvatar
+            key={index}
+            src={`/api/get-food-image?imageName=${image.name}`}
+            sx={{ mr: 2.5, width: 38, height: 38 }}
+          />
+        ))}
+      </Box>
     );
   } else {
     return (
@@ -93,6 +102,8 @@ const RowOptions = ({ id, data }) => {
   // ** State
   const [anchorEl, setAnchorEl] = useState(null);
   const rowOptionsOpen = Boolean(anchorEl);
+  const [deleting, setDeleting] = useState(false);
+
 
   const handleRowOptionsClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -110,9 +121,17 @@ const RowOptions = ({ id, data }) => {
     handleRowOptionsClose();
   };
 
-  const handleDelete = () => {
-    dispatch(deleteUser(id));
-    handleRowOptionsClose();
+  const handleDelete = async () => {
+    setDeleting(true); // Start loading
+    try {
+      await dispatch(deleteMenuItems(id)).unwrap(); // Dispatch the delete action
+      await fetchMenuItems();
+    } catch (error) {
+      console.error('Error deleting menu item:', error);
+    } finally {
+      setDeleting(false); // Stop loading
+      handleRowOptionsClose();
+    }
   };
 
   return (
@@ -148,8 +167,12 @@ const RowOptions = ({ id, data }) => {
           <Icon icon="tabler:edit" fontSize={20} />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleDelete} sx={{ "& svg": { mr: 2 } }}>
-          <Icon icon="tabler:trash" fontSize={20} />
+        <MenuItem onClick={handleDelete} sx={{ '& svg': { mr: 2 } }}>
+          {deleting ? (
+            <CircularProgress size={30} sx={{ mr: 2 }} />
+          ) : (
+            <Icon icon="tabler:trash" fontSize={20} />
+          )}
           Delete
         </MenuItem>
       </Menu>
@@ -281,11 +304,17 @@ const columns = [
     minWidth: 280,
     field: "food_name",
     headerName: "Menu Item Name",
-    renderCell: ({ row }) => (
-      <Typography noWrap sx={{ fontWeight: 500 }}>
-        {row.food_name}
-      </Typography>
-    ),
+    renderCell: ({ row }) => {
+      return (
+        <Box sx={{ display: "flex", alignItems: "center" }}>
+          {renderClient(row)}
+
+          <Typography noWrap sx={{ fontWeight: 500 }}>
+            {row.food_name}
+          </Typography>
+        </Box>
+      )
+    },
   },
   {
     flex: 0.15,
@@ -372,7 +401,6 @@ const UserList = ({ apiData }) => {
   // ** Hooks
   const dispatch = useDispatch();
   const foodItems = useSelector((state) => state.restaurants.foodItems); // Access the food items data
-  console.log("foodItems", foodItems);
   useEffect(() => {
     dispatch(fetchMenuItems());
   }, [dispatch]);
@@ -412,7 +440,7 @@ const UserList = ({ apiData }) => {
       <Grid item xs={12}>
         <Card>
           <CardHeader title="Search Filters" />
-          <CardContent>
+          {/* <CardContent>
             <Grid container spacing={6}>
               <Grid item sm={4} xs={12}>
                 <CustomTextField
@@ -470,7 +498,7 @@ const UserList = ({ apiData }) => {
                 </CustomTextField>
               </Grid>
             </Grid>
-          </CardContent>
+          </CardContent> */}
           <Divider sx={{ m: "0 !important" }} />
           {/* <TableHeader
             value={value}

@@ -239,7 +239,6 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
   };
 
 
-
   return (
     <DatePickerWrapper>
       <Grid container spacing={6} className="match-height">
@@ -531,7 +530,7 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
                     <Controller
                       name="avialableSizes"
                       control={control}
-                      rules={{ required: true }}
+                      rules={{ required: false }}
                       render={({ field: { value, onChange } }) => (
                         <CustomTextField
                           select
@@ -690,7 +689,7 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
                     <Controller
                       name="customiseable"
                       control={control}
-                      rules={{ required: true }}
+                      rules={{ required: false }}
                       render={({ field: { value, onChange } }) => (
                         <FormControlLabel
                           control={
@@ -700,9 +699,9 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
                             />
                           }
                           label="Customiseable"
-                          {...(errors.customiseable && {
-                            helperText: "This Customiseable is required",
-                          })}
+                          // {...(errors.customiseable && {
+                          //   helperText: "This Customiseable is required",
+                          // })}
                         />
                       )}
                     />

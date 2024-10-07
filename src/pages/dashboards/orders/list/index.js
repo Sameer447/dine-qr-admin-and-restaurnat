@@ -60,11 +60,19 @@ const userStatusObj = {
   complete: "success",
 };
 
-// ** renders client column
+// ** Renders client column for multiple images
 const renderClient = (row) => {
-  if (row.avatar.length) {
+  if (row.images && row.images.length) {
     return (
-      <CustomAvatar src={row.avatar} sx={{ mr: 2.5, width: 38, height: 38 }} />
+      <Box sx={{ display: 'flex', gap: 1 }}>
+        {row.images.map((image, index) => (
+          <CustomAvatar
+            key={index}
+            src={`/api/get-food-image?imageName=${image.name}`}
+            sx={{ mr: 2.5, width: 38, height: 38 }}
+          />
+        ))}
+      </Box>
     );
   } else {
     return (
@@ -85,6 +93,7 @@ const renderClient = (row) => {
   }
 };
 
+
 const RowOptions = ({ id, data }) => {
   // ** Hooks
   const dispatch = useDispatch();
@@ -98,12 +107,16 @@ const RowOptions = ({ id, data }) => {
     setAnchorEl(event.currentTarget);
   };
 
-  const handleRowOptionsClose = () => {
+  const handleView = () => {
     // navigation.push(`/apps/orders/view/account`, data);
     router.push({
       pathname: "/dashboards/orders/view/account",
       query: { data: JSON.stringify(data) },
     });
+    setAnchorEl(null);
+  };
+
+  const handleRowOptionsClose = () => {
     setAnchorEl(null);
   };
 
@@ -136,7 +149,7 @@ const RowOptions = ({ id, data }) => {
           // component={Link}
           sx={{ "& svg": { mr: 2 } }}
           // href="/dashboards/orders/view/account"
-          onClick={handleRowOptionsClose}
+          onClick={handleView}
         >
           <Icon icon="tabler:eye" fontSize={20} />
           View
@@ -161,11 +174,14 @@ const columns = [
     field: "fullName",
     headerName: "User",
     renderCell: ({ row }) => {
-      const { user_name, user_email } = row;
+      const { user_name, user_email, cart_items } = row;
+      console.log("cart_items", cart_items);
 
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* {renderClient(row)} */}
+          {/* Assuming we want to show the first item's images */}
+          {cart_items && cart_items.length > 0 && renderClient(cart_items[0])}
+
           <Box
             sx={{
               display: "flex",
@@ -254,9 +270,8 @@ const columns = [
               <div>
                 {row?.cart_items.map((item, index) => (
                   <span key={item._id}>
-                    {`${item.food_name} ${
-                      index < row?.cart_items.length - 1 ? ", " : ""
-                    }`}
+                    {`${item.food_name} ${index < row?.cart_items.length - 1 ? ", " : ""
+                      }`}
                   </span>
                 ))}
               </div>

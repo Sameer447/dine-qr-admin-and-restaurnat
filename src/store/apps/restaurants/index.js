@@ -18,8 +18,19 @@ export const fetchMenuItems = createAsyncThunk(
   "appRestaurants/fetchMenuItems",
   async () => {
     const user = localStorage.getItem('userData') ? JSON.parse(localStorage.getItem('userData')) : null;
-    if(!user) return;
-    const response = await axios.get(`/api/get-food-items?restaurant_id=${user._id}`);   
+    if (!user) return;
+    const response = await axios.get(`/api/get-food-items?restaurant_id=${user._id}`);
+    return response.data;
+  },
+);
+
+
+export const deleteMenuItems = createAsyncThunk(
+  "appRestaurants/deleteMenuItems",
+  async (id) => {
+    console.log(" del id !!!:", id);
+    const response = await axios.delete(`/api/del-food-items?id=${id}`);
+    dispatch(fetchMenuItems());
     return response.data;
   },
 );
@@ -53,18 +64,21 @@ export const deleteRestaurant = createAsyncThunk(
 export const appRestaurantsSlice = createSlice({
   name: "appRestaurants",
   initialState: {
-    restaurants: [], // Array to store restaurant data
-    foodItems: [], // Array to store food items data
+    restaurants: [],
+    foodItems: [],
   },
   reducers: {},
   extraReducers: (builder) => {
     builder
-    .addCase(fetchData.fulfilled, (state, action) => {
-      state.restaurants = action.payload; // Store fetched restaurant data
-    })
-    .addCase(fetchMenuItems.fulfilled, (state, action) => {
-      state.foodItems = action.payload; // Store fetched food items
-    });
+      .addCase(fetchData.fulfilled, (state, action) => {
+        state.restaurants = action.payload;
+      })
+      .addCase(fetchMenuItems.fulfilled, (state, action) => {
+        state.foodItems = action.payload;
+      })
+      .addCase(deleteMenuItems.fulfilled, (state, action) => {
+        state.foodItems = state.foodItems.filter((item) => item._id !== action.payload);
+      });
 
   },
 });
