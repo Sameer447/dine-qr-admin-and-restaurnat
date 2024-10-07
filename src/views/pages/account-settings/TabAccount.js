@@ -195,8 +195,15 @@ const TabAccount = () => {
           "restaurantAboutUs.discount",
           user?.restaurantAboutUs?.discount,
         );
-        setQualities(user?.restaurantAboutUs?.qualities);
-        setFeatures(user?.restaurantAboutUs?.features?.features);
+        setQualities(user?.restaurantAboutUs?.qualities?.length > 0 ? user?.restaurantAboutUs?.qualities : [{
+          id: 1,
+          description: ""
+        }]);
+        setFeatures(user?.restaurantAboutUs?.features?.features?.length ? user?.restaurantAboutUs?.features.features : [{
+          id: 1,
+          description: "",
+          logo: ""
+        }]);
         setImgSrc(
           `/api/get-user-image?imageName=${user.restaurantDetails.logo}`,
         );
@@ -206,6 +213,9 @@ const TabAccount = () => {
       mounted = false;
     };
   }, []);
+
+   console.log('qualities', qualities)
+   console.log('features', features)
 
   const onSubmit = async (data) => {
     console.log("data", data);
