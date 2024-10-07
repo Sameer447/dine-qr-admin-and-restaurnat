@@ -214,8 +214,8 @@ const TabAccount = () => {
     };
   }, []);
 
-   console.log('qualities', qualities)
-   console.log('features', features)
+  console.log('qualities', qualities)
+  console.log('features', features)
 
   const onSubmit = async (data) => {
     console.log("data", data);
@@ -330,21 +330,14 @@ const TabAccount = () => {
   const handleInputImageChange = (event) => {
     const { files } = event.target;
     if (files && files.length > 0) {
-      const file = files[0]; // Get the first file
-      const reader = new FileReader();
-
-      // Log the file object to verify it's being received
-      console.log("File object:", file);
-
-      // Read the file as a DataURL for displaying the image preview
-      reader.onload = () => {
-        setImgSrc(reader.result); // Set the image preview
-        setInputValue(file); // Set the actual file to state for form submission
-      };
-
-      reader.readAsDataURL(file);
+      const file = files[0];
+      const fileUrl = URL.createObjectURL(file);
+      setImgSrc(fileUrl);
+      setInputValue(file);
     }
   };
+
+  console.log("inputValue", inputValue);
 
 
   const handleInputImageReset = () => {
@@ -421,19 +414,13 @@ const TabAccount = () => {
                     <input
                       hidden
                       type="file"
-                      value={inputValue}
                       accept="image/png, image/jpeg"
-                      onChange={handleInputImageChange}
+                      onChange={(event) => {
+                        handleInputImageChange(event);
+                      }}
                       id="account-settings-upload-image"
                     />
                   </ButtonStyled>
-                  {/* <ResetButtonStyled
-                    color="secondary"
-                    variant="tonal"
-                    onClick={handleInputImageReset}
-                  >
-                    Reset
-                  </ResetButtonStyled> */}
                   <Typography sx={{ mt: 4, color: "text.disabled" }}>
                     Allowed PNG or JPEG. Max size of 800K.
                   </Typography>
@@ -461,7 +448,6 @@ const TabAccount = () => {
                         }}
                         error={Boolean(errors.restaurantDetails?.banner)}
                         helperText={errors.restaurantDetails?.banner ? "This field is required" : ""}
-                        {...rest}
                       />
                     )}
                   />
@@ -891,8 +877,12 @@ const TabAccount = () => {
                         label="About us logo"
                         type="file"
                         placeholder="Upload your restaurant's about us logo"
-                        value={value}
-                        onChange={onChange}
+                        // value={value}
+                        onChange={(e) => {
+                          const file = e.target.files[0]; // Capture the file object
+                          console.log("about us file logo:", file); // Log the file object for debugging
+                          onChange(file); // Pass the file object to React Hook Form
+                        }}
                         error={Boolean(errors?.restaurantAboutUs?.logo)}
                         id="validation-basic-select"
                         aria-describedby="validation-basic-select"
@@ -914,8 +904,12 @@ const TabAccount = () => {
                         label="About us side banner"
                         type="file"
                         placeholder="Upload your restaurant's about us side banner"
-                        value={value}
-                        onChange={onChange}
+                        // value={value}
+                        onChange={(e) => {
+                          const file = e.target.files[0]; // Capture the file object
+                          console.log("about us banner file:", file); // Log the file object for debugging
+                          onChange(file); // Pass the file object to React Hook Form
+                        }}
                         error={Boolean(errors?.restaurantAboutUs?.banner)}
                         id="validation-basic-select"
                         aria-describedby="validation-basic-select"
@@ -971,7 +965,11 @@ const TabAccount = () => {
                             type="file"
                             placeholder="Upload your restaurant's core value logo"
                             // value={value}
-                            onChange={onChange}
+                            onChange={(e) => {
+                              const file = e.target.files[0]; // Capture the file object
+                              console.log("restaurant logo file:", file); // Log the file object for debugging
+                              onChange(file); // Pass the file object to React Hook Form
+                            }}
                           />
                         )}
                       />
@@ -1058,8 +1056,12 @@ const TabAccount = () => {
                         label="Discount Banner"
                         type="file"
                         placeholder="Upload the discount banner"
-                        value={value}
-                        onChange={onChange}
+                        // value={value}
+                        onChange={(e) => {
+                          const file = e.target.files[0]; // Capture the file object
+                          console.log("discount Banner file:", file); // Log the file object for debugging
+                          onChange(file); // Pass the file object to React Hook Form
+                        }}
                         error={Boolean(
                           errors?.restaurantAboutUs?.discount?.banner,
                         )}
@@ -1187,8 +1189,11 @@ const TabAccount = () => {
                         label="Working Hours Banner"
                         type="file"
                         placeholder="Upload the working hours banner"
-                        value={value}
-                        onChange={onChange}
+                        onChange={(e) => {
+                          const file = e.target.files[0]; // Capture the file object
+                          console.log("working hour Banner file:", file); // Log the file object for debugging
+                          onChange(file); // Pass the file object to React Hook Form
+                        }}
                         error={Boolean(
                           errors.restaurantAboutUs?.workingHours?.banner,
                         )}
