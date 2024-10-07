@@ -35,7 +35,6 @@ import { useForm, Controller } from "react-hook-form";
 import Icon from "src/@core/components/icon";
 import PickersTime from "../../forms/form-elements/pickers/PickersTime";
 import { set } from "nprogress";
-import { id } from "date-fns/locale";
 
 const initialData = {
   email: "",
@@ -151,15 +150,8 @@ const TabAccount = () => {
   const [time, setTime] = useState(new Date());
   const [offTime, setOffTime] = useState(new Date());
   const [dateTime, setDateTime] = useState(new Date());
-  const [qualities, setQualities] = useState([{
-    id: 1,
-    description: "",
-  }]);
-  const [features, setFeatures] = useState([{
-    id: 1,
-    description: "",
-    logo: "",
-  }]);
+  const [qualities, setQualities] = useState([]);
+  const [features, setFeatures] = useState([]);
 
   // ** Hooks
   const {
