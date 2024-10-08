@@ -842,55 +842,6 @@ const TabAccount = () => {
                     )}
                   />
                 </Grid>
-                <Grid item xs={12} sm={12}>
-                  <CardHeader title="Qualities" />
-                </Grid>
-                {qualities?.map((quality, index) => (
-                  <GridRow
-                    key={index}
-                    item
-                    xs={12}
-                    sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
-                      marginBottom: 5,
-                    }}
-                  >
-                    <Grid item xs={12} sm={10}>
-                      <Controller
-                        name={`restaurantAboutUs.qualities[${index}].description`}
-                        control={control}
-                        rules={{ required: false }}
-                        render={({ field: { value, onChange } }) => (
-                          <CustomTextField
-                            fullWidth
-                            label={`Quality ${index + 1}`}
-                            placeholder="List your restaurant's top qualities in one line"
-                            value={value}
-                            onChange={onChange}
-                          />
-                        )}
-                      />
-                    </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      sm={2}
-                      sx={{ marginTop: 5, marginLeft: 10 }}
-                    >
-                      {index === qualities.length - 1 ? (
-                        <Button onClick={addQuality}>Add</Button>
-                      ) : null}
-                      {index !== 0 ? (
-                        <Button onClick={() => removeQuality(index)}>
-                          Remove
-                        </Button>
-                      ) : null}
-                    </Grid>
-                  </GridRow>
-                ))}
                 <Grid item xs={12} sm={6}>
                   <Controller
                     name="restaurantAboutUs.logo"
@@ -945,6 +896,55 @@ const TabAccount = () => {
                     )}
                   />
                 </Grid>
+                <Grid item xs={12} sm={12}>
+                  <CardHeader title="Qualities" />
+                </Grid>
+                {qualities?.map((quality, index) => (
+                  <GridRow
+                    key={index}
+                    item
+                    xs={12}
+                    sx={{
+                      display: "flex",
+                      flexDirection: "row",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      marginBottom: 5,
+                    }}
+                  >
+                    <Grid item xs={12} sm={10}>
+                      <Controller
+                        name={`restaurantAboutUs.qualities[${index}].description`}
+                        control={control}
+                        rules={{ required: false }}
+                        render={({ field: { value, onChange } }) => (
+                          <CustomTextField
+                            fullWidth
+                            label={`Quality ${index + 1}`}
+                            placeholder="List your restaurant's top qualities in one line"
+                            value={value}
+                            onChange={onChange}
+                          />
+                        )}
+                      />
+                    </Grid>
+                    <Grid
+                      item
+                      xs={12}
+                      sm={2}
+                      sx={{ marginTop: 5, marginLeft: 10 }}
+                    >
+                      {index === qualities.length - 1 ? (
+                        <Button onClick={addQuality}>Add</Button>
+                      ) : null}
+                      {index !== 0 ? (
+                        <Button onClick={() => removeQuality(index)}>
+                          Remove
+                        </Button>
+                      ) : null}
+                    </Grid>
+                  </GridRow>
+                ))}
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Features" />
                 </Grid>

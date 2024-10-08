@@ -35,7 +35,12 @@ import UserSubscriptionDialog from "src/views/apps/user/view/UserSubscriptionDia
 
 // ** Utils Import
 import { getInitials } from "src/@core/utils/get-initials";
-import { CardMedia } from "@mui/material";
+import { CardMedia, CircularProgress } from "@mui/material";
+import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
+
+const serviceUrl = process.env.NEXT_PUBLIC_CUSTOMER_API_URL;
+
 
 const data = {
   id: 1,
@@ -88,14 +93,60 @@ const UserViewLeft = ({ orderData }) => {
   const [openPlans, setOpenPlans] = useState(false);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
   const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
-
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
   const handleEditClose = () => setOpenEdit(false);
 
-  // Handle Upgrade Plan dialog
   const handlePlansClickOpen = () => setOpenPlans(true);
   const handlePlansClose = () => setOpenPlans(false);
+
+  const handleChangeStatus = async () => {
+    try {
+      let object;
+      if (orderData.status === 'Pending') {
+        object = {
+          orderId: orderData._id,
+          status: 'preparing',
+        }
+      } else if (orderData.status === 'preparing') {
+        object = {
+          orderId: orderData._id,
+          status: 'ready',
+        }
+      } else if (orderData.status === 'ready') {
+        object = {
+          orderId: orderData._id,
+          status: 'delivered',
+        }
+      }
+      setLoading(true);
+      const response = await fetch(`${serviceUrl}/change-order-status`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(object)
+      });
+      if (!response.ok) {
+        const error = await response.json();
+        setLoading(false);
+        throw new Error(error.message);
+      }
+      toast.success('Order status changed successfully');
+      router.push('/dashboards/orders/list/');
+      setLoading(false);
+    } catch (error) {
+      console.error('Error:', error);
+      setLoading(false);
+      toast.error('Something went wrong');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
 
   if (data) {
@@ -189,8 +240,19 @@ const UserViewLeft = ({ orderData }) => {
               </Box>
 
               <CardActions sx={{ display: "flex", justifyContent: "center" }}>
-                <Button variant="contained" sx={{ mr: 2 }} onClick={handleEditClickOpen}>
-                  Change Status To Preparing
+                <Button variant="contained" sx={{ mr: 2 }} onClick={handleChangeStatus}>
+                  {loading ? (
+                    <Box display='flex' alignItems='center'>
+                      <Box component='span' mr={1}>
+                        Loading...
+                      </Box>
+                      <Box component={CircularProgress} color={'white'} size={16} />
+                    </Box>
+                  ) : (
+                    <>
+                      {orderData.status === 'Pending' ? 'Start Preparing' : orderData.status === 'preparing' ? 'Ready' : 'Delivered'}
+                    </>
+                  )}
                 </Button>
                 <Button color="error" variant="tonal" onClick={() => setSuspendDialogOpen(true)}>
                   Cancel Order

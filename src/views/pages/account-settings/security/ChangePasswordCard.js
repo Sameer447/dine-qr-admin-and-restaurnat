@@ -23,6 +23,8 @@ import * as yup from 'yup'
 import toast from 'react-hot-toast'
 import { useForm, Controller } from 'react-hook-form'
 import { yupResolver } from '@hookform/resolvers/yup'
+import { set } from 'nprogress'
+import { CircularProgress } from '@mui/material'
 
 const defaultValues = {
   newPassword: '',
@@ -52,7 +54,9 @@ const ChangePasswordCard = () => {
     showNewPassword: false,
     showCurrentPassword: false,
     showConfirmNewPassword: false
-  })
+  });
+  const [loading, setLoading] = useState(false);
+
 
   // ** Hooks
   const {
@@ -74,9 +78,44 @@ const ChangePasswordCard = () => {
     setValues({ ...values, showConfirmNewPassword: !values.showConfirmNewPassword })
   }
 
-  const onPasswordFormSubmit = () => {
-    toast.success('Password Changed Successfully')
-    reset(defaultValues)
+  const onPasswordFormSubmit = async (data) => {
+    if (data.currentPassword === data.newPassword) {
+      toast.error('Current Password and New Password should not be same');
+      return;
+    }
+    try {
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      if(!userData) {
+        toast.error('User not found');
+        return;
+      }
+      const object = {
+        oldPassword: data.currentPassword,
+        newPassword: data.newPassword,
+        email: userData.email
+      }
+      setLoading(true);
+      const response = await fetch('/api/change-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(object)
+      })
+      if (!response.ok) {
+        const error = await response.json()
+        setLoading(false);
+        throw new Error(error.message)
+      }
+      setLoading(false);
+      toast.success('Password Changed Successfully')
+      reset(defaultValues)
+    } catch (error) {
+      setLoading(false);
+      toast.error(error.message)
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -202,7 +241,16 @@ const ChangePasswordCard = () => {
             </Grid>
             <Grid item xs={12}>
               <Button variant='contained' type='submit' sx={{ mr: 4 }}>
-                Save Changes
+                {loading ? (
+                  <Box display='flex' alignItems='center'>
+                    <Box component='span' mr={1}>
+                      Loading...
+                    </Box>
+                    <Box component={CircularProgress} color={'white'} size={16} />
+                  </Box>
+                ) : (
+                  'Save Changes'
+                )}
               </Button>
               <Button type='reset' variant='tonal' color='secondary' onClick={() => reset()}>
                 Reset

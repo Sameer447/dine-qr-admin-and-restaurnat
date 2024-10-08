@@ -3,6 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 // ** Axios Imports
 import axios from "axios";
+const serviceUrl = process.env.NEXT_PUBLIC_CUSTOMER_API_URL;
 
 // ** Fetch Orders
 export const fetchOrdersData = createAsyncThunk(
@@ -13,7 +14,7 @@ export const fetchOrdersData = createAsyncThunk(
       : null;
     if (!user) return;
     const response = await axios.get(
-      `http://localhost:3001/api/get-orders?restaurant_id=${user._id}`,
+      `${serviceUrl}/get-orders?restaurant_id=${user._id}`,
     );
     return response.data;
   },
