@@ -35,6 +35,7 @@ import { useForm, Controller } from "react-hook-form";
 import Icon from "src/@core/components/icon";
 import PickersTime from "../../forms/form-elements/pickers/PickersTime";
 import { set } from "nprogress";
+import axios from "axios";
 
 const initialData = {
   email: "",
@@ -152,6 +153,7 @@ const TabAccount = () => {
   const [dateTime, setDateTime] = useState(new Date());
   const [qualities, setQualities] = useState([]);
   const [features, setFeatures] = useState([]);
+  const url = process?.env?.API_URL || "http://localhost:3000/api";
 
   // ** Hooks
   const {
@@ -214,22 +216,22 @@ const TabAccount = () => {
     };
   }, []);
 
-  console.log('qualities', qualities)
-  console.log('features', features)
 
   const onSubmit = async (data) => {
     console.log("data", data);
     try {
       const formData = new FormData();
 
-      // Append regular fields
       formData.append("email", data.email);
       formData.append("role", data.role);
+      formData.append("isActivated", data.isActivated);
 
       // Append restaurantDetails fields
       formData.append("restaurantName", data.restaurantDetails.restaurantName);
       formData.append("cnicNumber", data.restaurantDetails.cnicNumber);
       formData.append("restaurantOwner", data.restaurantDetails.restaurantOwner);
+      formData.append("tagline", data.restaurantDetails.tagline);
+
 
       // Append addressDetails fields
       formData.append("address", data.addressDetails.address);
@@ -239,10 +241,12 @@ const TabAccount = () => {
       formData.append("city", data.addressDetails.city);
       formData.append("landmark", data.addressDetails.landmark);
 
+
       // Append restaurantContactUs fields
       formData.append("contactUsHeading", data.restaurantContactUs.heading);
       formData.append("contactUsSubHeading", data.restaurantContactUs.subHeading);
       formData.append("contactUsDescription", data.restaurantContactUs.description);
+
 
       // Append restaurantSocialMedia fields
       formData.append("facebook", data.restaurantSocialMedia.facebook);
@@ -260,11 +264,21 @@ const TabAccount = () => {
       if (data.restaurantAboutUs.qualities) {
         formData.append("qualities", JSON.stringify(data.restaurantAboutUs.qualities));
       }
+
       if (data.restaurantAboutUs.features && data.restaurantAboutUs.features.features) {
+        // Append the description and other text fields of the features
         formData.append("features", JSON.stringify(data.restaurantAboutUs.features.features));
+
+        // Append the logos for each feature separately
+        data.restaurantAboutUs.features.features.forEach((feature, index) => {
+          if (feature.logo) {
+            formData.append(`featuresLogo_${index + 1}`, feature.logo);
+          }
+        });
       }
 
       formData.append("featuresDescription", data.restaurantAboutUs.features.description);
+
 
       // Append working hours
       formData.append("workingDays", data.restaurantAboutUs.workingHours.days);
@@ -272,34 +286,8 @@ const TabAccount = () => {
       formData.append("offTime", data.restaurantAboutUs.workingHours.offTime);
 
       // Append discount details
-      formData.append("discountDescription", data.restaurantAboutUs.discount.description);
       formData.append("discountTitle", data.restaurantAboutUs.discount.title);
-
-      // Handle file uploads
-      // if (data.restaurantDetails.logo && data.restaurantDetails.logo[0]) {
-      //   formData.append("logo", data.restaurantDetails.logo[0]); // File object
-      // }
-
-      // if (data.restaurantDetails.banner && data.restaurantDetails.banner[0]) {
-      //   formData.append("banner", data.restaurantDetails.banner[0]); // File object
-      // }
-
-      // if (data.restaurantAboutUs.logo && data.restaurantAboutUs.logo[0]) {
-      //   formData.append("aboutUsLogo", data.restaurantAboutUs.logo[0]); // File object
-      // }
-
-      // if (data.restaurantAboutUs.banner && data.restaurantAboutUs.banner[0]) {
-      //   formData.append("aboutUsBanner", data.restaurantAboutUs.banner[0]); // File object
-      // }
-
-      // if (data.restaurantAboutUs.workingHours.banner && data.restaurantAboutUs.workingHours.banner[0]) {
-      //   formData.append("workingBanner", data.restaurantAboutUs.workingHours.banner[0]); // File object
-      // }
-
-      // if (data.restaurantAboutUs.discount.banner && data.restaurantAboutUs.discount.banner[0]) {
-      //   formData.append("discountBanner", data.restaurantAboutUs.discount.banner[0]); // File object
-      // }
-
+      formData.append("discountDescription", data.restaurantAboutUs.discount.description);
 
       // Handle file uploads (logo, banner, etc.)
       const appendFile = (key, file) => {
@@ -308,25 +296,37 @@ const TabAccount = () => {
         }
       };
 
+      // restaurantDetails images fields
       appendFile("logo", data.restaurantDetails.logo);
       appendFile("banner", data.restaurantDetails.banner);
+
+      // restaurantAboutUs images fields
       appendFile("aboutUsLogo", data.restaurantAboutUs.logo);
       appendFile("aboutUsBanner", data.restaurantAboutUs.banner);
+
+      // restaurantAboutUs working hourse image fields
       appendFile("workingBanner", data.restaurantAboutUs.workingHours.banner);
+
+      // restaurantAboutUs discount image fields
       appendFile("discountBanner", data.restaurantAboutUs.discount.banner);
 
-      // You can now submit the formData to your API using Axios or fetch
+      if (data.restaurantAboutUs.features.features) {
+        data.restaurantAboutUs.features.features.forEach((feature, index) => {
+          appendFile(`featuresLogo_${index + 1}`, feature.logo);
+        });
+      }
 
-      console.log([...formData.entries()]); // To check if all data is appended correctly
+      console.log([...formData.entries()]);
+      console.log("url", url);
 
-      // Make the API call
-      const response = await fetch(`/api/RestaurantProfile/${userData._id}`, {
-        method: "PUT",
-        body: formData, // Send the FormData
+      const response = await axios.post(`${url}/RestaurantProfile/${userData._id}/profile`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
-      if (response.ok) {
-        const result = await response.json();
+      if (response.status === 200) {
+        const result = response.data;
         console.log("Restaurant updated successfully:", result);
       } else {
         console.error("Error updating restaurant:", response.statusText);
@@ -351,9 +351,6 @@ const TabAccount = () => {
       setInputValue(file);
     }
   };
-
-  console.log("inputValue", inputValue);
-
 
   const handleInputImageReset = () => {
     setInputValue("");
@@ -437,7 +434,6 @@ const TabAccount = () => {
                           accept="image/png, image/jpeg"
                           onChange={(e) => {
                             const file = e.target.files[0]; // Capture the file object
-                            console.log("logo file:", file); // Log the file object for debugging
                             onChange(file);
                             handleInputImageChange(e);
                           }}
@@ -468,7 +464,6 @@ const TabAccount = () => {
                         placeholder="banner"
                         onChange={(e) => {
                           const file = e.target.files[0]; // Capture the file object
-                          console.log("Banner file:", file); // Log the file object for debugging
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(errors.restaurantDetails?.banner)}
@@ -856,7 +851,6 @@ const TabAccount = () => {
                         // value={value}
                         onChange={(e) => {
                           const file = e.target.files[0]; // Capture the file object
-                          console.log("about us file logo:", file); // Log the file object for debugging
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(errors?.restaurantAboutUs?.logo)}
@@ -883,7 +877,6 @@ const TabAccount = () => {
                         // value={value}
                         onChange={(e) => {
                           const file = e.target.files[0]; // Capture the file object
-                          console.log("about us banner file:", file); // Log the file object for debugging
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(errors?.restaurantAboutUs?.banner)}
@@ -992,7 +985,6 @@ const TabAccount = () => {
                             // value={value}
                             onChange={(e) => {
                               const file = e.target.files[0]; // Capture the file object
-                              console.log("restaurant logo file:", file); // Log the file object for debugging
                               onChange(file); // Pass the file object to React Hook Form
                             }}
                           />
@@ -1084,7 +1076,6 @@ const TabAccount = () => {
                         // value={value}
                         onChange={(e) => {
                           const file = e.target.files[0]; // Capture the file object
-                          console.log("discount Banner file:", file); // Log the file object for debugging
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(
@@ -1216,7 +1207,6 @@ const TabAccount = () => {
                         placeholder="Upload the working hours banner"
                         onChange={(e) => {
                           const file = e.target.files[0]; // Capture the file object
-                          console.log("working hour Banner file:", file); // Log the file object for debugging
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(
