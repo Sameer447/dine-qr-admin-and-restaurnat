@@ -3,8 +3,6 @@ const navigation = (role) => {
     {
       title: "Dashboards",
       icon: "tabler:smart-home",
-      // badgeContent: "new",
-      // badgeColor: "error",
       children: [
         !role
           ? {
@@ -16,13 +14,8 @@ const navigation = (role) => {
               icon: "tabler:home",
               path: "/dashboards/restaurants/list",
             },
-      ].filter(Boolean), // Filter out null values
+      ].filter(Boolean), 
     },
-    // !role && {
-    //   title: "Chat",
-    //   icon: "tabler:messages",
-    //   path: "/apps/chat",
-    // },
     // !role && {
     //   title: "Invoice",
     //   icon: "tabler:file-dollar",
@@ -38,8 +31,18 @@ const navigation = (role) => {
     //   ],
     // },
     !role && {
-      title: "Menus",
-      icon: "tabler:home",
+      title: "Qr Code",
+      icon: "tabler:qrcode",
+      children: [
+        {
+          title: "View",
+          path: "/apps/qr-code/view",
+        },
+      ],
+    },
+    !role && {
+      title: "Menu",
+      icon: "tabler:menu-2",
       children: [
         {
           title: "List",
@@ -48,10 +51,6 @@ const navigation = (role) => {
         {
           title: "View",
           children: [
-            // {
-            //   title: "Add Menu",
-            //   path: "/apps/menus/view/add-menu",
-            // },
             {
               title: "Add Menu Item",
               path: "/apps/menus/view/add-menu-item",
@@ -60,7 +59,7 @@ const navigation = (role) => {
         },
       ],
     },
-  ].filter(Boolean); // Filter out null values
+  ].filter(Boolean);
 };
 
 export default navigation;

@@ -97,7 +97,6 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
   const [state, dispatch] = useReducer(reducer, initialState);
   const [image, setImage] = useState(null);
   const [loading, setLoading] = useState(false);
-  console.log("here ====>", menuData);
 
   // ** Hooks
   const {
@@ -151,8 +150,7 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
   }, []);
 
   const onSubmit = async (data) => {
-    console.log("data", data);
-
+   
     try {
       setLoading(true);
       const formData = new FormData();
@@ -223,8 +221,6 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
 
   const addAddOn = () => {
     const updatedAddOns = [...state.addOns, { name: "", price: 0 }];
-
-    console.log("updatedAddOns", updatedAddOns);
 
     dispatch({ type: "addOns", payload: updatedAddOns });
 

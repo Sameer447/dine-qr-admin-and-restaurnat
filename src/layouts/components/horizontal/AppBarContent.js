@@ -116,7 +116,6 @@ const AppBarContent = (props) => {
 
   // ** Hook
   const auth = useAuth();
-  console.log("auth", auth);
 
   return (
     <Box sx={{ display: "flex", alignItems: "center" }}>

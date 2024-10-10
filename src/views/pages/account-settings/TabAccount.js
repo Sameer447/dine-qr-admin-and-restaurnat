@@ -218,7 +218,6 @@ const TabAccount = () => {
 
 
   const onSubmit = async (data) => {
-    console.log("data", data);
     try {
       const formData = new FormData();
 
@@ -315,9 +314,6 @@ const TabAccount = () => {
           appendFile(`featuresLogo_${index + 1}`, feature.logo);
         });
       }
-
-      console.log([...formData.entries()]);
-      console.log("url", url);
 
       const response = await axios.post(`${url}/RestaurantProfile/${userData._id}/profile`, formData, {
         headers: {

@@ -11,10 +11,11 @@ import DialogActions from '@mui/material/DialogActions'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
+import { CircularProgress } from '@mui/material'
 
 const UserSuspendDialog = props => {
   // ** Props
-  const { open, setOpen } = props
+  const { open, setOpen, handleChangeStatus, loading } = props
 
   // ** States
   const [userInput, setUserInput] = useState('yes')
@@ -22,7 +23,8 @@ const UserSuspendDialog = props => {
   const handleClose = () => setOpen(false)
   const handleSecondDialogClose = () => setSecondDialogOpen(false)
 
-  const handleConfirmation = value => {
+  const handleConfirmation = async value => {
+    await handleChangeStatus('cancel');
     handleClose()
     setUserInput(value)
     setSecondDialogOpen(true)
@@ -51,7 +53,7 @@ const UserSuspendDialog = props => {
             <Typography variant='h4' sx={{ mb: 5, color: 'text.secondary' }}>
               Are you sure?
             </Typography>
-            <Typography>You won't be able to revert user!</Typography>
+            <Typography>Cancel the order. You can't revert this action!</Typography>
           </Box>
         </DialogContent>
         <DialogActions
@@ -62,9 +64,22 @@ const UserSuspendDialog = props => {
           }}
         >
           <Button variant='contained' sx={{ mr: 2 }} onClick={() => handleConfirmation('yes')}>
-            Yes, Suspend user!
+            {loading ? (
+              <Box display='flex' alignItems='center'>
+                <Box component='span' mr={1}>
+                  Loading...
+                </Box>
+                <Box component={CircularProgress} color={'white'} size={16} />
+              </Box>
+            ) : (
+              <>
+                {'Yes, Cancel Order'}
+              </>
+            )}
           </Button>
-          <Button variant='tonal' color='secondary' onClick={() => handleConfirmation('cancel')}>
+          <Button variant='outlined' color='secondary' onClick={() => {
+            handleClose(false);
+          }}>
             Cancel
           </Button>
         </DialogActions>
@@ -89,9 +104,9 @@ const UserSuspendDialog = props => {
           >
             <Icon fontSize='5.5rem' icon={userInput === 'yes' ? 'tabler:circle-check' : 'tabler:circle-x'} />
             <Typography variant='h4' sx={{ mb: 8 }}>
-              {userInput === 'yes' ? 'Suspended!' : 'Cancelled'}
+              {userInput === 'yes' ? '' : 'Cancelled'}
             </Typography>
-            <Typography>{userInput === 'yes' ? 'User has been suspended.' : 'Cancelled Suspension :)'}</Typography>
+            <Typography>{userInput === 'yes' ? 'Order has been cancelled.' : 'Cancelled Order:)'}</Typography>
           </Box>
         </DialogContent>
         <DialogActions sx={{ justifyContent: 'center' }}>

@@ -4,11 +4,9 @@ import User from "../../models/user";
 import bcrypt from "bcrypt";
 
 export async function UpdatePassword(userId, newPassword) {
-  // console.log(userId,newPassword,'hit ...?');
   try {
     const newPasswordHash = await bcrypt.hash(newPassword, 10);
-    // Find the user by their userId
-    const updatedUser = await User.findByIdAndUpdate(
+    await User.findByIdAndUpdate(
       userId,
       { password: newPasswordHash },
       { new: true },
@@ -32,23 +30,6 @@ export async function UserById(userId) {
     return { success: false, error: "Internal server error" };
   }
 }
-
-// export async function UpdateData(userId, username,email) {
-//   // console.log(userId,newPassword,'hit ...?');
-//     try {
-
-//     const updatedData = await User.findByIdAndUpdate(
-//         userId,
-//         { username: username },
-//         { email: email },
-//         { new: true }
-//     );
-//     console.log(updatedData)
-//     return { success: true, message: "Password updated successfully" };
-//   } catch (error) {
-//     return { success: false, error: "Internal server error" };
-//   }
-// }
 
 export async function UpdateData(userId, updateFields) {
   try {

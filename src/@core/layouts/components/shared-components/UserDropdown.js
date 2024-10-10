@@ -55,8 +55,6 @@ const UserDropdown = (props) => {
 
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("userData"));
-    console.log("user", user);
-
     if (user) {
       if (user?.role === "superAdmin") {
         setUserRole(true);

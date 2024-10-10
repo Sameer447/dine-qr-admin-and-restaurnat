@@ -95,7 +95,7 @@ const UserViewLeft = ({ orderData }) => {
   const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  
+
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
   const handleEditClose = () => setOpenEdit(false);
@@ -103,23 +103,30 @@ const UserViewLeft = ({ orderData }) => {
   const handlePlansClickOpen = () => setOpenPlans(true);
   const handlePlansClose = () => setOpenPlans(false);
 
-  const handleChangeStatus = async () => {
+  const handleChangeStatus = async (purpose) => {
     try {
       let object;
-      if (orderData.status === 'Pending') {
+      if (purpose === 'cancel') {
         object = {
           orderId: orderData._id,
-          status: 'preparing',
+          status: 'cancelled',
         }
-      } else if (orderData.status === 'preparing') {
-        object = {
-          orderId: orderData._id,
-          status: 'ready',
-        }
-      } else if (orderData.status === 'ready') {
-        object = {
-          orderId: orderData._id,
-          status: 'delivered',
+      } else {
+        if (orderData.status === 'Pending') {
+          object = {
+            orderId: orderData._id,
+            status: 'preparing',
+          }
+        } else if (orderData.status === 'preparing') {
+          object = {
+            orderId: orderData._id,
+            status: 'ready',
+          }
+        } else if (orderData.status === 'ready') {
+          object = {
+            orderId: orderData._id,
+            status: 'delivered',
+          }
         }
       }
       setLoading(true);
@@ -240,7 +247,7 @@ const UserViewLeft = ({ orderData }) => {
               </Box>
 
               <CardActions sx={{ display: "flex", justifyContent: "center" }}>
-                <Button variant="contained" sx={{ mr: 2 }} onClick={handleChangeStatus}>
+                <Button disabled={orderData?.status == "cancelled" ? true : false} variant={`${orderData?.status == "cancelled" ? "outlined" : "contained"}`} sx={{ mr: 2 }} onClick={() => { handleChangeStatus(''); }}>
                   {loading ? (
                     <Box display='flex' alignItems='center'>
                       <Box component='span' mr={1}>
@@ -261,7 +268,8 @@ const UserViewLeft = ({ orderData }) => {
 
               {/* Dialogs for Edit and Suspend */}
               {/* <EditUserDialog open={openEdit} handleClose={handleEditClose} data={data} /> */}
-              <UserSuspendDialog open={suspendDialogOpen} setOpen={setSuspendDialogOpen} />
+              <UserSuspendDialog open={suspendDialogOpen} setOpen={setSuspendDialogOpen}
+                handleChangeStatus={handleChangeStatus} loading={loading} />
               <UserSubscriptionDialog open={subscriptionDialogOpen} setOpen={setSubscriptionDialogOpen} />
             </Card>
           </Grid>

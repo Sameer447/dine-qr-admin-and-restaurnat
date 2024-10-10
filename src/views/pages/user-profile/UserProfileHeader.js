@@ -36,8 +36,6 @@ const UserProfileHeader = ({ userData }) => {
       setData(response.data);
     });
   }, []);
-  console.log("userData", userData);
-
   const designationIcon = data?.designationIcon || "tabler:briefcase";
 
   return data !== null ? (

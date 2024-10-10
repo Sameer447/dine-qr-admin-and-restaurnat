@@ -175,8 +175,6 @@ const columns = [
     headerName: "User",
     renderCell: ({ row }) => {
       const { user_name, user_email, cart_items } = row;
-      console.log("cart_items", cart_items);
-
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
           {/* Assuming we want to show the first item's images */}
