@@ -111,7 +111,7 @@ export default async function handler(req, res) {
     const qualities = JSON.parse(fields.qualities || "[]");
     const features = JSON.parse(fields.features || "[]");
 
-    const processedFeatures = features.map((feature, index) => {
+    const processedFeatures = features.features?.map((feature, index) => {
       const logoKey = `featuresLogo_${index + 1}`;
       const logoFile = files[logoKey] ? files[logoKey][0] : null;
 
@@ -125,25 +125,51 @@ export default async function handler(req, res) {
     });
     console.log("Processed Features:", processedFeatures);
 
+    if (files.logo && files.logo[0] && files.logo[0].filepath) {
+      user.restaurantDetails.logo = uploadFile(files.logo[0], uploadDir);
+    }
+    if (files.banner && files.banner[0] && files.banner[0].filepath) {
+      user.restaurantDetails.banner = uploadFile(files.banner[0], uploadDir);
+    }
+    if (
+      files.aboutUsLogo &&
+      files.aboutUsLogo[0] &&
+      files.aboutUsLogo[0].filepath
+    ) {
+      user.restaurantAboutUs.logo = uploadFile(files.aboutUsLogo[0], uploadDir);
+    }
+    if (
+      files.aboutUsBanner &&
+      files.aboutUsBanner[0] &&
+      files.aboutUsBanner[0].filepath
+    ) {
+      user.restaurantAboutUs.banner = uploadFile(
+        files.aboutUsBanner[0],
+        uploadDir,
+      );
+    }
+    if (
+      files.workingBanner &&
+      files.workingBanner[0] &&
+      files.workingBanner[0].filepath
+    ) {
+      user.restaurantAboutUs.workingHours.banner = uploadFile(
+        files.workingBanner[0],
+        uploadDir,
+      );
+    }
+    if (
+      files.discountBanner &&
+      files.discountBanner[0] &&
+      files.discountBanner[0].filepath
+    ) {
+      user.restaurantAboutUs.discount.banner = uploadFile(
+        files.discountBanner[0],
+        uploadDir,
+      );
+    }
 
-    if (files.logo) {
-      user.restaurantDetails.logo = uploadFile(files.logo[0]);
-    }
-    if (files.banner) {
-      user.restaurantDetails.banner = uploadFile(files.banner[0]);
-    }
-    if (files.aboutUsLogo) {
-      user.restaurantAboutUs.logo = uploadFile(files.aboutUsLogo[0]);
-    }
-    if (files.aboutUsBanner) {
-      user.restaurantAboutUs.banner = uploadFile(files.aboutUsBanner[0]);
-    }
-    if (files.workingBanner) {
-      user.restaurantAboutUs.workingHours.banner = uploadFile(files.workingBanner[0]);
-    }
-    if (files.discountBanner) {
-      user.restaurantAboutUs.discount.banner = uploadFile(files.discountBanner[0]);
-    }
+    console.log("tagline:", tagline);
 
     // Update user data
     user.email = email[0];
@@ -155,6 +181,8 @@ export default async function handler(req, res) {
       cnicNumber: cnicNumber[0],
       restaurantOwner: restaurantOwner[0],
       tagline: tagline[0],
+      banner: user.restaurantDetails.banner,
+      logo: user.restaurantDetails.logo,
     };
 
     user.addressDetails = {
@@ -169,7 +197,7 @@ export default async function handler(req, res) {
     user.restaurantContactUs = {
       heading: contactUsHeading[0],
       subHeading: contactUsSubHeading[0],
-      description: contactUsDescription[0]
+      description: contactUsDescription[0],
     };
 
     user.restaurantSocialMedia = {
@@ -184,23 +212,28 @@ export default async function handler(req, res) {
       heading: aboutUsHeading[0],
       subHeading: aboutUsSubHeading[0],
       description: aboutUsDescription[0],
-      features: processedFeatures,
+      features: {
+        description: featuresDescription[0],
+        features: processedFeatures,
+      },
       qualities: qualities,
       workingHours: {
         days: workingDays[0],
         startTime: startTime[0],
         offTime: offTime[0],
+        banner: user.restaurantAboutUs.workingHours.banner,
       },
       discount: {
         title: discountTitle[0],
         description: discountDescription[0],
-      }
+        banner: user.restaurantAboutUs.discount.banner,
+      },
     };
 
     const updatedUser = user;
     console.log("Updated User:", updatedUser);
 
-    // const updatedUser = await user.save();
+    await user.save();
 
     return res.status(200).json({
       message: "Restaurant updated successfully",

@@ -197,15 +197,27 @@ const TabAccount = () => {
           "restaurantAboutUs.discount",
           user?.restaurantAboutUs?.discount,
         );
-        setQualities(user?.restaurantAboutUs?.qualities?.length > 0 ? user?.restaurantAboutUs?.qualities : [{
-          id: 1,
-          description: ""
-        }]);
-        setFeatures(user?.restaurantAboutUs?.features?.features?.length ? user?.restaurantAboutUs?.features.features : [{
-          id: 1,
-          description: "",
-          logo: ""
-        }]);
+        setQualities(
+          user?.restaurantAboutUs?.qualities?.length > 0
+            ? user?.restaurantAboutUs?.qualities
+            : [
+                {
+                  id: 1,
+                  description: "",
+                },
+              ],
+        );
+        setFeatures(
+          user?.restaurantAboutUs?.features?.features?.length
+            ? user?.restaurantAboutUs?.features.features
+            : [
+                {
+                  id: 1,
+                  description: "",
+                  logo: "",
+                },
+              ],
+        );
         setImgSrc(
           `/api/get-user-image?imageName=${user.restaurantDetails.logo}`,
         );
@@ -215,7 +227,6 @@ const TabAccount = () => {
       mounted = false;
     };
   }, []);
-
 
   const onSubmit = async (data) => {
     console.log("data", data);
@@ -229,9 +240,11 @@ const TabAccount = () => {
       // Append restaurantDetails fields
       formData.append("restaurantName", data.restaurantDetails.restaurantName);
       formData.append("cnicNumber", data.restaurantDetails.cnicNumber);
-      formData.append("restaurantOwner", data.restaurantDetails.restaurantOwner);
+      formData.append(
+        "restaurantOwner",
+        data.restaurantDetails.restaurantOwner,
+      );
       formData.append("tagline", data.restaurantDetails.tagline);
-
 
       // Append addressDetails fields
       formData.append("address", data.addressDetails.address);
@@ -241,12 +254,16 @@ const TabAccount = () => {
       formData.append("city", data.addressDetails.city);
       formData.append("landmark", data.addressDetails.landmark);
 
-
       // Append restaurantContactUs fields
       formData.append("contactUsHeading", data.restaurantContactUs.heading);
-      formData.append("contactUsSubHeading", data.restaurantContactUs.subHeading);
-      formData.append("contactUsDescription", data.restaurantContactUs.description);
-
+      formData.append(
+        "contactUsSubHeading",
+        data.restaurantContactUs.subHeading,
+      );
+      formData.append(
+        "contactUsDescription",
+        data.restaurantContactUs.description,
+      );
 
       // Append restaurantSocialMedia fields
       formData.append("facebook", data.restaurantSocialMedia.facebook);
@@ -262,12 +279,21 @@ const TabAccount = () => {
 
       // Append complex fields
       if (data.restaurantAboutUs.qualities) {
-        formData.append("qualities", JSON.stringify(data.restaurantAboutUs.qualities));
+        formData.append(
+          "qualities",
+          JSON.stringify(data.restaurantAboutUs.qualities),
+        );
       }
 
-      if (data.restaurantAboutUs.features && data.restaurantAboutUs.features.features) {
+      if (
+        data.restaurantAboutUs.features &&
+        data.restaurantAboutUs.features.features
+      ) {
         // Append the description and other text fields of the features
-        formData.append("features", JSON.stringify(data.restaurantAboutUs.features.features));
+        formData.append(
+          "features",
+          JSON.stringify(data.restaurantAboutUs.features),
+        );
 
         // Append the logos for each feature separately
         data.restaurantAboutUs.features.features.forEach((feature, index) => {
@@ -277,17 +303,25 @@ const TabAccount = () => {
         });
       }
 
-      formData.append("featuresDescription", data.restaurantAboutUs.features.description);
-
+      formData.append(
+        "featuresDescription",
+        data.restaurantAboutUs.features.description,
+      );
 
       // Append working hours
       formData.append("workingDays", data.restaurantAboutUs.workingHours.days);
-      formData.append("startTime", data.restaurantAboutUs.workingHours.startTime);
+      formData.append(
+        "startTime",
+        data.restaurantAboutUs.workingHours.startTime,
+      );
       formData.append("offTime", data.restaurantAboutUs.workingHours.offTime);
 
       // Append discount details
       formData.append("discountTitle", data.restaurantAboutUs.discount.title);
-      formData.append("discountDescription", data.restaurantAboutUs.discount.description);
+      formData.append(
+        "discountDescription",
+        data.restaurantAboutUs.discount.description,
+      );
 
       // Handle file uploads (logo, banner, etc.)
       const appendFile = (key, file) => {
@@ -319,14 +353,22 @@ const TabAccount = () => {
       console.log([...formData.entries()]);
       console.log("url", url);
 
-      const response = await axios.post(`${url}/RestaurantProfile/${userData._id}/profile`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
+      const response = await axios.post(
+        `${url}/RestaurantProfile/${userData._id}/profile`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
         },
-      });
+      );
 
       if (response.status === 200) {
         const result = response.data;
+        window.localStorage.setItem(
+          "userData",
+          JSON.stringify(result?.updatedUser),
+        );
         console.log("Restaurant updated successfully:", result);
       } else {
         console.error("Error updating restaurant:", response.statusText);
@@ -467,7 +509,11 @@ const TabAccount = () => {
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(errors.restaurantDetails?.banner)}
-                        helperText={errors.restaurantDetails?.banner ? "This field is required" : ""}
+                        helperText={
+                          errors.restaurantDetails?.banner
+                            ? "This field is required"
+                            : ""
+                        }
                       />
                     )}
                   />
@@ -1075,8 +1121,8 @@ const TabAccount = () => {
                         placeholder="Upload the discount banner"
                         // value={value}
                         onChange={(e) => {
-                          const file = e.target.files[0]; // Capture the file object
-                          onChange(file); // Pass the file object to React Hook Form
+                          const file = e.target.files[0];
+                          onChange(file);
                         }}
                         error={Boolean(
                           errors?.restaurantAboutUs?.discount?.banner,
