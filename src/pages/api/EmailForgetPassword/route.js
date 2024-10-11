@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import nodemailer from "nodemailer";
-import { user, pass } from "../../global";
+import { user, pass } from "../../../@core/utils/global";
 
 export async function POST(request) {
   try {

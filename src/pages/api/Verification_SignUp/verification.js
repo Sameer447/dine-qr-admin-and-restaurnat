@@ -3,12 +3,12 @@ import * as formidable from "formidable";
 import { v4 as uuidv4 } from "uuid";
 import * as path from "path";
 import * as fs from "fs";
-import { generateVerificationToken } from "../../utils/jwt";
 import {
   pass,
   user,
   verificationLinkBaseUrl,
 } from "../../../@core/utils/global";
+import generateVerificationToken from "../../utils/jwt";
 
 // Disable body parsing (since we are using formidable for multipart form data)
 export const config = {
