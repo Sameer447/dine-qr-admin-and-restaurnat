@@ -126,6 +126,9 @@ var UserSchema = new mongoose.Schema(
         title: { type: String },
       },
     },
+    qr_code_url: {
+      type: String,
+    },
   },
   {
     timestamps: true,

@@ -169,51 +169,6 @@ const LoginPage = () => {
     }
   };
 
-  // try {
-  // const response = await axios.post(`/api/Login/verify-login`, {
-  //   email,
-  //   password
-  // }, {
-  //   headers: {
-  //     'Content-Type': 'application/json',
-  //   },
-  // });
-
-  // console.log('response :>> ', response.data);
-
-  // // Successful login
-  // if (response.status === 200) {
-  //   const user = response.data.user;
-  //     console.log('Logged in user :>> ', user);
-
-  //     // Redirect based on user type
-  //     if (user.role === "Resturant") {
-  //       const restaurantID = user._id;
-  //       router.push(`/Admin?resturant_id=${encodeURIComponent(restaurantID)}`);
-  //     } else if (user.role === "Admin") {
-  //       router.push('/SuperAdmin');
-  //     }
-
-  //     // Display success toast
-  //     toast.success("Logged in successfully");
-
-  //     // Save user data in localStorage
-  //     localStorage.setItem('current_user', JSON.stringify(user));
-  //     localStorage.setItem('_id', user._id);
-  //     localStorage.setItem('role', user.role);
-  //   } else {
-  //     // Handle failure cases (401: Incorrect password, 404: User not found)
-  //     toast.error(response.data.message);
-  //   }
-  // } catch (error) {
-  //   // Network or server error
-  //   console.error('Error during login:', error);
-  //   toast.error('An error occurred during login. Please try again.');
-  // } finally {
-  //   }
-  //   setIsLoaded(false);
-  // };
-
   const imageSource =
     skin === "bordered"
       ? "auth-v2-login-illustration-bordered"

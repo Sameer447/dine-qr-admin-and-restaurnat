@@ -81,7 +81,6 @@ const MenuForm = ({ restaurantData }) => {
   // ** States
   const [state, dispatch] = useReducer(reducer, initialState);
   const [image, setImage] = useState(null);
-  console.log("here", here);
 
   // ** Hooks
   const {

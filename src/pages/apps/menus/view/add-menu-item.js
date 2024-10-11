@@ -21,7 +21,6 @@ const AddMenu = () => {
         console.error(error);
       }
     };
-    console.log(id);
     if (id) {
       setMenuData(JSON.parse(data));
     }

@@ -300,7 +300,6 @@ const UserList = ({ apiData }) => {
   // ** Hooks
   const dispatch = useDispatch();
   const store = useSelector((state) => state.restaurants.restaurants);
-  console.log("store", store);
   useEffect(() => {
     dispatch(fetchData());
   }, []);

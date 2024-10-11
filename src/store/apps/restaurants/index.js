@@ -28,7 +28,6 @@ export const fetchMenuItems = createAsyncThunk(
 export const deleteMenuItems = createAsyncThunk(
   "appRestaurants/deleteMenuItems",
   async (id) => {
-    console.log(" del id !!!:", id);
     const response = await axios.delete(`/api/del-food-items?id=${id}`);
     dispatch(fetchMenuItems());
     return response.data;
