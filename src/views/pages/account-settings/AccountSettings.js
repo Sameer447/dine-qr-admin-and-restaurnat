@@ -79,7 +79,7 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
   }, [tab]);
 
   const tabContentList = {
-    account: <TabAccount />,
+    // account: <TabAccount />,
     security: <TabSecurity />,
     // connections: <TabConnections />,
     // notifications: <TabNotifications />,
@@ -98,7 +98,7 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
                 onChange={handleChange}
                 aria-label="customized tabs example"
               >
-                <Tab
+                {/* <Tab
                   value="account"
                   label={
                     <Box
@@ -112,7 +112,7 @@ const AccountSettings = ({ tab, apiPricingPlanData }) => {
                       {!hideText && "Account"}
                     </Box>
                   }
-                />
+                /> */}
                 <Tab
                   value="security"
                   label={

@@ -36,6 +36,7 @@ import Icon from "src/@core/components/icon";
 import PickersTime from "../../forms/form-elements/pickers/PickersTime";
 import { set } from "nprogress";
 import axios from "axios";
+import { color } from "@mui/system";
 
 const initialData = {
   email: "",
@@ -154,6 +155,14 @@ const TabAccount = () => {
   const [qualities, setQualities] = useState([]);
   const [features, setFeatures] = useState([]);
   const url = process?.env?.API_URL || "http://localhost:3000/api";
+  const [restaurantBanner, setRestaurantBanner] = useState("");
+  const [aboutUsBanner, setAboutUsBanner] = useState("");
+  const [aboutUsLogo, setAboutUsLogo] = useState("");
+  const [workingBanner, setWorkingBanner] = useState("");
+  const [discountBanner, setDiscountBanner] = useState("");
+  const [featureLogos, setFeatureLogos] = useState({});
+
+
 
   // ** Hooks
   const {
@@ -168,68 +177,92 @@ const TabAccount = () => {
   const handleSecondDialogClose = () => setSecondDialogOpen(false);
 
   useEffect(() => {
-    let mounted = true;
-    if (mounted) {
-      const user = JSON.parse(localStorage.getItem("userData"));
-      setUserData(user);
-      if (user) {
-        setValue("email", user?.email);
-        setValue("role", user?.role);
-        setValue("isActivated", user?.isActivated);
-        setValue("restaurantDetails", user?.restaurantDetails);
-        setValue("addressDetails", user?.addressDetails);
-        setValue("restaurantContactUs", user?.restaurantContactUs);
-        setValue("restaurantSocialMedia", user?.restaurantSocialMedia);
-        setValue("restaurantAboutUs", user?.restaurantAboutUs);
-        setValue(
-          "restaurantAboutUs.qualities",
-          user?.restaurantAboutUs?.qualities,
-        );
-        setValue(
-          "restaurantAboutUs.features",
-          user?.restaurantAboutUs?.features,
-        );
-        setValue(
-          "restaurantAboutUs.workingHours",
-          user?.restaurantAboutUs?.workingHours,
-        );
-        setValue(
-          "restaurantAboutUs.discount",
-          user?.restaurantAboutUs?.discount,
-        );
-        setQualities(
-          user?.restaurantAboutUs?.qualities?.length > 0
-            ? user?.restaurantAboutUs?.qualities
-            : [
-                {
-                  id: 1,
-                  description: "",
-                },
-              ],
-        );
-        setFeatures(
-          user?.restaurantAboutUs?.features?.features?.length
-            ? user?.restaurantAboutUs?.features.features
-            : [
-                {
-                  id: 1,
-                  description: "",
-                  logo: "",
-                },
-              ],
-        );
-        setImgSrc(
-          `/api/get-user-image?imageName=${user.restaurantDetails.logo}`,
-        );
-      }
+    const user = JSON.parse(localStorage.getItem("userData"));
+    setUserData(user);
+    if (user) {
+      setValue("email", user?.email);
+      setValue("role", user?.role);
+      setValue("isActivated", user?.isActivated);
+      setValue("restaurantDetails.restaurantName", user?.restaurantDetails?.restaurantName);
+      setValue("restaurantDetails.cnicNumber", user?.restaurantDetails?.cnicNumber);
+      setValue("restaurantDetails.restaurantOwner", user?.restaurantDetails?.restaurantOwner);
+      setValue("restaurantDetails.tagline", user?.restaurantDetails?.tagline);
+      setValue("addressDetails.address", user?.addressDetails?.address);
+      setValue("addressDetails.state", user?.addressDetails?.state);
+      setValue("addressDetails.zipcode", user?.addressDetails?.zipcode);
+      setValue("addressDetails.mobile", user?.addressDetails?.mobile);
+      setValue("addressDetails.city", user?.addressDetails?.city);
+      setValue("addressDetails.landmark", user?.addressDetails?.landmark);
+      setValue("restaurantContactUs.heading", user?.restaurantContactUs?.heading);
+      setValue("restaurantContactUs.subHeading", user?.restaurantContactUs?.subHeading);
+      setValue("restaurantContactUs.description", user?.restaurantContactUs?.description);
+      setValue("restaurantSocialMedia.facebook", user?.restaurantSocialMedia?.facebook);
+      setValue("restaurantSocialMedia.twitter", user?.restaurantSocialMedia?.twitter);
+      setValue("restaurantSocialMedia.instagram", user?.restaurantSocialMedia?.instagram);
+      setValue("restaurantSocialMedia.linkedin", user?.restaurantSocialMedia?.linkedin);
+      setValue("restaurantSocialMedia.portfolio", user?.restaurantSocialMedia?.portfolio);
+      setValue("restaurantAboutUs.heading", user?.restaurantAboutUs?.heading);
+      setValue("restaurantAboutUs.subHeading", user?.restaurantAboutUs?.subHeading);
+      setValue("restaurantAboutUs.description", user?.restaurantAboutUs?.description);
+      setValue("restaurantAboutUs.qualities", user?.restaurantAboutUs?.qualities);
+      setValue("restaurantAboutUs.features", user?.restaurantAboutUs?.features);
+      setValue("restaurantAboutUs.workingHours.days", user?.restaurantAboutUs?.workingHours?.days);
+      setValue("restaurantAboutUs.workingHours.startTime", user?.restaurantAboutUs?.workingHours?.startTime);
+      setValue("restaurantAboutUs.workingHours.offTime", user?.restaurantAboutUs?.workingHours?.offTime);
+      setValue("restaurantAboutUs.discount.title", user?.restaurantAboutUs?.discount?.title);
+      setValue("restaurantAboutUs.discount.description", user?.restaurantAboutUs?.discount?.description);
+
+      setQualities(
+        user?.restaurantAboutUs?.qualities?.length > 0
+          ? user?.restaurantAboutUs?.qualities
+          : [{ id: 1, description: "" }]
+      );
+      setFeatures(
+        user?.restaurantAboutUs?.features?.features?.length
+          ? user?.restaurantAboutUs?.features?.features
+          : [{ id: 1, description: "", logo: "" }]
+      );
+
+      const initialLogos = {};
+      user?.restaurantAboutUs?.features?.features?.forEach((feature, index) => {
+        if (feature.logo) {
+          initialLogos[index] = `/api/get-user-image?imageName=${feature?.logo}`;
+        }
+      });
+      setFeatureLogos(initialLogos);
+
+      setImgSrc(`/api/get-user-image?imageName=${user?.restaurantDetails?.logo}`);
+      setValue("restaurantDetails.logo", user?.restaurantDetails?.logo);
+      setRestaurantBanner(`/api/get-user-image?imageName=${user?.restaurantDetails?.banner}`);
+      setValue("restaurantDetails.banner", user?.restaurantDetails?.banner);
+      setAboutUsBanner(`/api/get-user-image?imageName=${user?.restaurantAboutUs?.banner}`);
+      setValue("restaurantAboutUs.banner", user?.restaurantAboutUs?.banner);
+      setAboutUsLogo(`/api/get-user-image?imageName=${user?.restaurantAboutUs?.logo}`);
+      setValue("restaurantAboutUs.logo", user?.restaurantAboutUs?.logo);
+      setWorkingBanner(`/api/get-user-image?imageName=${user?.restaurantAboutUs?.workingHours?.banner}`);
+      setValue("restaurantAboutUs.workingHours.banner", user?.restaurantAboutUs?.workingHours?.banner);
+      setDiscountBanner(`/api/get-user-image?imageName=${user?.restaurantAboutUs?.discount?.banner}`);
+      setValue("restaurantAboutUs.discount.banner", user?.restaurantAboutUs?.discount?.banner);
     }
-    return () => {
-      mounted = false;
-    };
-  }, []);
+  }, [setValue]);
+
+  const handleFileChange = (e, index, onChange) => {
+    const file = e.target.files[0];
+    if (file) {
+      // Update the state with the new selected image URL
+      const imageURL = URL.createObjectURL(file);
+      setFeatureLogos((prevLogos) => ({
+        ...prevLogos,
+        [index]: imageURL,
+      }));
+      onChange(file);
+    }
+  };
 
   const onSubmit = async (data) => {
     try {
+
+      console.log("data", data);
       const formData = new FormData();
 
       formData.append("email", data.email);
@@ -239,10 +272,7 @@ const TabAccount = () => {
       // Append restaurantDetails fields
       formData.append("restaurantName", data.restaurantDetails.restaurantName);
       formData.append("cnicNumber", data.restaurantDetails.cnicNumber);
-      formData.append(
-        "restaurantOwner",
-        data.restaurantDetails.restaurantOwner,
-      );
+      formData.append("restaurantOwner", data.restaurantDetails.restaurantOwner);
       formData.append("tagline", data.restaurantDetails.tagline);
 
       // Append addressDetails fields
@@ -255,14 +285,8 @@ const TabAccount = () => {
 
       // Append restaurantContactUs fields
       formData.append("contactUsHeading", data.restaurantContactUs.heading);
-      formData.append(
-        "contactUsSubHeading",
-        data.restaurantContactUs.subHeading,
-      );
-      formData.append(
-        "contactUsDescription",
-        data.restaurantContactUs.description,
-      );
+      formData.append("contactUsSubHeading", data.restaurantContactUs.subHeading);
+      formData.append("contactUsDescription", data.restaurantContactUs.description);
 
       // Append restaurantSocialMedia fields
       formData.append("facebook", data.restaurantSocialMedia.facebook);
@@ -278,21 +302,12 @@ const TabAccount = () => {
 
       // Append complex fields
       if (data.restaurantAboutUs.qualities) {
-        formData.append(
-          "qualities",
-          JSON.stringify(data.restaurantAboutUs.qualities),
-        );
+        formData.append("qualities", JSON.stringify(data.restaurantAboutUs.qualities));
       }
 
-      if (
-        data.restaurantAboutUs.features &&
-        data.restaurantAboutUs.features.features
-      ) {
+      if (data.restaurantAboutUs.features && data.restaurantAboutUs.features.features) {
         // Append the description and other text fields of the features
-        formData.append(
-          "features",
-          JSON.stringify(data.restaurantAboutUs.features),
-        );
+        formData.append("features", JSON.stringify(data.restaurantAboutUs.features));
 
         // Append the logos for each feature separately
         data.restaurantAboutUs.features.features.forEach((feature, index) => {
@@ -302,25 +317,41 @@ const TabAccount = () => {
         });
       }
 
-      formData.append(
-        "featuresDescription",
-        data.restaurantAboutUs.features.description,
-      );
+      formData.append("featuresDescription", data.restaurantAboutUs.features.description);
+
+      const parseTime = (timeString) => {
+        const date = new Date(timeString);
+        const options = {
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true,
+          timeZone: 'Asia/Karachi' // Adjust the time zone as needed
+        };
+        return new Intl.DateTimeFormat('en-US', options).format(date);
+      };
+
+      let startTime = typeof data.restaurantAboutUs.workingHours.startTime === 'string'
+        ? parseTime(data.restaurantAboutUs.workingHours.startTime)
+        : parseTime(data.restaurantAboutUs.workingHours.startTime.toString());
+
+      let offTime = typeof data.restaurantAboutUs.workingHours.offTime === 'string'
+        ? parseTime(data.restaurantAboutUs.workingHours.offTime)
+        : parseTime(data.restaurantAboutUs.workingHours.offTime.toString());
+
+      offTime = offTime.split('"').find((item) => item !== "");
+      startTime = startTime.split('"').find((item) => item !== "");
+
+      console.log('Start Time:', startTime);
+      console.log('Off Time:', offTime);
 
       // Append working hours
       formData.append("workingDays", data.restaurantAboutUs.workingHours.days);
-      formData.append(
-        "startTime",
-        data.restaurantAboutUs.workingHours.startTime,
-      );
-      formData.append("offTime", data.restaurantAboutUs.workingHours.offTime);
+      formData.append("startTime", JSON.stringify(startTime));
+      formData.append("offTime", JSON.stringify(offTime));
 
       // Append discount details
       formData.append("discountTitle", data.restaurantAboutUs.discount.title);
-      formData.append(
-        "discountDescription",
-        data.restaurantAboutUs.discount.description,
-      );
+      formData.append("discountDescription", data.restaurantAboutUs.discount.description);
 
       // Handle file uploads (logo, banner, etc.)
       const appendFile = (key, file) => {
@@ -337,20 +368,14 @@ const TabAccount = () => {
       appendFile("aboutUsLogo", data.restaurantAboutUs.logo);
       appendFile("aboutUsBanner", data.restaurantAboutUs.banner);
 
-      // restaurantAboutUs working hourse image fields
+      // restaurantAboutUs working hours image fields
       appendFile("workingBanner", data.restaurantAboutUs.workingHours.banner);
 
       // restaurantAboutUs discount image fields
       appendFile("discountBanner", data.restaurantAboutUs.discount.banner);
 
-      if (data.restaurantAboutUs.features.features) {
-        data.restaurantAboutUs.features.features.forEach((feature, index) => {
-          appendFile(`featuresLogo_${index + 1}`, feature.logo);
-        });
-      }
-
       console.log([...formData.entries()]);
-      console.log("url", url);
+
 
       const response = await axios.post(
         `${url}/RestaurantProfile/${userData._id}/profile`,
@@ -359,15 +384,15 @@ const TabAccount = () => {
           headers: {
             "Content-Type": "multipart/form-data",
           },
-        },
+        }
       );
+
+      console.log("response", response);
 
       if (response.status === 200) {
         const result = response.data;
-        window.localStorage.setItem(
-          "userData",
-          JSON.stringify(result?.updatedUser),
-        );
+        console.log("result", result);
+        window.localStorage.setItem("userData", JSON.stringify(result?.updatedUser));
         console.log("Restaurant updated successfully:", result);
       } else {
         console.error("Error updating restaurant:", response.statusText);
@@ -399,7 +424,7 @@ const TabAccount = () => {
   };
 
   const addQuality = () => {
-    if (qualities.length < 4) {
+    if (qualities.length < 3) {
       setQualities([
         ...qualities,
         {
@@ -421,7 +446,7 @@ const TabAccount = () => {
   };
 
   const addFeature = () => {
-    if (features.length < 4) {
+    if (features.length < 3) {
       setFeatures([
         ...features,
         {
@@ -442,10 +467,6 @@ const TabAccount = () => {
     const newFeatures = features.filter((_, i) => i !== index);
     setFeatures(newFeatures);
   };
-
-  // const handleFormChange = (field, value) => {
-  //   setFormData({ ...formData, [field]: value });
-  // };
 
   return (
     <Grid container spacing={6}>
@@ -504,8 +525,10 @@ const TabAccount = () => {
                         label="Upload High-Quality Restaurant Banner"
                         placeholder="banner"
                         onChange={(e) => {
-                          const file = e.target.files[0]; // Capture the file object
-                          onChange(file); // Pass the file object to React Hook Form
+                          const file = e.target.files[0];
+                          const fileUrl = URL.createObjectURL(file);
+                          setRestaurantBanner(fileUrl);
+                          onChange(file);
                         }}
                         error={Boolean(errors.restaurantDetails?.banner)}
                         helperText={
@@ -516,8 +539,11 @@ const TabAccount = () => {
                       />
                     )}
                   />
+                  {getValues("restaurantDetails.banner") &&
+                    <Grid xs={12} sx={{ mt: 5 }} sm={2}> <ImgStyled src={restaurantBanner} alt="Profile Pic" />
+                    </Grid>
+                  }
                 </Grid>
-
                 <Grid item xs={12} sm={6}>
                   <Controller
                     name="restaurantDetails.restaurantName"
@@ -896,6 +922,8 @@ const TabAccount = () => {
                         // value={value}
                         onChange={(e) => {
                           const file = e.target.files[0]; // Capture the file object
+                          const fileUrl = URL.createObjectURL(file);
+                          setAboutUsLogo(fileUrl);
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(errors?.restaurantAboutUs?.logo)}
@@ -907,6 +935,10 @@ const TabAccount = () => {
                       />
                     )}
                   />
+                  {getValues("restaurantAboutUs.logo") &&
+                    <Grid xs={12} sx={{ mt: 5 }} sm={2}> <ImgStyled src={aboutUsLogo} alt="Profile Pic" />
+                    </Grid>
+                  }
                 </Grid>
                 <Grid item xs={12} sm={6}>
                   <Controller
@@ -922,6 +954,8 @@ const TabAccount = () => {
                         // value={value}
                         onChange={(e) => {
                           const file = e.target.files[0]; // Capture the file object
+                          const fileUrl = URL.createObjectURL(file);
+                          setAboutUsBanner(fileUrl);
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(errors?.restaurantAboutUs?.banner)}
@@ -933,6 +967,11 @@ const TabAccount = () => {
                       />
                     )}
                   />
+                  {getValues("restaurantAboutUs.banner") &&
+                    <Grid xs={12} sx={{ mt: 5 }} sm={2}>
+                      <ImgStyled src={aboutUsBanner} alt="Profile Pic" />
+                    </Grid>
+                  }
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Qualities" />
@@ -993,10 +1032,10 @@ const TabAccount = () => {
                     item
                     xs={12}
                     sx={{
-                      display: "flex",
-                      flexDirection: "row",
-                      alignItems: "center",
-                      justifyContent: "space-between",
+                      display: 'flex',
+                      flexDirection: 'row',
+                      alignItems: 'start',
+                      justifyContent: 'space-between',
                       marginBottom: 5,
                     }}
                   >
@@ -1027,32 +1066,30 @@ const TabAccount = () => {
                             label={`Restaurant Core Value ${index + 1} Logo`}
                             type="file"
                             placeholder="Upload your restaurant's core value logo"
-                            // value={value}
-                            onChange={(e) => {
-                              const file = e.target.files[0]; // Capture the file object
-                              onChange(file); // Pass the file object to React Hook Form
-                            }}
+                            onChange={(e) => handleFileChange(e, index, onChange)} // Handle file selection
                           />
                         )}
                       />
+                      {featureLogos[index] && (
+                        <Grid item xs={12} sm={2} sx={{ mt: 5 }}>
+                          <ImgStyled
+                            src={featureLogos[index]} // Use the corresponding image preview or initial image
+                            alt={`Core Value ${index + 1} Logo Preview`}
+                          />
+                        </Grid>
+                      )}
                     </Grid>
-                    <Grid
-                      item
-                      xs={12}
-                      sm={2}
-                      sx={{ marginTop: 5, marginLeft: 10 }}
-                    >
+                    <Grid item xs={12} sm={2} sx={{ marginTop: 5, marginLeft: 10 }}>
                       {index === features.length - 1 ? (
                         <Button onClick={addFeature}>Add</Button>
                       ) : null}
                       {index !== 0 ? (
-                        <Button onClick={() => removeFeature(index)}>
-                          Remove
-                        </Button>
+                        <Button onClick={() => removeFeature(index)}>Remove</Button>
                       ) : null}
                     </Grid>
                   </Grid>
                 ))}
+
                 <Grid item xs={12} sm={12}>
                   <Controller
                     name="restaurantAboutUs.features.description"
@@ -1121,6 +1158,8 @@ const TabAccount = () => {
                         // value={value}
                         onChange={(e) => {
                           const file = e.target.files[0];
+                          const fileUrl = URL.createObjectURL(file);
+                          setDiscountBanner(fileUrl);
                           onChange(file);
                         }}
                         error={Boolean(
@@ -1134,6 +1173,11 @@ const TabAccount = () => {
                       />
                     )}
                   />
+                  {getValues(`restaurantAboutUs.discount.banner`) &&
+                    <Grid xs={12} sx={{ mt: 5 }} sm={2}>
+                      <ImgStyled src={discountBanner} alt="Profile Pic" />
+                    </Grid>
+                  }
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <Controller
@@ -1252,6 +1296,8 @@ const TabAccount = () => {
                         placeholder="Upload the working hours banner"
                         onChange={(e) => {
                           const file = e.target.files[0]; // Capture the file object
+                          const fileUrl = URL.createObjectURL(file);
+                          setWorkingBanner(fileUrl);
                           onChange(file); // Pass the file object to React Hook Form
                         }}
                         error={Boolean(
@@ -1265,6 +1311,11 @@ const TabAccount = () => {
                       />
                     )}
                   />
+                  {getValues(`restaurantAboutUs.workingHours.banner`) &&
+                    <Grid xs={12} sx={{ mt: 5 }} sm={2}>
+                      <ImgStyled src={workingBanner} alt="Profile Pic" />
+                    </Grid>
+                  }
                 </Grid>
                 <Grid item xs={12} sm={12}>
                   <CardHeader title="Social Links" />

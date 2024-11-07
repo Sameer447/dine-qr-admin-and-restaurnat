@@ -15,7 +15,7 @@ const parseForm = (req, uploadDir) => {
   const form = new formidable.IncomingForm({
     uploadDir,
     keepExtensions: true,
-    maxFileSize: 20 * 1024 * 1024 * 1024 * 1024, // 20MB
+    maxFileSize: 20 * 1024 * 1024, // 20MB
   });
 
   return new Promise((resolve, reject) => {
@@ -110,7 +110,8 @@ export default async function handler(req, res) {
 
     const qualities = JSON.parse(fields.qualities || "[]");
     const features = JSON.parse(fields.features || "[]");
-
+    console.log("Qualities:", qualities);
+    console.log("Features:", features);
     const processedFeatures = features.features?.map((feature, index) => {
       const logoKey = `featuresLogo_${index + 1}`;
       const logoFile = files[logoKey] ? files[logoKey][0] : null;
@@ -118,6 +119,8 @@ export default async function handler(req, res) {
       if (logoFile) {
         const fileName = uploadFile(logoFile, uploadDir);
         feature.logo = fileName;
+      } else if (user.restaurantAboutUs.features.features[index].logo) {
+        feature.logo = user.restaurantAboutUs.features.features[index].logo;
       } else {
         feature.logo = null;
       }
@@ -169,6 +172,7 @@ export default async function handler(req, res) {
       );
     }
 
+
     console.log("tagline:", tagline);
 
     // Update user data
@@ -212,6 +216,8 @@ export default async function handler(req, res) {
       heading: aboutUsHeading[0],
       subHeading: aboutUsSubHeading[0],
       description: aboutUsDescription[0],
+      banner: user.restaurantAboutUs.banner,
+      logo: user.restaurantAboutUs.logo,
       features: {
         description: featuresDescription[0],
         features: processedFeatures,

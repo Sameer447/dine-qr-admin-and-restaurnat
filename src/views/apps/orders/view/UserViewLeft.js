@@ -164,11 +164,12 @@ const UserViewLeft = ({ orderData }) => {
         sx={{ mt: 6 }}
         justifyContent={"center"}
         alignItems={"center"}
+        width={'100%'}
       >
         <Grid container spacing={6} justifyContent={"center"} alignItems={"center"}>
           <Grid item xs={8}>
             <Card>
-              <CardContent sx={{ pt: 18.5, display: "flex", alignItems: "center", flexDirection: "column" }}>
+              <CardContent sx={{ pt: 18.5, paddingX: 60,  display: "flex", alignItems: "center", flexDirection: "column" }}>
                 {orderData.user_name ? (
                   <CustomAvatar skin="light" variant="rounded" color={data.avatarColor} sx={{ width: 100, height: 100, mb: 4, fontSize: "3rem" }}>
                     {getInitials(orderData.user_name)}
@@ -184,7 +185,7 @@ const UserViewLeft = ({ orderData }) => {
 
               <Divider sx={{ my: "0 !important", mx: 6 }} />
 
-              <Box container spacing={1} marginTop={3} justifyContent={"center"}
+              <Box container  spacing={1} marginTop={3} justifyContent={"center"}
                 alignItems={"start"} >
                 {orderData.cart_items.map((item) => (
                   <Grid item xs={12} md={6} lg={4} key={item._id.$oid} justifyContent={'center'} >

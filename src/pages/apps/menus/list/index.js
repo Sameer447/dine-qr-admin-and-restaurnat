@@ -115,8 +115,14 @@ const RowOptions = ({ id, data }) => {
 
   const hadleViewItem = () => {
     router.push({
-      pathname: `/apps/menus/view/add-menu-item`,
-      query: { id: id, data: JSON.stringify(data) },
+      pathname: `/apps/menus/view/menu-item/${id}`,
+    });
+    handleRowOptionsClose();
+  };
+
+  const hadleEditMenuItem = () => {
+    router.push({
+      pathname: `/apps/menus/edit/menu-item/${id}`,
     });
     handleRowOptionsClose();
   };
@@ -129,8 +135,9 @@ const RowOptions = ({ id, data }) => {
     } catch (error) {
       console.error('Error deleting menu item:', error);
     } finally {
-      setDeleting(false); // Stop loading
+      setDeleting(false);
       handleRowOptionsClose();
+      window.location.reload();
     }
   };
 
@@ -163,7 +170,7 @@ const RowOptions = ({ id, data }) => {
           <Icon icon="tabler:eye" fontSize={20} />
           View
         </MenuItem>
-        <MenuItem onClick={handleRowOptionsClose} sx={{ "& svg": { mr: 2 } }}>
+        <MenuItem onClick={hadleEditMenuItem} sx={{ "& svg": { mr: 2 } }}>
           <Icon icon="tabler:edit" fontSize={20} />
           Edit
         </MenuItem>
@@ -365,7 +372,7 @@ const columns = [
     minWidth: 100,
     field: "price",
     headerName: "Price",
-    renderCell: ({ row }) => <Typography noWrap>${row.price}</Typography>,
+    renderCell: ({ row }) => <Typography noWrap>{row.price} RS</Typography>,
   },
   {
     flex: 0.1,

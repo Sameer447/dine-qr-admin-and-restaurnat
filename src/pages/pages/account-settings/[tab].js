@@ -29,7 +29,7 @@ export const getStaticProps = async ({ params }) => {
 
   return {
     props: {
-      tab: params?.tab,
+      tab: 'security',
       apiPricingPlanData: data.pricingPlans,
     },
   };

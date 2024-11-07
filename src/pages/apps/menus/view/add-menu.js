@@ -1,7 +1,7 @@
 // ** Third Party Imports
 "use client"
 import React, { useEffect } from "react";
-import MenuForm from "src/views/apps/menus/view/menuForm";
+import MenuForm from "../../../../views/apps/menus/view/menuForm";
 
 // ** Demo Components Imports
 

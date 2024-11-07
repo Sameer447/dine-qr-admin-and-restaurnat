@@ -166,8 +166,7 @@ const ResetPassword = () => {
         if (response?.status === 200) {
           if (!response.error) {
             toast.success(
-              `Password ${
-                type === "reset-password" ? "Reset" : "Set"
+              `Password ${type === "reset-password" ? "Reset" : "Set"
               } Successfully`,
             );
           }

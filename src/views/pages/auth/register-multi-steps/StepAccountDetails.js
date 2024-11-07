@@ -193,7 +193,7 @@ const StepAccountDetails = ({ handleNext, setRestaurantData }) => {
                 <CustomTextField
                   fullWidth
                   label="CNIC (Without Dashes)"
-                  placeholder="00000-0000000-0"
+                  placeholder="0000000000000"
                   maxLength="13"
                   type="tel"
                   value={value}

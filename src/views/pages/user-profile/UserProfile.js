@@ -26,6 +26,7 @@ import Profile from "src/views/pages/user-profile/profile";
 import Projects from "src/views/pages/user-profile/projects";
 import Connections from "src/views/pages/user-profile/connections";
 import UserProfileHeader from "src/views/pages/user-profile/UserProfileHeader";
+import TabAccount from "../account-settings/TabAccount";
 
 const TabList = styled(MuiTabList)(({ theme }) => ({
   borderBottom: "0 !important",
@@ -97,7 +98,8 @@ const UserProfile = ({ tab, data }) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <UserProfileHeader userData={data} />
+        <TabAccount/>
+        {/* <UserProfileHeader userData={data} /> */}
       </Grid>
       {/* {activeTab === undefined ? null : (
         <Grid item xs={12}>
