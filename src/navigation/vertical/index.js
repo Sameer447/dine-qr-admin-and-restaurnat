@@ -1,3 +1,4 @@
+
 const navigation = (role) => {
   return [
     {
@@ -6,15 +7,15 @@ const navigation = (role) => {
       children: [
         !role
           ? {
-              title: "Orders",
-              path: "/dashboards/orders/list",
-            }
+            title: "Orders",
+            path: "/dashboards/orders/list",
+          }
           : {
-              title: "Restaurants",
-              icon: "tabler:home",
-              path: "/dashboards/restaurants/list",
-            },
-      ].filter(Boolean), 
+            title: "Restaurants",
+            icon: "tabler:home",
+            path: "/dashboards/restaurants/list",
+          },
+      ].filter(Boolean),
     },
     // !role && {
     //   title: "Invoice",
@@ -58,6 +59,11 @@ const navigation = (role) => {
           ],
         },
       ],
+    },
+    !role && {
+      title: "Add Billing",
+      icon: "tabler:credit-card",
+      path: "/add-billing",
     },
   ].filter(Boolean);
 };
