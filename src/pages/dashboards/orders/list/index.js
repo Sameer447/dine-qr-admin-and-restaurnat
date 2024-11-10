@@ -64,7 +64,7 @@ const userStatusObj = {
 const renderClient = (row) => {
   if (row.images && row.images.length) {
     return (
-      <Box sx={{ display: 'flex', gap: 1 }}>
+      <Box sx={{ display: "flex", gap: 1 }}>
         {row.images.map((image, index) => (
           <CustomAvatar
             key={index}
@@ -92,7 +92,6 @@ const renderClient = (row) => {
     );
   }
 };
-
 
 const RowOptions = ({ id, data }) => {
   // ** Hooks
@@ -190,7 +189,7 @@ const columns = [
             <Typography
               noWrap
               component={Link}
-              href="/apps/user/view/account"
+              href="/dashboards/orders/view/account"
               sx={{
                 fontWeight: 500,
                 textDecoration: "none",
@@ -268,8 +267,9 @@ const columns = [
               <div>
                 {row?.cart_items.map((item, index) => (
                   <span key={item._id}>
-                    {`${item.food_name} ${index < row?.cart_items.length - 1 ? ", " : ""
-                      }`}
+                    {`${item.food_name} ${
+                      index < row?.cart_items.length - 1 ? ", " : ""
+                    }`}
                   </span>
                 ))}
               </div>
@@ -327,7 +327,7 @@ const UserList = ({ apiData }) => {
   // ** State
   const [role, setRole] = useState("");
   const [plan, setPlan] = useState("");
-  const [value, setValue] = useState("");
+  const [value, setValue] = useState("Pending");
   const [status, setStatus] = useState("");
   const [addUserOpen, setAddUserOpen] = useState(false);
   const [paginationModel, setPaginationModel] = useState({
@@ -356,6 +356,13 @@ const UserList = ({ apiData }) => {
   }, []);
 
   const handleStatusChange = useCallback((e) => {
+    console.log("store.orders", store.orders);
+
+    const data = store.orders.filter(
+      (item) => item.status === e.target.value.toLowerCase(),
+    );
+    console.log("data => ", data);
+
     setStatus(e.target.value);
   }, []);
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);
@@ -378,9 +385,9 @@ const UserList = ({ apiData }) => {
       <Grid item xs={12}>
         <Card>
           <CardHeader title="Orders" />
-          {/* <CardContent>
+          <CardContent>
             <Grid container spacing={6}>
-              <Grid item sm={4} xs={12}>
+              {/*<Grid item sm={4} xs={12}>
                 <CustomTextField
                   select
                   fullWidth
@@ -416,7 +423,7 @@ const UserList = ({ apiData }) => {
                   <MenuItem value="enterprise">Enterprise</MenuItem>
                   <MenuItem value="team">Team</MenuItem>
                 </CustomTextField>
-              </Grid>
+              </Grid> */}
               <Grid item sm={4} xs={12}>
                 <CustomTextField
                   select
@@ -429,13 +436,15 @@ const UserList = ({ apiData }) => {
                   }}
                 >
                   <MenuItem value="">Select Status</MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="active">Active</MenuItem>
-                  <MenuItem value="inactive">Inactive</MenuItem>
+                  <MenuItem value="Pending">Pending</MenuItem>
+                  <MenuItem value="preparing">Preparing</MenuItem>
+                  <MenuItem value="ready">Ready</MenuItem>
+                  <MenuItem value="canceled">Canceled</MenuItem>
+                  <MenuItem value="delivered">Delivered</MenuItem>
                 </CustomTextField>
               </Grid>
             </Grid>
-          </CardContent> */}
+          </CardContent>
           <Divider sx={{ m: "0 !important" }} />
           {/* <TableHeader
             value={value}
@@ -445,7 +454,7 @@ const UserList = ({ apiData }) => {
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={store.orders}
+            rows={store.orders.filter((item) => item.status === status)}
             columns={columns}
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
