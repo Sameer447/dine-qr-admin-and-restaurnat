@@ -176,7 +176,6 @@ const columns = [
       const { user_name, user_email, cart_items } = row;
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {/* Assuming we want to show the first item's images */}
           {cart_items && cart_items.length > 0 && renderClient(cart_items[0])}
 
           <Box
@@ -267,9 +266,8 @@ const columns = [
               <div>
                 {row?.cart_items.map((item, index) => (
                   <span key={item._id}>
-                    {`${item.food_name} ${
-                      index < row?.cart_items.length - 1 ? ", " : ""
-                    }`}
+                    {`${item.food_name} ${index < row?.cart_items.length - 1 ? ", " : ""
+                      }`}
                   </span>
                 ))}
               </div>
@@ -454,7 +452,7 @@ const UserList = ({ apiData }) => {
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={store.orders.filter((item) => item.status === status)}
+            rows={status ? store.orders.filter((item) => item.status === status) : store.orders}
             columns={columns}
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
