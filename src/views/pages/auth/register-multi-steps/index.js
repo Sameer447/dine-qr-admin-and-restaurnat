@@ -41,11 +41,11 @@ const steps = [
     icon: 'tabler:users',
     subtitle: 'Restaurant Address Information'
   },
-  // {
-  //   title: 'Billing',
-  //   icon: 'tabler:file-text',
-  //   subtitle: 'Payment Details'
-  // }
+  {
+    title: 'Billing',
+    icon: 'tabler:file-text',
+    subtitle: 'Payment Details'
+  }
 ]
 
 const Step = styled(MuiStep)(({ theme }) => ({
@@ -98,7 +98,17 @@ const RegisterMultiSteps = () => {
     registrationNumber: "",
     email: "",
     retaurantOwner: "" 
-   });  
+   });
+  
+   const [personaDetail , SetPersonalDetails] = useState({ 
+    mobile: "",
+    zipcode: "",
+    address: "",
+    landmark: "",
+    city: "",
+    state: "" 
+   });
+   
 
   // ** Hooks & Var
   const { settings } = useSettings()
@@ -140,9 +150,9 @@ const RegisterMultiSteps = () => {
       case 0:
         return <StepAccountDetails handleNext={handleNext} setRestaurantData={setRestaurantData} />
       case 1:
-        return <StepPersonalInfo handleNext={handleNext} handlePrev={handlePrev} restaurantData={restaurantData} />
-      // case 2:
-      //   return <StepBillingDetails handlePrev={handlePrev} />
+        return <StepPersonalInfo handleNext={handleNext} handlePrev={handlePrev} SetPersonalDetails={SetPersonalDetails} />
+      case 2:
+        return <StepBillingDetails handlePrev={handlePrev}  restaurantData={restaurantData} personaDetail={personaDetail} />
       default:
         return null
     }

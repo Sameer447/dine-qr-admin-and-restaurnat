@@ -27,83 +27,17 @@ const defaultValues = {
   state: "",
 };
 
-const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
+const StepPersonalDetails = ({ handleNext, handlePrev, SetPersonalDetails }) => {
   const {
     control,
     handleSubmit,
     formState: { errors },
     resetField,
   } = useForm({ defaultValues });
-  const [loading, setLoading] = useState(false);
 
   const onSubmit = async (formData) => {
-    try {
-      setLoading(true);
-      const email = restaurantData.email;
-      const res = await axios.get(`/api/Emailcheck/${email}/emailcheck`, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (res.status === 200) {
-        toast.success("Account Already Exist");
-        setLoading(false);
-      } else {
-        const completeData = new FormData();
-        // Append restaurant details
-        completeData.append("role", "Resturant");
-        completeData.append("email", restaurantData.email);
-        completeData.append("logo", restaurantData.logo);
-        completeData.append("tagline", restaurantData.tagline);
-        completeData.append("restaurantName", restaurantData.restaurantName);
-        completeData.append("cnicNumber", restaurantData.registrationNumber);
-        completeData.append("restaurantOwner", restaurantData.retaurantOwner);
-
-        // Append address details
-        completeData.append("mobile", formData.mobile);
-        completeData.append("zipcode", formData.zipcode);
-        completeData.append("address", formData.address);
-        completeData.append("landmark", formData.landmark);
-        completeData.append("city", formData.city);
-        completeData.append("state", formData.state);
-
-        const response = await axios.post(
-          `/api/Verification_SignUp/verification`,
-          completeData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          },
-        );
-
-        if (response.status === 200) {
-          toast.success("We have sent you an email please verify your account");
-          setLoading(false);
-          resetField("address");
-          resetField("city");
-          resetField("landmark");
-          resetField("mobile");
-          resetField("state");
-          resetField("zipcode");
-          handlePrev();
-        } else if (response.status === 400) {
-          console.error("Error creating account:", response.data.message);
-          toast.error(response.data.message);
-          setLoading(false);
-        } else if (response.status === 500) {
-          console.error("Error creating account:", response.data.message);
-          toast.error(response.data.message);
-          setLoading(false);
-        }
-      }
-    } catch (error) {
-      console.error("Error signing up:", error);
-      toast.error(error);
-      setLoading(false);
-    } finally {
-      setLoading(false);
-    }
+    handleNext();
+    SetPersonalDetails(formData);
   };
 
   return (
@@ -270,12 +204,13 @@ const StepPersonalDetails = ({ handleNext, handlePrev, restaurantData }) => {
                 <Icon fontSize="1.125rem" icon="tabler:arrow-left" />
                 Previous
               </Button>
-              <Button variant="contained" color="success" type="submit">
-                {loading ? (
-                  <CircularProgress size={24} thickness={6} color="inherit" />
-                ) : (
-                  <text>Submit</text>
-                )}
+              <Button
+                variant="contained"
+                type="submit"
+                sx={{ "& svg": { ml: 2 } }}
+              >
+                Next
+                <Icon fontSize="1.125rem" icon="tabler:arrow-right" />
               </Button>
             </Box>
           </Grid>

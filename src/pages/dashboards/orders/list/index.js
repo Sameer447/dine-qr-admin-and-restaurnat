@@ -444,11 +444,6 @@ const UserList = ({ apiData }) => {
             </Grid>
           </CardContent>
           <Divider sx={{ m: "0 !important" }} />
-          {/* <TableHeader
-            value={value}
-            handleFilter={handleFilter}
-            toggle={toggleAddUserDrawer}
-          /> */}
           <DataGrid
             autoHeight
             rowHeight={62}
