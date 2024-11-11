@@ -16,6 +16,8 @@ export const fetchOrdersData = createAsyncThunk(
     const response = await axios.get(
       `${serviceUrl}/get-orders?restaurant_id=${user._id}`,
     );
+    console.log("response", response);
+
     return response.data;
   },
 );
