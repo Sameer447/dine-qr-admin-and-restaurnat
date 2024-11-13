@@ -296,6 +296,8 @@ const UserList = ({ apiData }) => {
     page: 0,
     pageSize: 10,
   });
+  const [allRestaurantsItems, setAllRestaurantsItems] = useState([]); 
+  const [paginatedItems, setPaginatedItems] = useState([]);
 
   // ** Hooks
   const dispatch = useDispatch();
@@ -303,6 +305,20 @@ const UserList = ({ apiData }) => {
   useEffect(() => {
     dispatch(fetchData());
   }, []);
+
+  useEffect(() => {
+     setAllRestaurantsItems(store)
+  }, [store])
+
+  useEffect(() => {
+    const start = paginationModel.page * paginationModel.pageSize;
+    const end = start + paginationModel.pageSize;
+    setPaginatedItems(allRestaurantsItems?.slice(start, end));
+  }, [allRestaurantsItems, paginationModel]);
+
+   const handlePaginationChange = (model) => {
+    setPaginationModel(model); 
+  };
 
   const handleFilter = useCallback((val) => {
     setValue(val);
@@ -407,12 +423,15 @@ const UserList = ({ apiData }) => {
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={store}
+            rows={paginatedItems}
             columns={columns}
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
             paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
+            onPaginationModelChange={handlePaginationChange}
+            paginationMode="server"
+            rowCount={paginatedItems.length}
+            getRowId={(row) => row._id}
           />
         </Card>
       </Grid>

@@ -332,6 +332,8 @@ const UserList = ({ apiData }) => {
     page: 0,
     pageSize: 10,
   });
+  const [allOrdersItems, setAllOrdersItems] = useState([]); 
+  const [paginatedItems, setPaginatedItems] = useState([]);
 
   // ** Hooks
   const dispatch = useDispatch();
@@ -340,6 +342,20 @@ const UserList = ({ apiData }) => {
   useEffect(() => {
     dispatch(fetchOrdersData());
   }, []);
+
+  useEffect(() => {
+     setAllOrdersItems(store.orders)
+  }, [store.orders.length])
+
+  useEffect(() => {
+    const start = paginationModel.page * paginationModel.pageSize;
+    const end = start + paginationModel.pageSize;
+    setPaginatedItems(allOrdersItems?.slice(start, end));
+  }, [allOrdersItems, paginationModel]);
+
+  const handlePaginationChange = (model) => {
+    setPaginationModel(model); 
+  };
 
   const handleFilter = useCallback((val) => {
     setValue(val);
@@ -447,12 +463,15 @@ const UserList = ({ apiData }) => {
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={status ? store.orders.filter((item) => item.status === status) : store.orders}
+            rows={status ? paginatedItems.filter((item) => item.status === status) : paginatedItems}
             columns={columns}
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
             paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
+            // onPaginationModelChange={setPaginationModel}
+            onPaginationModelChange={handlePaginationChange}
+            paginationMode="server"
+            rowCount={paginatedItems.length}
             getRowId={(row) => row._id}
           />
         </Card>
