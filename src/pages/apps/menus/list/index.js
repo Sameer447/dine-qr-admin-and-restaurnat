@@ -186,125 +186,6 @@ const RowOptions = ({ id, data }) => {
     </>
   );
 };
-
-// {
-//   flex: 0.25,
-//   minWidth: 280,
-//   field: "fullName",
-//   headerName: "Menu Item Name",
-//   renderCell: ({ row }) => {
-//     const { fullName, email } = row;
-
-//     return (
-//       <Box sx={{ display: "flex", alignItems: "center" }}>
-//         {renderClient(row)}
-//         <Box
-//           sx={{
-//             display: "flex",
-//             alignItems: "flex-start",
-//             flexDirection: "column",
-//           }}
-//         >
-//           <Typography
-//             noWrap
-//             component={Link}
-//             href="/apps/user/view/account"
-//             sx={{
-//               fontWeight: 500,
-//               textDecoration: "none",
-//               color: "text.secondary",
-//               "&:hover": { color: "primary.main" },
-//             }}
-//           >
-//             {fullName}
-//           </Typography>
-//           <Typography noWrap variant="body2" sx={{ color: "text.disabled" }}>
-//             {email}
-//           </Typography>
-//         </Box>
-//       </Box>
-//     );
-//   },
-// },
-// {
-//   flex: 0.15,
-//   minWidth: 120,
-//   headerName: "Category",
-//   field: "Category",
-//   renderCell: ({ row }) => {
-//     return (
-//       <Typography
-//         noWrap
-//         sx={{
-//           fontWeight: 500,
-//           color: "text.secondary",
-//           textTransform: "capitalize",
-//         }}
-//       >
-//         {row.currentPlan}
-//       </Typography>
-//     );
-//   },
-// },
-// {
-//   flex: 0.15,
-//   minWidth: 190,
-//   field: "Sub Category",
-//   headerName: "Sub Category",
-//   renderCell: ({ row }) => {
-//     return (
-//       <Typography noWrap sx={{ color: "text.secondary" }}>
-//         {row.billing}
-//       </Typography>
-//     );
-//   },
-// },
-// {
-//   flex: 0.15,
-//   minWidth: 190,
-//   field: "Speciality Tags",
-//   headerName: "Speciality Tags",
-//   renderCell: ({ row }) => {
-//     return (
-//       <Typography noWrap sx={{ color: "text.secondary" }}>
-//         {row.billing}
-//       </Typography>
-//     );
-//   },
-// },
-// {
-//   flex: 0.15,
-//   minWidth: 190,
-//   field: "Cuisine",
-//   headerName: "Cuisine",
-//   renderCell: ({ row }) => {
-//     return (
-//       <Typography noWrap sx={{ color: "text.secondary" }}>
-//         {row.billing}
-//       </Typography>
-//     );
-//   },
-// },
-
-// {
-//   flex: 0.1,
-//   minWidth: 110,
-//   field: "status",
-//   headerName: "Status",
-//   renderCell: ({ row }) => {
-//     return (
-//       <CustomChip
-//         rounded
-//         skin="light"
-//         size="small"
-//         label={row.status}
-//         color={userStatusObj[row.status]}
-//         sx={{ textTransform: "capitalize" }}
-//       />
-//     );
-//   },
-// },
-
 const columns = [
   {
     flex: 0.2,
@@ -404,13 +285,29 @@ const UserList = ({ apiData }) => {
     page: 0,
     pageSize: 10,
   });
+  const [allFoodItems, setAllFoodItems] = useState([]); 
+  const [paginatedItems, setPaginatedItems] = useState([]);
 
   // ** Hooks
   const dispatch = useDispatch();
-  const foodItems = useSelector((state) => state.restaurants.foodItems); // Access the food items data
+  // const foodItems = useSelector((state) => state.restaurants.foodItems); // Access the food items data
   useEffect(() => {
-    dispatch(fetchMenuItems());
+    const fetchAllData = async () => {
+      const response = await dispatch(fetchMenuItems()); 
+      setAllFoodItems(response.payload); 
+    };
+    fetchAllData();
   }, [dispatch]);
+
+  useEffect(() => {
+    const start = paginationModel.page * paginationModel.pageSize;
+    const end = start + paginationModel.pageSize;
+    setPaginatedItems(allFoodItems.slice(start, end));
+  }, [allFoodItems, paginationModel]);
+
+  const handlePaginationChange = (model) => {
+    setPaginationModel(model); 
+  };
 
   const handleFilter = useCallback((val) => {
     setValue(val);
@@ -431,81 +328,9 @@ const UserList = ({ apiData }) => {
 
   return (
     <Grid container spacing={6.5}>
-      {/* <Grid item xs={12}>
-        {apiData && (
-          <Grid container spacing={6}>
-            {apiData.statsHorizontalWithDetails.map((item, index) => {
-              return (
-                <Grid item xs={12} md={3} sm={6} key={index}>
-                  <CardStatsHorizontalWithDetails {...item} />
-                </Grid>
-              );
-            })}
-          </Grid>
-        )}
-      </Grid> */}
       <Grid item xs={12}>
         <Card>
           <CardHeader title="Menu Items" />
-          {/* <CardContent>
-            <Grid container spacing={6}>
-              <Grid item sm={4} xs={12}>
-                <CustomTextField
-                  select
-                  fullWidth
-                  defaultValue="Select Billing"
-                  SelectProps={{
-                    value: role,
-                    displayEmpty: true,
-                    onChange: (e) => handleRoleChange(e),
-                  }}
-                >
-                  <MenuItem value="">Select Billing</MenuItem>
-                  <MenuItem value="Auto Debit">Auto Debit</MenuItem>
-                  <MenuItem value="Manual-Paypal">Manual-Paypal</MenuItem>
-                  <MenuItem value="Manual-Cash">Manual-Cash</MenuItem>
-                  <MenuItem value="Manual-Credit Card">
-                    Manual-Credit Card
-                  </MenuItem>
-                </CustomTextField>
-              </Grid>
-              <Grid item sm={4} xs={12}>
-                <CustomTextField
-                  select
-                  fullWidth
-                  defaultValue="Select Plan"
-                  SelectProps={{
-                    value: plan,
-                    displayEmpty: true,
-                    onChange: (e) => handlePlanChange(e),
-                  }}
-                >
-                  <MenuItem value="">Select Plan</MenuItem>
-                  <MenuItem value="basic">Basic</MenuItem>
-                  <MenuItem value="company">Company</MenuItem>
-                  <MenuItem value="enterprise">Enterprise</MenuItem>
-                  <MenuItem value="team">Team</MenuItem>
-                </CustomTextField>
-              </Grid>
-              <Grid item sm={4} xs={12}>
-                <CustomTextField
-                  select
-                  fullWidth
-                  defaultValue="Select Status"
-                  SelectProps={{
-                    value: status,
-                    displayEmpty: true,
-                    onChange: (e) => handleStatusChange(e),
-                  }}
-                >
-                  <MenuItem value="">Select Status</MenuItem>
-                  <MenuItem value="pending">Pending</MenuItem>
-                  <MenuItem value="active">Active</MenuItem>
-                  <MenuItem value="inactive">Inactive</MenuItem>
-                </CustomTextField>
-              </Grid>
-            </Grid>
-          </CardContent> */}
           <Divider sx={{ m: "0 !important" }} />
           {/* <TableHeader
             value={value}
@@ -515,13 +340,16 @@ const UserList = ({ apiData }) => {
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={foodItems}
+            rows={paginatedItems}
             columns={columns}
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
             paginationModel={paginationModel}
-            onPaginationModelChange={setPaginationModel}
-            getRowId={(row) => row._id} // Specify _id as the unique identifier
+            // onPaginationModelChange={setPaginationModel}
+            onPaginationModelChange={handlePaginationChange}
+            paginationMode="server"
+            rowCount={paginatedItems.length}
+            getRowId={(row) => row._id}
           />
         </Card>
       </Grid>
