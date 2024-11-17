@@ -10,13 +10,14 @@ export default async function handler(req, res) {
   try {
     const user = await User.findOne({ email }).lean();
     if (!user) {
-      return res.status(400).json({ status: 404, message: "User Not Found" });
+      return res.json({ status: 404, message: "User Not Found" });
+    }
+    if (!user.isActivated) {
+      return res.json({ status: 401, message: "Unauthorized Access" });
     }
     const isPasswordCorrect = await bcrypt.compare(password, user.password);
     if (!isPasswordCorrect) {
-      return res
-        .status(401)
-        .json({ status: 400, message: "Incorrect Password" });
+      return res.json({ status: 500, message: "Incorrect Password" });
     }
     const { password: _, ...userData } = user;
     return res.status(200).json({

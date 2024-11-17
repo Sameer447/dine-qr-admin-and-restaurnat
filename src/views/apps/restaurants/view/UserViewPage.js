@@ -6,11 +6,11 @@ import Grid from "@mui/material/Grid";
 import UserViewLeft from "src/views/apps/restaurants/view/UserViewLeft";
 import UserViewRight from "src/views/apps/restaurants/view/UserViewRight";
 
-const UserView = ({ tab, invoiceData, userData }) => {
+const UserView = ({ tab, invoiceData, userData , billingData }) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12} md={12} lg={12}>
-        <UserViewLeft userData={userData} />
+        <UserViewLeft userData={userData} billingData={billingData} />
       </Grid>
       {/* <Grid item xs={12} md={7} lg={8}>
         <UserViewRight

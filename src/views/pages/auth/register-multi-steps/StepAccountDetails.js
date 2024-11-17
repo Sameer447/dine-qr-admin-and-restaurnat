@@ -1,5 +1,5 @@
 // ** React Imports
-import { useState, forwardRef } from "react";
+import { useState, forwardRef, useEffect } from "react";
 
 // ** MUI Components
 import Box from "@mui/material/Box";
@@ -39,35 +39,29 @@ const defaultValues = {
   email: "",
   retaurantOwner: "",
 };
-const StepAccountDetails = ({ handleNext, setRestaurantData }) => {
+const StepAccountDetails = ({ handleNext, setRestaurantData , restaurantData }) => {
   // ** States
   const [image, setImage] = useState(null);
-  // ** Hooks
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({ defaultValues });
+  const { control, handleSubmit, formState: { errors }, setValue } = useForm({ defaultValues: restaurantData });
 
-  // ** Vars
+  useEffect(() => {
+    if (restaurantData.logo) {
+      setImage(URL.createObjectURL(restaurantData.logo));
+    }
+  }, [restaurantData.logo]);
+
   const onSubmit = (data) => {
-    setRestaurantData({
-      ...data,
-    })
-    // toast.success("Form Submitted");
+    setRestaurantData(data);
     handleNext();
   };
 
   const onImageSelect = (e) => {
     const { files } = e.target;
     if (files && files.length !== 0) {
-      const url = URL.createObjectURL(files[0]);
-      setImage(url);
+      const file = files[0];
+      setImage(URL.createObjectURL(file));
+      setValue("logo", file);
     }
-  };
-
-  const handleNumberInput = (e) => {
-    const value = e.target.value.replace(/\D/g, "");
   };
 
 
@@ -255,11 +249,11 @@ const StepAccountDetails = ({ handleNext, setRestaurantData }) => {
             xs={12}
             sx={{ pt: (theme) => `${theme.spacing(6)} !important` }}
           >
-            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-              <Button disabled variant="tonal" sx={{ "& svg": { mr: 2 } }}>
+            <Box sx={{ display: "flex", justifyContent: "end", alignItems: "end" }}>
+              {/* <Button disabled variant="tonal" sx={{ "& svg": { mr: 2 } }}>
                 <Icon fontSize="1.125rem" icon="tabler:arrow-left" />
                 Previous
-              </Button>
+              </Button> */}
               <Button
                 variant="contained"
                 type="submit"

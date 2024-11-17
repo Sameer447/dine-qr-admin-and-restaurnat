@@ -150,10 +150,16 @@ const LoginPage = () => {
         },
       );
 
-      if (response.status === 200) {
+      if (response.data.status === 200) {
         const user = response.data;
         await auth.login({ email, password, rememberMe, isSuperAdmin });
         toast.success("Logged in successfully");
+      } else if (response.data.status === 401) {
+        toast.error(response.data.message);
+      } else if (response.data.status === 404) {
+        toast.error(response.data.message);
+      } else if (response.data.status === 500) {
+        toast.error(response.data.message);
       } else {
         toast.error(response.data.message);
       }

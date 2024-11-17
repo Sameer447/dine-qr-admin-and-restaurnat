@@ -172,13 +172,11 @@ export default async function handler(req, res) {
       );
     }
 
-
     console.log("tagline:", tagline);
 
     // Update user data
     user.email = email[0];
     user.role = role[0];
-    user.isActivated = isActivated[0] === "true";
 
     user.restaurantDetails = {
       restaurantName: restaurantName[0],

@@ -11,15 +11,34 @@ const UserView = ({ tab, invoiceData }) => {
   const router = useRouter();
   const { id } = router.query;
   const [userData, setUserData] = useState(null);
+  const [billingData, setBillingData] = useState(null);
+
   useEffect(() => {
-    axios.get("/api/UserById/route?id=" + id).then((res) => {
-      setUserData(res.data);
-    });
-  }, [router.query.id]);
+    if (id) {
+      axios.get(`/api/UserById/route?id=${id}`).then((res) => {
+        setUserData(res.data);
+      }).catch((error) => {
+        console.error("Error fetching user data:", error);
+      });
+
+      axios.get(`/api/get-billing-data?id=${id}`).then((res) => {
+        setBillingData(res.data);
+      }).catch((error) => {
+        console.error("Error fetching billing data:", error);
+      });
+    }
+  }, [id]);
+
   return (
-    <UserViewPage tab={tab} invoiceData={invoiceData} userData={userData} />
+    <UserViewPage 
+      tab={tab} 
+      invoiceData={invoiceData} 
+      userData={userData}
+      billingData={billingData}
+    />
   );
 };
+
 
 export const getStaticPaths = () => {
   return {

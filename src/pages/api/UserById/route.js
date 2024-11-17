@@ -9,7 +9,7 @@ export default async function handler(req, res) {
     }
 
     try {
-      const user = await User.findOne({ id });
+      const user = await User.findOne({ _id: id });
 
       if (!user) {
         return res.status(404).json({ message: "User not found" });

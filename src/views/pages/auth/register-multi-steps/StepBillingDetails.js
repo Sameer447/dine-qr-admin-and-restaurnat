@@ -5,29 +5,29 @@ import { useState } from 'react'
 import Box from '@mui/material/Box'
 import Grid from '@mui/material/Grid'
 import Button from '@mui/material/Button'
-import Tooltip from '@mui/material/Tooltip'
 import Typography from '@mui/material/Typography'
 import FormControl from '@mui/material/FormControl'
-import InputAdornment from '@mui/material/InputAdornment'
-
-// ** Third Party Imports
-import Payment from 'payment'
 
 // ** Icon Imports
 import Icon from 'src/@core/components/icon'
 
 // ** Custom Components Imports
 import CustomTextField from 'src/@core/components/mui/text-field'
-import CustomRadioIcons from 'src/@core/components/custom-radio/icons'
-
-// ** Util Import
-import { formatCVC, formatExpirationDate, formatCreditCardNumber } from 'src/@core/utils/format'
 
 // ** Styles Import
 import 'react-credit-cards/es/styles-compiled.css'
-import { CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem } from '@mui/material'
+import { CircularProgress, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, MenuItem, Radio } from '@mui/material'
 import toast from 'react-hot-toast'
 import axios from 'axios'
+import { ServiceUrl } from '../../../../@core/utils/global'
+// import Button from '@mui/material/Button'
+import { styled } from '@mui/material/styles'
+
+// // ** Util Import
+import { hexToRGBA } from 'src/@core/utils/hex-to-rgba'
+
+// // ** Custom Components Imports
+import CustomChip from 'src/@core/components/mui/chip'
 
 const data = [
   {
@@ -66,7 +66,7 @@ const data = [
     ),
     content: (
       <Box sx={{ my: 'auto', display: 'flex', alignItems: 'center', flexDirection: 'column' }}>
-        <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>For small to medium businesses</Typography>
+        <Typography sx={{ textAlign: 'center', color: 'text.secondary' }}>For every businesses</Typography>
         <Box sx={{ mt: 1, display: 'flex' }}>
           <Typography component='sup' sx={{ mt: 1.5, color: 'primary.main', alignSelf: 'flex-start' }}>
             RS
@@ -109,14 +109,28 @@ const data = [
   }
 ]
 
-const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
-  const initialSelected = data.filter(item => item.isSelected)[data.filter(item => item.isSelected).length - 1].value
+
+
+// // ** Styled Component for the wrapper of whole component
+const BoxWrapper = styled(Box)(({ theme }) => ({
+  position: 'relative',
+  padding: theme.spacing(6),
+  paddingTop: theme.spacing(16),
+  borderRadius: theme.shape.borderRadius
+}))
+
+// ** Styled Component for the wrapper of all the features of a plan
+const BoxFeature = styled(Box)(({ theme }) => ({
+  marginBottom: theme.spacing(4),
+  '& > :not(:last-child)': {
+    marginBottom: theme.spacing(2.5)
+  }
+}))
+
+
+const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail, resetSteps }) => {
 
   // ** State
-  // const [cvc, setCvc] = useState('');
-  // const [name, setName] = useState('');
-  // const [expiry, setExpiry] = useState('');
-  const [selectedRadio, setSelectedRadio] = useState('standard')
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState({
     _id: '',
     payment_method: '',
@@ -128,9 +142,6 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
   const [loading, setLoading] = useState(false);
 
   const Standard_data_Plan = data.filter(item => item.value === 'standard');
-
-  console.log("restaurantData", restaurantData);
-  console.log("personaDetail", personaDetail);
 
   const paymentMethods = [
     {
@@ -153,23 +164,33 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
     }
   ];
 
-  // const handleInputChange = ({ target }) => {
-  //   if (target.name === 'cardNumber') {
-  //     target.value = formatCreditCardNumber(target.value, Payment);
-  //     setCardNumber(target.value);
-  //   } else if (target.name === 'expiry') {
-  //     target.value = formatExpirationDate(target.value);
-  //     setExpiry(target.value);
-  //   } else if (target.name === 'cvc') {
-  //     target.value = formatCVC(target.value, cardNumber, Payment);
-  //     setCvc(target.value);
-  //   }
-  // };
+  const planBenefits = [
+    'Seamless QR code-based ordering system',
+    'Access to exclusive deals and discounts',
+    'Faster table service with real-time order tracking',
+    'Customizable digital menus',
+    'Integrated payment solutions for quick checkout',
+    'Donation feature to support social causes',
+    'Analytics dashboard for restaurant performance insights',
+    'Customer feedback and rating system',
+    'Secure and scalable cloud-based platform'
+  ];
+
+
+  const renderFeatures = () => {
+    return planBenefits.map((item, index) => (
+      <Box key={index} sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box component='span' sx={{ display: 'inline-flex', color: 'text.secondary', mr: 2.5 }}>
+          <Icon icon='tabler:circle' fontSize='0.875rem' />
+        </Box>
+        <Typography sx={{ color: 'text.secondary' }}>{item}</Typography>
+      </Box>
+    ))
+  }
+
 
   const handlePaymentMethodChange = (e) => {
-    console.log("e payment method", e.target.value);
     const selectedMethod = paymentMethods.find(method => method._id === e.target.value);
-    console.log("selectedMethod", selectedMethod);
     setSelectedPaymentMethod(selectedMethod);
   };
 
@@ -187,7 +208,7 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
     try {
       setLoading(true);
       const email = restaurantData.email;
-      const res = await axios.get(`/api/Emailcheck/${email}/emailcheck`, {
+      const res = await axios.get(`${ServiceUrl}/Emailcheck/${email}/emailcheck`, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -225,7 +246,7 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
         completeData.append("paymentProof", paymentProof);
 
         const response = await axios.post(
-          `/api/Verification_SignUp/verification`,
+          `${ServiceUrl}/Verification_SignUp/verification`,
           completeData,
           {
             headers: {
@@ -242,7 +263,9 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
             }
           );
           setLoading(false);
-          setOpen(true);
+          setTimeout(() => {
+            setOpen(true);
+          }, 6000);
         } else if (response.status === 400) {
           console.error("Error sending request:", response.data.message);
           toast.error(response.data.message);
@@ -262,93 +285,19 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
     }
   };
 
-
-  //////////////////////////////////////  Need this verification signup api //////////////////////////////////////
-
-  // const onSubmit = async (formData) => {
-  //   try {
-  //     setLoading(true);
-  //     const email = restaurantData.email;
-  //     const res = await axios.get(`/api/Emailcheck/${email}/emailcheck`, {
-  //       headers: {
-  //         "Content-Type": "application/json",
-  //       },
-  //     });
-  //     if (res.status === 200) {
-  //       toast.success("Account Already Exist");
-  //       setLoading(false);
-  //     } else {
-  //       const completeData = new FormData();
-  //       // Append restaurant details
-  //       completeData.append("role", "Resturant");
-  //       completeData.append("email", restaurantData.email);
-  //       completeData.append("logo", restaurantData.logo);
-  //       completeData.append("tagline", restaurantData.tagline);
-  //       completeData.append("restaurantName", restaurantData.restaurantName);
-  //       completeData.append("cnicNumber", restaurantData.registrationNumber);
-  //       completeData.append("restaurantOwner", restaurantData.retaurantOwner);
-
-  //       // Append address details
-  //       completeData.append("mobile", formData.mobile);
-  //       completeData.append("zipcode", formData.zipcode);
-  //       completeData.append("address", formData.address);
-  //       completeData.append("landmark", formData.landmark);
-  //       completeData.append("city", formData.city);
-  //       completeData.append("state", formData.state);
-
-  //       const response = await axios.post(
-  //         `/api/Verification_SignUp/verification`,
-  //         completeData,
-  //         {
-  //           headers: {
-  //             "Content-Type": "multipart/form-data",
-  //           },
-  //         },
-  //       );
-
-  //       if (response.status === 200) {
-  //         toast.success("We have sent you an email please verify your account");
-  //         setLoading(false);
-  //         resetField("address");
-  //         resetField("city");
-  //         resetField("landmark");
-  //         resetField("mobile");
-  //         resetField("state");
-  //         resetField("zipcode");
-  //         handlePrev();
-  //       } else if (response.status === 400) {
-  //         console.error("Error creating account:", response.data.message);
-  //         toast.error(response.data.message);
-  //         setLoading(false);
-  //       } else if (response.status === 500) {
-  //         console.error("Error creating account:", response.data.message);
-  //         toast.error(response.data.message);
-  //         setLoading(false);
-  //       }
-  //     }
-  //   } catch (error) {
-  //     console.error("Error signing up:", error);
-  //     toast.error(error);
-  //     setLoading(false);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
-
-
   const handleClose = () => {
     setOpen(false);
-    window.location.href = '/signup';
+    resetSteps();
   };
 
+  const [image, setImage] = useState(null);
 
-  const handleRadioChange = prop => {
-    if (typeof prop === 'string') {
-      setSelectedRadio(prop)
-    } else {
-      setSelectedRadio(prop.target.value)
-    }
+  const handleFileChange = (e) => {
+    setPaymentProof(e.target.files[0]);
+    const url = URL.createObjectURL(e.target.files[0]);
+    setImage(url);
   }
+
 
 
   return (
@@ -368,80 +317,68 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
         flexWrap: 'wrap',
         width: 'full'
       }} >
-        {Standard_data_Plan.map((item, index) => (
-          <CustomRadioIcons
-            key={index}
-            data={Standard_data_Plan[0]}
-            selected={selectedRadio}
-            name='custom-radios-plan'
-            gridProps={{ sm: 4, xs: 12 }}
-            handleChange={handleRadioChange}
-          />
-        ))}
 
-        {/* <Grid item xs={12} sx={{ pt: theme => `${theme.spacing(6)} !important` }}>
-          <Typography variant='h3' sx={{ mb: 1.5 }}>
-            Payment Information
-          </Typography>
-          <Typography sx={{ color: 'text.secondary' }}>Enter your card information</Typography>
-        </Grid>
-        <Grid item xs={12} sx={{ pt: theme => `${theme.spacing(6)} !important` }}>
-          <FormControl fullWidth>
-            <CustomTextField
-              fullWidth
-              name='cardNumber'
-              value={cardNumber}
-              autoComplete='off'
-              label='Card Number'
-              onChange={handleInputChange}
-              placeholder='0000 0000 0000 0000'
-            />
-          </FormControl>
-        </Grid>
-        <Grid item xs={12} sm={6}>
-          <CustomTextField
-            fullWidth
-            name='name'
-            value={name}
-            autoComplete='off'
-            label='Name on Card'
-            placeholder='John Doe'
-            onChange={e => setName(e.target.value)}
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <CustomTextField
-            fullWidth
-            name='expiry'
-            label='Expiry'
-            value={expiry}
-            placeholder='MM/YY'
-            onChange={handleInputChange}
-            inputProps={{ maxLength: '5' }}
-          />
-        </Grid>
-        <Grid item xs={6} sm={3}>
-          <CustomTextField
-            fullWidth
-            name='cvc'
-            label='CVC'
-            value={cvc}
-            placeholder='234'
-            autoComplete='off'
-            onChange={handleInputChange}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position='start' sx={{ '& svg': { cursor: 'pointer' } }}>
-                  <Tooltip title='Card Verification Value'>
-                    <Box sx={{ display: 'flex' }}>
-                      <Icon fontSize='1.25rem' icon='tabler:question-circle' />
-                    </Box>
-                  </Tooltip>
-                </InputAdornment>
-              )
+        <BoxWrapper
+          sx={{
+            marginTop: 5,
+            border: theme =>
+              `1px solid ${hexToRGBA(theme.palette.primary.main, 0.5)}`
+          }}
+        >
+          <CustomChip
+            rounded
+            size='small'
+            skin='light'
+            label='Popular'
+            color='primary'
+            sx={{
+              top: 24,
+              right: 24,
+              position: 'absolute',
+              '& .MuiChip-label': {
+                px: 1.75,
+                fontWeight: 500,
+                fontSize: '0.75rem'
+              }
             }}
           />
-        </Grid> */}
+
+          <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+            <img
+              width={140}
+              src={`/images/pages/pricing-plan-standard.png`}
+              height={140}
+              alt={`standrad-plan-img`}
+            />
+          </Box>
+          <Box sx={{ textAlign: 'center' }}>
+            <Typography sx={{ mb: 1.5, fontWeight: 500, lineHeight: 1.385, fontSize: '1.625rem' }}>
+              Standard
+            </Typography>
+            <Typography sx={{ color: 'text.secondary' }}>For small to medium businesses</Typography>
+            <Box sx={{ my: 7, position: 'relative' }}>
+              <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                <Typography sx={{ mt: 2.5, mr: 0.5, fontWeight: 500, color: 'primary.main', alignSelf: 'flex-start' }}>
+                  Rs
+                </Typography>
+                <Typography variant='h1' sx={{ color: 'primary.main', fontSize: '3rem', lineHeight: 1.4168 }}>
+                  10,000
+                </Typography>
+                <Typography sx={{ mb: 1.5, alignSelf: 'flex-end', color: 'text.disabled' }}>/month</Typography>
+              </Box>
+            </Box>
+          </Box>
+          <BoxFeature>{renderFeatures()}</BoxFeature>
+          <Box sx={{ mb: 4, display: 'flex', justifyContent: 'center' }}>
+            <Radio
+              name={`custom-radios-plan`}
+              size='small'
+              color={'primary'}
+              value={'standard'}
+              checked={true}
+            />
+          </Box>
+        </BoxWrapper>
 
         <Grid item xs={12} sx={{ pt: theme => `${theme.spacing(6)} !important` }}>
           <Typography variant='h3' sx={{ mb: 1.5 }}>
@@ -449,23 +386,6 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
           </Typography>
           <Typography sx={{ color: 'text.secondary' }}>Select a payment method and upload the payment proof</Typography>
         </Grid>
-        {/* <Grid item xs={12}>
-          <FormControl fullWidth>
-            <select
-              className="w-full p-2 border border-gray-300 rounded"
-              value={selectedPaymentMethod._id}
-              onChange={handlePaymentMethodChange}
-              required
-            >
-              <option value="" disabled>Select a payment method</option>
-              {paymentMethods.map((method) => (
-                <option key={method._id} value={method._id}>
-                  {method.payment_method}
-                </option>
-              ))}
-            </select>
-          </FormControl>
-        </Grid> */}
 
         <Grid item xs={12} style={{ width: 'full' }} >
           <CustomTextField
@@ -500,15 +420,17 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
           </Grid>
         )}
 
-        <Grid item xs={12}>
+        <Grid item xs={12} sx={{
+          marginTop: 5,
+        }}>
           <FormControl fullWidth>
-            <Typography variant='h4' sx={{ mb: 1 }}>
+            <Typography variant='h4' sx={{ mb: 4 }}>
               Upload Payment Proof
             </Typography>
             <input
               type="file"
               className="w-full p-2 border border-gray-300 rounded"
-              onChange={(e) => setPaymentProof(e.target.files[0])}
+              onChange={handleFileChange}
               required
             />
           </FormControl>
@@ -518,6 +440,14 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
           <Grid item xs={12}>
             <Box sx={{ mt: 4 }}>
               <Typography><strong>Selected File:</strong> {paymentProof.name}</Typography>
+            </Box>
+          </Grid>
+        )}
+
+        {paymentProof && (
+          <Grid item xs={12}>
+            <Box sx={{ mt: 4, width: '100%', height: 400 }}>
+              <img src={image} alt="payment-proof" style={{ width: '100%', height: 'auto' }} />
             </Box>
           </Grid>
         )}
@@ -532,7 +462,7 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
               {loading ? (
                 <CircularProgress size={24} thickness={6} color="inherit" />
               ) : (
-                <text>Submit</text>
+                "Submit"
               )}
             </Button>
           </Box>
@@ -556,4 +486,5 @@ const StepBillingDetails = ({ handlePrev, restaurantData, personaDetail }) => {
   )
 }
 
-export default StepBillingDetails
+
+export default StepBillingDetails;

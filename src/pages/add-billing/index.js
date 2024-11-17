@@ -70,7 +70,6 @@ const AddBilling = () => {
             });
 
             const result = await response.json();
-            console.log('result:', result);
             if (result) {
                 toast.success('Payment method added successfully');
                 setLoading(false);

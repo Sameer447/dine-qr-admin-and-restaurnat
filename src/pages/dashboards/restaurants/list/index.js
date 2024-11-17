@@ -281,7 +281,7 @@ const columns = [
     sortable: false,
     field: "actions",
     headerName: "Actions",
-    renderCell: ({ row }) => <RowOptions id={row.id} />,
+    renderCell: ({ row }) => <RowOptions id={row._id} />,
   },
 ];
 

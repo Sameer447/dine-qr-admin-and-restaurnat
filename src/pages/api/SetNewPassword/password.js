@@ -10,7 +10,6 @@ export default async (req, res) => {
 
   // Destructure request body
   const { type, token, newPassword } = req.body;
-  console.log("Received request with:", { type, token, newPassword });
 
   try {
     if (!token) {
@@ -33,7 +32,6 @@ export default async (req, res) => {
       }
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       user.password = hashedPassword;
-      user.isActivated = true;
       await user.save();
 
       return res.status(200).json({

@@ -354,13 +354,10 @@ const UserList = ({ apiData }) => {
   }, []);
 
   const handleStatusChange = useCallback((e) => {
-    console.log("store.orders", store.orders);
 
     const data = store.orders.filter(
       (item) => item.status === e.target.value.toLowerCase(),
     );
-    console.log("data => ", data);
-
     setStatus(e.target.value);
   }, []);
   const toggleAddUserDrawer = () => setAddUserOpen(!addUserOpen);

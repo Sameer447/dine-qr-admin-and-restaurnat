@@ -16,7 +16,7 @@ import toast from "react-hot-toast";
 import { ServiceUrl } from "src/@core/utils/global";
 import axios from "axios";
 import { CircularProgress } from "@mui/material";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const defaultValues = {
   mobile: "",
@@ -27,17 +27,19 @@ const defaultValues = {
   state: "",
 };
 
-const StepPersonalDetails = ({ handleNext, handlePrev, SetPersonalDetails }) => {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    resetField,
-  } = useForm({ defaultValues });
+const StepPersonalDetails = ({ handleNext, handlePrev, SetPersonalDetails, personaDetail }) => {
+  
+  const { control, handleSubmit, formState: { errors }, setValue } = useForm({ defaultValues: personaDetail });
 
-  const onSubmit = async (formData) => {
+  useEffect(() => {
+    Object.keys(personaDetail).forEach(key => {
+      setValue(key, personaDetail[key]);
+    });
+  }, [personaDetail, setValue]);
+
+  const onSubmit = (data) => {
+    SetPersonalDetails(data);
     handleNext();
-    SetPersonalDetails(formData);
   };
 
   return (

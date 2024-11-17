@@ -91,76 +91,74 @@ const Step = styled(MuiStep)(({ theme }) => ({
 const RegisterMultiSteps = () => {
   // ** States
   const [activeStep, setActiveStep] = useState(0);
-  const [restaurantData, setRestaurantData] = useState({ 
+  const [restaurantData, setRestaurantData] = useState({
     logo: "",
     tagline: "",
     restaurantName: "",
     registrationNumber: "",
     email: "",
-    retaurantOwner: "" 
-   });
-  
-   const [personaDetail , SetPersonalDetails] = useState({ 
+    retaurantOwner: ""
+  });
+
+  const [personaDetail, SetPersonalDetails] = useState({
     mobile: "",
     zipcode: "",
     address: "",
     landmark: "",
     city: "",
-    state: "" 
-   });
-   
+    state: ""
+  });
 
-  // ** Hooks & Var
-  const { settings } = useSettings()
-  const smallScreen = useMediaQuery(theme => theme.breakpoints.down('md'))
-  const { direction } = settings
-  // const [restaurantData, setRestaurantData] = useState({
-  //   name: '',
-  //   type: '',
-  //   // other fields...
-  // });
+  const { settings } = useSettings();
+  const smallScreen = useMediaQuery(theme => theme.breakpoints.down('md'));
+  const { direction } = settings;
 
-  // const validateStep = () => {
-  //   let tempErrors = {};
-  //   if (activeStep === 0) {
-  //     if (!restaurantData.name) tempErrors.name = 'Restaurant name is required';
-  //     if (!restaurantData.type) tempErrors.type = 'Restaurant type is required';
-  //     // Add other field validations here...
-  //   }
-  //   // You can add validations for other steps similarly
-  
-  //   setErrors(tempErrors);
-  //   return Object.keys(tempErrors).length === 0; // Returns true if no errors
-  // };
-  
-
-  // Handle Stepper
   const handleNext = () => {
-    setActiveStep(activeStep + 1)
-  }
+    setActiveStep(activeStep + 1);
+  };
 
   const handlePrev = () => {
     if (activeStep !== 0) {
-      setActiveStep(activeStep - 1)
+      setActiveStep(activeStep - 1);
     }
-  }
+  };
+
+  const resetSteps = () => {
+    setActiveStep(0);
+    setRestaurantData({
+      logo: "",
+      tagline: "",
+      restaurantName: "",
+      registrationNumber: "",
+      email: "",
+      retaurantOwner: ""
+    });
+    SetPersonalDetails({
+      mobile: "",
+      zipcode: "",
+      address: "",
+      landmark: "",
+      city: "",
+      state: ""
+    });
+  };
 
   const getStepContent = step => {
     switch (step) {
       case 0:
-        return <StepAccountDetails handleNext={handleNext} setRestaurantData={setRestaurantData} />
+        return <StepAccountDetails handleNext={handleNext} setRestaurantData={setRestaurantData} restaurantData={restaurantData} />;
       case 1:
-        return <StepPersonalInfo handleNext={handleNext} handlePrev={handlePrev} SetPersonalDetails={SetPersonalDetails} />
+        return <StepPersonalInfo handleNext={handleNext} handlePrev={handlePrev} SetPersonalDetails={SetPersonalDetails} personaDetail={personaDetail} />;
       case 2:
-        return <StepBillingDetails handlePrev={handlePrev}  restaurantData={restaurantData} personaDetail={personaDetail} />
+        return <StepBillingDetails handlePrev={handlePrev} restaurantData={restaurantData} personaDetail={personaDetail} resetSteps={resetSteps} />;
       default:
-        return null
+        return null;
     }
-  }
+  };
 
   const renderContent = () => {
-    return getStepContent(activeStep)
-  }
+    return getStepContent(activeStep);
+  };
 
   return (
     <>

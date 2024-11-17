@@ -35,6 +35,11 @@ import UserSubscriptionDialog from "src/views/apps/user/view/UserSubscriptionDia
 
 // ** Utils Import
 import { getInitials } from "src/@core/utils/get-initials";
+import { CircularProgress, IconButton } from "@mui/material";
+import { Controller } from "react-hook-form";
+import toast from "react-hot-toast";
+import { ServiceUrl, user } from "../../../../@core/utils/global";
+import axios from "axios";
 
 const data = {
   id: 1,
@@ -81,12 +86,17 @@ const Sub = styled("sub")(({ theme }) => ({
   fontSize: theme.typography.body1.fontSize,
 }));
 
-const UserViewLeft = ({ userData }) => {
+const UserViewLeft = ({ userData, billingData }) => {
   // ** States
   const [openEdit, setOpenEdit] = useState(false);
   const [openPlans, setOpenPlans] = useState(false);
   const [suspendDialogOpen, setSuspendDialogOpen] = useState(false);
   const [subscriptionDialogOpen, setSubscriptionDialogOpen] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const [reason, setReason] = useState("");
+  // const [status, setStatus] = useState(userData?.isActivated);
+
 
   // Handle Edit dialog
   const handleEditClickOpen = () => setOpenEdit(true);
@@ -95,6 +105,56 @@ const UserViewLeft = ({ userData }) => {
   // Handle Upgrade Plan dialog
   const handlePlansClickOpen = () => setOpenPlans(true);
   const handlePlansClose = () => setOpenPlans(false);
+
+  // const handleStatusChange = (event) => {
+  //   setStatus(event.target.value === 'active');
+  // };
+
+  const [updateLoading, setUpdateLoading] = useState(false);
+
+
+  // Handle Activate/Deactivate User
+  const handleToggleActivation = async () => {
+    if (userData.isActivated) {
+      if (!reason) {
+        toast.error('Please provide a reason to deactivate user');
+        return;
+      }
+    } else {
+      if (!password) {
+        toast.error('Please provide password to activate user');
+        return;
+      }
+    }
+
+    try {
+      setUpdateLoading(true);
+      const response = await axios.patch(`${ServiceUrl}/update-user-status`,
+        {
+          userId: userData._id,
+          isActivated: userData.isActivated ? false : true,
+          reason: reason,
+          password: password
+        }
+      );
+      if (response.data.error) {
+        toast.error(response.data.error);
+        setUpdateLoading(false);
+        return;
+      } else {
+        setUpdateLoading(false);
+        setOpenEdit(false);
+        toast.success(`User ${userData.isActivated ? 'deactivated' : 'activated'} successfully`);
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000);
+      }
+    } catch (error) {
+      toast.error('Failed to update user status');
+    }
+  };
+
+
   if (userData) {
     const { restaurantDetails, addressDetails } = userData;
     return (
@@ -122,10 +182,9 @@ const UserViewLeft = ({ userData }) => {
                 <CustomAvatar
                   skin="light"
                   variant="rounded"
-                  color={data.avatarColor}
                   sx={{ width: 100, height: 100, mb: 4, fontSize: "3rem" }}
                 >
-                  {getInitials(restaurantDetails.restaurantName)}
+                  {restaurantDetails.restaurantName.charAt(0)}
                 </CustomAvatar>
               )}
               <Typography variant="h4" sx={{ mb: 3 }}>
@@ -136,56 +195,8 @@ const UserViewLeft = ({ userData }) => {
                 skin="light"
                 size="small"
                 label={userData.role}
-                color={roleColors[userData.role]}
                 sx={{ textTransform: "capitalize" }}
               />
-            </CardContent>
-
-            <CardContent
-              sx={{ pt: (theme) => `${theme.spacing(2)} !important` }}
-            >
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                }}
-              >
-                <Box sx={{ mr: 8, display: "flex", alignItems: "center" }}>
-                  <CustomAvatar
-                    skin="light"
-                    variant="rounded"
-                    sx={{ mr: 2.5, width: 38, height: 38 }}
-                  >
-                    <Icon fontSize="1.75rem" icon="tabler:checkbox" />
-                  </CustomAvatar>
-                  <div>
-                    <Typography
-                      sx={{ fontWeight: 500, color: "text.secondary" }}
-                    >
-                      1.23k
-                    </Typography>
-                    <Typography variant="body2">Orders Done</Typography>
-                  </div>
-                </Box>
-                <Box sx={{ display: "flex", alignItems: "center" }}>
-                  <CustomAvatar
-                    skin="light"
-                    variant="rounded"
-                    sx={{ mr: 2.5, width: 38, height: 38 }}
-                  >
-                    <Icon fontSize="1.75rem" icon="tabler:briefcase" />
-                  </CustomAvatar>
-                  <div>
-                    <Typography
-                      sx={{ fontWeight: 500, color: "text.secondary" }}
-                    >
-                      568
-                    </Typography>
-                    <Typography variant="body2">Food Items</Typography>
-                  </div>
-                </Box>
-              </Box>
             </CardContent>
 
             <Divider sx={{ my: "0 !important", mx: 6 }} />
@@ -197,17 +208,39 @@ const UserViewLeft = ({ userData }) => {
               >
                 Details
               </Typography>
+
               <Box sx={{ pt: 4 }}>
                 <Box sx={{ display: "flex", mb: 3 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
                   >
-                    Restaurant Owner
+                    Restaurant Owner:
                   </Typography>
                   <Typography sx={{ color: "text.secondary" }}>
                     {restaurantDetails.restaurantOwner}
                   </Typography>
                 </Box>
+                <Box sx={{ display: "flex", mb: 3 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
+                  >
+                    Restaurant Tagline:
+                  </Typography>
+                  <Typography sx={{ color: "text.secondary" }}>
+                    {restaurantDetails.tagline}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 3 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
+                  >
+                    Restaurant CNIC:
+                  </Typography>
+                  <Typography sx={{ color: "text.secondary" }}>
+                    {restaurantDetails.cnicNumber}
+                  </Typography>
+                </Box>
+
                 <Box sx={{ display: "flex", mb: 3 }}>
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
@@ -229,9 +262,6 @@ const UserViewLeft = ({ userData }) => {
                     skin="light"
                     size="small"
                     label={userData.isActivated ? "active" : "inactive"}
-                    color={
-                      statusColors[userData.isActivated ? "active" : "inactive"]
-                    }
                     sx={{
                       textTransform: "capitalize",
                     }}
@@ -256,16 +286,6 @@ const UserViewLeft = ({ userData }) => {
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
                   >
-                    Tax ID:
-                  </Typography>
-                  <Typography sx={{ color: "text.secondary" }}>
-                    Tax-8894
-                  </Typography>
-                </Box>
-                <Box sx={{ display: "flex", mb: 3 }}>
-                  <Typography
-                    sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
-                  >
                     Contact:
                   </Typography>
                   <Typography sx={{ color: "text.secondary" }}>
@@ -276,10 +296,30 @@ const UserViewLeft = ({ userData }) => {
                   <Typography
                     sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
                   >
-                    Language:
+                    ZipCode:
                   </Typography>
                   <Typography sx={{ color: "text.secondary" }}>
-                    English
+                    {addressDetails.zipcode}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 3 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
+                  >
+                    Landmark:
+                  </Typography>
+                  <Typography sx={{ color: "text.secondary" }}>
+                    {addressDetails.landmark}
+                  </Typography>
+                </Box>
+                <Box sx={{ display: "flex", mb: 3 }}>
+                  <Typography
+                    sx={{ mr: 2, fontWeight: 500, color: "text.secondary" }}
+                  >
+                    Address:
+                  </Typography>
+                  <Typography sx={{ color: "text.secondary" }}>
+                    {addressDetails.address}
                   </Typography>
                 </Box>
                 <Box sx={{ display: "flex" }}>
@@ -295,22 +335,32 @@ const UserViewLeft = ({ userData }) => {
               </Box>
             </CardContent>
 
-            <CardActions sx={{ display: "flex", justifyContent: "center" }}>
-              {/* <Button
-                variant="contained"
-                sx={{ mr: 2 }}
-                onClick={handleEditClickOpen}
-              >
-                Edit
-              </Button> */}
-              <Button
-                color="error"
-                variant="tonal"
-                onClick={() => setSuspendDialogOpen(true)}
-              >
-                Suspend
-              </Button>
-            </CardActions>
+            <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
+              {!userData.isActivated ? (
+                <CardActions sx={{ display: "flex", justifyContent: "center" }}>
+                  <Button
+                    color={userData.isActivated ? "error" : "success"}
+                    variant="tonal"
+                    onClick={handleEditClickOpen}
+                  >
+                    {/* {userData.isActivated ? "Deactivate User" : "Activate User"} */}
+                    Activate User
+                  </Button>
+                </CardActions>
+              ) : (
+                <CardActions
+                  sx={{ display: "flex", justifyContent: "center" }}>
+                  <Button
+                    color={userData.isActivated ? "error" : "success"}
+                    variant="tonal"
+                    onClick={handleEditClickOpen}
+                  >
+                    {/* {userData.isActivated ? "Deactivate User" : "Activate User"} */}
+                    Deactivate User
+                  </Button>
+                </CardActions>
+              )}
+            </Box>
 
             <Dialog
               open={openEdit}
@@ -354,101 +404,55 @@ const UserViewLeft = ({ userData }) => {
                 </DialogContentText>
                 <form>
                   <Grid container spacing={6}>
-                    <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        fullWidth
-                        label="Full Name"
-                        placeholder="John Doe"
-                        defaultValue={data.fullName}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        fullWidth
-                        label="Username"
-                        placeholder="John.Doe"
-                        defaultValue={data.username}
-                        InputProps={{
-                          startAdornment: (
-                            <InputAdornment position="start">@</InputAdornment>
-                          ),
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        fullWidth
-                        type="email"
-                        label="Billing Email"
-                        defaultValue={data.email}
-                        placeholder="john.doe@gmail.com"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        select
-                        fullWidth
-                        label="Status"
-                        defaultValue={data.status}
-                      >
-                        <MenuItem value="pending">Pending</MenuItem>
-                        <MenuItem value="active">Active</MenuItem>
-                        <MenuItem value="inactive">Inactive</MenuItem>
-                      </CustomTextField>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        fullWidth
-                        label="TAX ID"
-                        defaultValue="Tax-8894"
-                        placeholder="Tax-8894"
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        fullWidth
-                        label="Contact"
-                        placeholder="723-348-2344"
-                        defaultValue={`+1 ${data.contact}`}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        select
-                        fullWidth
-                        label="Language"
-                        defaultValue="English"
-                      >
-                        <MenuItem value="English">English</MenuItem>
-                        <MenuItem value="Spanish">Spanish</MenuItem>
-                        <MenuItem value="Portuguese">Portuguese</MenuItem>
-                        <MenuItem value="Russian">Russian</MenuItem>
-                        <MenuItem value="French">French</MenuItem>
-                        <MenuItem value="German">German</MenuItem>
-                      </CustomTextField>
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <CustomTextField
-                        select
-                        fullWidth
-                        label="Country"
-                        defaultValue="USA"
-                      >
-                        <MenuItem value="USA">USA</MenuItem>
-                        <MenuItem value="UK">UK</MenuItem>
-                        <MenuItem value="Spain">Spain</MenuItem>
-                        <MenuItem value="Russia">Russia</MenuItem>
-                        <MenuItem value="France">France</MenuItem>
-                        <MenuItem value="Germany">Germany</MenuItem>
-                      </CustomTextField>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControlLabel
-                        label="Use as a billing address?"
-                        control={<Switch defaultChecked />}
-                        sx={{ "& .MuiTypography-root": { fontWeight: 500 } }}
-                      />
-                    </Grid>
+                    {userData.isActivated && (
+                      <Grid item sx={{ width: '100%' }}>
+                        <Grid item sx={{ width: '100%' }}  >
+                          <CustomTextField
+                            rows={4}
+                            fullWidth
+                            multiline
+                            onChange={(e) => setReason(e.target.value)}
+                            label="Reason"
+                            aria-describedby="validation-basic-textarea"
+                            placeholder="Write your reason here"
+                            style={{ width: '100%' }}
+                          />
+                        </Grid>
+                      </Grid>
+                    )}
+
+                    {!userData.isActivated && (
+                      <Grid item sx={{ width: '100%' }}>
+                        <CustomTextField
+                          fullWidth
+                          value={password}
+                          label="Password"
+                          onChange={(e) => setPassword(e.target.value)}
+                          id="auth-login-v2-password"
+                          placeholder="Enter Password"
+                          type={showPassword ? "text" : "password"}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  edge="end"
+                                  onMouseDown={(e) => e.preventDefault()}
+                                  onClick={() => setShowPassword(!showPassword)}
+                                >
+                                  <Icon
+                                    fontSize="1.25rem"
+                                    icon={
+                                      showPassword ? "tabler:eye" : "tabler:eye-off"
+                                    }
+                                  />
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      </Grid>
+                    )}
+
                   </Grid>
                 </form>
               </DialogContent>
@@ -468,9 +472,9 @@ const UserViewLeft = ({ userData }) => {
                 <Button
                   variant="contained"
                   sx={{ mr: 2 }}
-                  onClick={handleEditClose}
+                  onClick={handleToggleActivation}
                 >
-                  Submit
+                  {updateLoading ? <CircularProgress size={24} thickness={6} color="inherit" /> : "Update"}
                 </Button>
                 <Button
                   variant="tonal"
@@ -486,12 +490,9 @@ const UserViewLeft = ({ userData }) => {
               open={suspendDialogOpen}
               setOpen={setSuspendDialogOpen}
             />
-            <UserSubscriptionDialog
-              open={subscriptionDialogOpen}
-              setOpen={setSubscriptionDialogOpen}
-            />
           </Card>
         </Grid>
+        {/* </Grid> */}
 
         <Grid item xs={12}>
           <Card>
@@ -508,23 +509,8 @@ const UserViewLeft = ({ userData }) => {
                 skin="light"
                 size="small"
                 color="primary"
-                label="Popular"
+                label="Billing Details"
               />
-              <Box sx={{ display: "flex", position: "relative" }}>
-                <Sup>$</Sup>
-                <Typography
-                  variant="h4"
-                  sx={{
-                    mt: -1,
-                    mb: -1.2,
-                    color: "primary.main",
-                    fontSize: "2.375rem !important",
-                  }}
-                >
-                  99
-                </Typography>
-                <Sub>/ month</Sub>
-              </Box>
             </CardContent>
 
             <CardContent>
@@ -539,7 +525,7 @@ const UserViewLeft = ({ userData }) => {
                 >
                   <Icon icon="tabler:point" fontSize="1.125rem" />
                   <Typography sx={{ color: "text.secondary" }}>
-                    10 Users
+                    Plan: {billingData?.plan}
                   </Typography>
                 </Box>
                 <Box
@@ -552,7 +538,33 @@ const UserViewLeft = ({ userData }) => {
                 >
                   <Icon icon="tabler:point" fontSize="1.125rem" />
                   <Typography sx={{ color: "text.secondary" }}>
-                    Up to 10GB storage
+                    Plan Amount: {billingData?.planAmount} RS
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    "& svg": { mr: 2, color: "text.secondary" },
+                  }}
+                >
+                  <Icon icon="tabler:point" fontSize="1.125rem" />
+                  <Typography sx={{ color: "text.secondary" }}>
+                    Cardholder Name: {billingData?.cardholder_name}
+                  </Typography>
+                </Box>
+                <Box
+                  sx={{
+                    mb: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    "& svg": { mr: 2, color: "text.secondary" },
+                  }}
+                >
+                  <Icon icon="tabler:point" fontSize="1.125rem" />
+                  <Typography sx={{ color: "text.secondary" }}>
+                    Card Number: {billingData?.card_number}
                   </Typography>
                 </Box>
                 <Box
@@ -564,35 +576,26 @@ const UserViewLeft = ({ userData }) => {
                 >
                   <Icon icon="tabler:point" fontSize="1.125rem" />
                   <Typography sx={{ color: "text.secondary" }}>
-                    Basic Support
+                    Payment Proof:
                   </Typography>
                 </Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    mt: 2,
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <img
+                    src={`/api/get-user-image?imageName=${billingData?.paymentProof}`}
+                    alt="Payment Proof"
+                    style={{ maxWidth: "100%", borderRadius: "8px" }}
+                  />
+                </Box>
               </Box>
-              <Box
-                sx={{
-                  display: "flex",
-                  mb: 1.5,
-                  justifyContent: "space-between",
-                }}
-              >
-                <Typography sx={{ fontWeight: 500 }}>Days</Typography>
-                <Typography sx={{ fontWeight: 500 }}>75% Completed</Typography>
-              </Box>
-              <LinearProgress
-                value={75}
-                variant="determinate"
-                sx={{ height: 10 }}
-              />
-              <Typography sx={{ mt: 1.5, mb: 6, color: "text.secondary" }}>
-                4 days remaining
-              </Typography>
-              {/* <Button
-                fullWidth
-                variant="contained"
-                onClick={handlePlansClickOpen}
-              >
-                Upgrade Plan
-              </Button> */}
             </CardContent>
 
             <Dialog
