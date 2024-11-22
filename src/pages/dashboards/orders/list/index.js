@@ -187,8 +187,6 @@ const columns = [
           >
             <Typography
               noWrap
-              component={Link}
-              href="/dashboards/orders/view/account"
               sx={{
                 fontWeight: 500,
                 textDecoration: "none",

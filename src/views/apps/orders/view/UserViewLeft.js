@@ -232,7 +232,7 @@ const UserViewLeft = ({ orderData }) => {
                             {item.selectedAddOns.map((addOn) => (
                               <Box key={addOn._id.$oid} marginTop={1}>
                                 <Typography variant="body2">
-                                  {addOn.name} - ${addOn.price} x {addOn.quantity}
+                                  {addOn.name} - {addOn.price} x {addOn.quantity}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary">
                                   Message: {addOn.message}
@@ -248,23 +248,27 @@ const UserViewLeft = ({ orderData }) => {
               </Box>
 
               <CardActions sx={{ display: "flex", justifyContent: "center" }}>
-                <Button disabled={orderData?.status == "cancelled" ? true : false} variant={`${orderData?.status == "cancelled" ? "outlined" : "contained"}`} sx={{ mr: 2 }} onClick={() => { handleChangeStatus(''); }}>
-                  {loading ? (
-                    <Box display='flex' alignItems='center'>
-                      <Box component='span' mr={1}>
-                        Loading...
-                      </Box>
-                      <Box component={CircularProgress} color={'white'} size={16} />
-                    </Box>
-                  ) : (
-                    <>
-                      {orderData.status === 'Pending' ? 'Start Preparing' : orderData.status === 'preparing' ? 'Ready' : 'Delivered'}
-                    </>
-                  )}
-                </Button>
-                <Button color="error" variant="tonal" onClick={() => setSuspendDialogOpen(true)}>
-                  Cancel Order
-                </Button>
+                {orderData.status !== "delivered" && (
+                  <>
+                    <Button disabled={orderData?.status == "cancelled" ? true : false} variant={`${orderData?.status == "cancelled" ? "outlined" : "contained"}`} sx={{ mr: 2 }} onClick={() => { handleChangeStatus(''); }}>
+                      {loading ? (
+                        <Box display='flex' alignItems='center'>
+                          <Box component='span' mr={1}>
+                            Loading...
+                          </Box>
+                          <Box component={CircularProgress} color={'white'} size={16} />
+                        </Box>
+                      ) : (
+                        <>
+                          {orderData.status === 'Pending' ? 'Start Preparing' : orderData.status === 'preparing' ? 'Ready' : 'Delivered'}
+                        </>
+                      )}
+                    </Button>
+                    <Button color="error" variant="tonal" onClick={() => setSuspendDialogOpen(true)}>
+                      Cancel Order
+                    </Button>
+                  </>
+                )}
               </CardActions>
 
               {/* Dialogs for Edit and Suspend */}
