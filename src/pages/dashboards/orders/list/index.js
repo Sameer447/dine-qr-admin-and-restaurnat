@@ -62,7 +62,7 @@ const userStatusObj = {
 
 // ** Renders client column for multiple images
 const renderClient = (row) => {
-  if (row.images && row.images.length) {
+  if (row.images && row?.images?.length) {
     return (
       <Box sx={{ display: "flex", gap: 1 }}>
         {row.images.map((image, index) => (
@@ -176,7 +176,7 @@ const columns = [
       const { user_name, user_email, cart_items } = row;
       return (
         <Box sx={{ display: "flex", alignItems: "center" }}>
-          {cart_items && cart_items.length > 0 && renderClient(cart_items[0])}
+          {cart_items && cart_items?.length > 0 && renderClient(cart_items[0])}
 
           <Box
             sx={{
@@ -255,17 +255,18 @@ const columns = [
             textTransform: "capitalize",
           }}
         >
-          {row?.cart_items && row?.cart_items.length > 0 ? (
+          {row?.cart_items && row?.cart_items?.length > 0 ? (
             <>
               <div>
-                <span>{row?.cart_items.length} Items </span>
+                <span>{row?.cart_items?.length} Items </span>
               </div>
               {/* display cart food names */}
               <div>
                 {row?.cart_items.map((item, index) => (
                   <span key={item._id}>
-                    {`${item.food_name} ${index < row?.cart_items.length - 1 ? ", " : ""
-                      }`}
+                    {`${item.food_name} ${
+                      index < row?.cart_items?.length - 1 ? ", " : ""
+                    }`}
                   </span>
                 ))}
               </div>
@@ -330,7 +331,7 @@ const UserList = ({ apiData }) => {
     page: 0,
     pageSize: 10,
   });
-  const [allOrdersItems, setAllOrdersItems] = useState([]); 
+  const [allOrdersItems, setAllOrdersItems] = useState([]);
   const [paginatedItems, setPaginatedItems] = useState([]);
 
   // ** Hooks
@@ -342,8 +343,8 @@ const UserList = ({ apiData }) => {
   }, []);
 
   useEffect(() => {
-     setAllOrdersItems(store.orders)
-  }, [store.orders.length])
+    setAllOrdersItems(store.orders);
+  }, [store?.orders?.length]);
 
   useEffect(() => {
     const start = paginationModel.page * paginationModel.pageSize;
@@ -352,7 +353,7 @@ const UserList = ({ apiData }) => {
   }, [allOrdersItems, paginationModel]);
 
   const handlePaginationChange = (model) => {
-    setPaginationModel(model); 
+    setPaginationModel(model);
   };
 
   const handleFilter = useCallback((val) => {
@@ -368,7 +369,6 @@ const UserList = ({ apiData }) => {
   }, []);
 
   const handleStatusChange = useCallback((e) => {
-
     const data = store.orders.filter(
       (item) => item.status === e.target.value.toLowerCase(),
     );
@@ -458,7 +458,11 @@ const UserList = ({ apiData }) => {
           <DataGrid
             autoHeight
             rowHeight={62}
-            rows={status ? paginatedItems.filter((item) => item.status === status) : paginatedItems}
+            rows={
+              status
+                ? paginatedItems.filter((item) => item.status === status)
+                : paginatedItems
+            }
             columns={columns}
             disableRowSelectionOnClick
             pageSizeOptions={[10, 25, 50]}
@@ -466,7 +470,7 @@ const UserList = ({ apiData }) => {
             // onPaginationModelChange={setPaginationModel}
             onPaginationModelChange={handlePaginationChange}
             paginationMode="server"
-            rowCount={paginatedItems.length}
+            rowCount={paginatedItems?.length}
             getRowId={(row) => row._id}
           />
         </Card>

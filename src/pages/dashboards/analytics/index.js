@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** MUI Import
 import Grid from "@mui/material/Grid";
 
@@ -17,7 +18,17 @@ import KeenSliderWrapper from "src/@core/styles/libs/keen-slider";
 import ApexChartWrapper from "src/@core/styles/libs/react-apexcharts";
 import CardStatsWithAreaChart from "src/@core/components/card-statistics/card-stats-with-area-chart";
 
+// store
+import { fetchOrdersData, deleteOrder } from "src/store/apps/orders";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
+
 const AnalyticsDashboard = () => {
+  const dispatch = useDispatch();
+  const { orders, foodItems } = useSelector((state) => state?.orders);
+  useEffect(() => {
+    dispatch(fetchOrdersData());
+  }, []);
   return (
     <ApexChartWrapper>
       <KeenSliderWrapper>
@@ -27,20 +38,20 @@ const AnalyticsDashboard = () => {
           </Grid> */}
 
           <Grid item xs={12} md={6}>
-            <AnalyticsEarningReports />
+            <AnalyticsEarningReports orders={orders} foodItems={foodItems} />
           </Grid>
           <Grid item xs={12} md={6}>
-            <AnalyticsSupportTracker />
+            <AnalyticsSupportTracker orders={orders} foodItems={foodItems} />
           </Grid>
           {/* <Grid item xs={12} md={6} lg={4}>
              <AnalyticsSalesByCountries />
            </Grid> */}
-          <Grid item xs={12} md={6} lg={4}>
+          {/* <Grid item xs={12} md={6} lg={4}>
             <AnalyticsTotalEarning />
           </Grid>
           <Grid item xs={12} sm={6} lg={6}>
             <AnalyticsOrderVisits />
-          </Grid>
+          </Grid> */}
           {/* <Grid item xs={12} md={6} lg={4}>
             <AnalyticsMonthlyCampaignState />
           </Grid>

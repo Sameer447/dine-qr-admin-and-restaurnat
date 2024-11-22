@@ -1,3 +1,4 @@
+// @ts-nocheck
 // ** MUI Imports
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -12,34 +13,37 @@ import Icon from "src/@core/components/icon";
 import OptionsMenu from "src/@core/components/option-menu";
 import CustomAvatar from "src/@core/components/mui/avatar";
 import ReactApexcharts from "src/@core/components/react-apexcharts";
+import moment from "moment/moment";
 
 // ** Util Import
 import { hexToRGBA } from "src/@core/utils/hex-to-rgba";
 
-const data = [
-  {
-    subtitle: "142",
-    title: "New Orders",
-    avatarIcon: "tabler:ticket",
-  },
-  {
-    subtitle: "28",
-    avatarColor: "info",
-    title: "Open Orders",
-    avatarIcon: "tabler:circle-check",
-  },
-  {
-    subtitle: "15 minutes",
-    title: "Response Time",
-    avatarColor: "warning",
-    avatarIcon: "tabler:clock",
-  },
-];
-
-const AnalyticsSupportTracker = () => {
+const AnalyticsSupportTracker = ({ orders }) => {
   // ** Hook
+  // today total orders
+  const todayOrders = orders;
   const theme = useTheme();
-
+  const data = [
+    {
+      subtitle: todayOrders.filter((order) => order.status === "Pending")
+        .length,
+      title: "New Orders",
+      avatarIcon: "tabler:ticket",
+    },
+    {
+      subtitle: todayOrders.filter((order) => order.status === "preparing")
+        .length,
+      avatarColor: "info",
+      title: "Open Orders",
+      avatarIcon: "tabler:circle-check",
+    },
+    {
+      subtitle: "15 minutes",
+      title: "Response Time",
+      avatarColor: "warning",
+      avatarIcon: "tabler:clock",
+    },
+  ];
   const options = {
     chart: {
       sparkline: { enabled: true },
@@ -125,18 +129,18 @@ const AnalyticsSupportTracker = () => {
     <Card>
       <CardHeader
         title="Support Tracker"
-        subheader="Last 2 hours"
-        action={
-          <OptionsMenu
-            options={["Refresh", "Edit", "Share"]}
-            iconButtonProps={{ size: "small", sx: { color: "text.disabled" } }}
-          />
-        }
+        // subheader="Last 2 hours"
+        // action={
+        //   <OptionsMenu
+        //     options={["Refresh", "Edit", "Share"]}
+        //     iconButtonProps={{ size: "small", sx: { color: "text.disabled" } }}
+        //   />
+        // }
       />
       <CardContent>
         <Grid container spacing={6}>
           <Grid item xs={12} sm={5}>
-            <Typography variant="h1">164</Typography>
+            <Typography variant="h1">{todayOrders.length}</Typography>
             <Typography sx={{ mb: 6, color: "text.secondary" }}>
               Total Orders
             </Typography>
@@ -186,7 +190,12 @@ const AnalyticsSupportTracker = () => {
               type="radialBar"
               height={325}
               options={options}
-              series={[85]}
+              series={[
+                (todayOrders.filter((order) => order.status === "delivered")
+                  .length /
+                  todayOrders.length) *
+                  100,
+              ]}
             />
           </Grid>
         </Grid>
