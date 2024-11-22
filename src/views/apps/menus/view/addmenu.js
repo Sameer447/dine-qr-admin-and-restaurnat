@@ -150,7 +150,6 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
   }, []);
 
   const onSubmit = async (data) => {
-   
     try {
       setLoading(true);
       const formData = new FormData();
@@ -233,7 +232,6 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
     dispatch({ type: "addOns", payload: updatedAddOns });
     setValue("addOns", updatedAddOns);
   };
-
 
   return (
     <DatePickerWrapper>
@@ -598,7 +596,12 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
                   <Grid item xs={12}>
                     <FormLabel>Add Ons</FormLabel>
                     {state.addOns.map((addOn, index) => (
-                      <Grid container spacing={2} key={index} sx={{ marginTop: 1 }}>
+                      <Grid
+                        container
+                        spacing={2}
+                        key={index}
+                        sx={{ marginTop: 1 }}
+                      >
                         <Grid item xs={5}>
                           <CustomTextField
                             fullWidth
@@ -614,8 +617,13 @@ const AddMenuItemForm = ({ restaurantData, menuData }) => {
                             fullWidth
                             label="Add On Price"
                             value={addOn.price}
-                            onChange={(e) =>
-                              handleAddOnChange(index, "price", e.target.value) // Keep as string
+                            onChange={
+                              (e) =>
+                                handleAddOnChange(
+                                  index,
+                                  "price",
+                                  e.target.value,
+                                ) // Keep as string
                             }
                             type="number" // Ensure this is a number input
                           />

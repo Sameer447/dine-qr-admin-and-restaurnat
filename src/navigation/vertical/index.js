@@ -1,4 +1,3 @@
-
 const navigation = (role) => {
   return [
     {
@@ -7,14 +6,18 @@ const navigation = (role) => {
       children: [
         !role
           ? {
-            title: "Orders",
-            path: "/dashboards/orders/list",
-          }
+              title: "Orders",
+              path: "/dashboards/orders/list",
+            }
           : {
-            title: "Restaurants",
-            icon: "tabler:home",
-            path: "/dashboards/restaurants/list",
-          },
+              title: "Restaurants",
+              icon: "tabler:home",
+              path: "/dashboards/restaurants/list",
+            },
+        !role && {
+          title: "Analytics",
+          path: "/dashboards/analytics",
+        },
       ].filter(Boolean),
     },
     // !role && {
