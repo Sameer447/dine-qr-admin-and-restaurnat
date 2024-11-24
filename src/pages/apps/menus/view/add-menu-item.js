@@ -3,7 +3,8 @@
 "use client";
 import { useRouter } from "next/router";
 import React, { useEffect } from "react";
-import AddMenuItemForm from "src/views/apps/menus/view/AddMenu";
+import AddMenuItemForm from "../../../../views/apps/menus/view/addmenu";
+
 
 const AddMenu = () => {
   const [restaurantData, setRestaurantData] = React.useState(null);
